@@ -29,8 +29,6 @@ function WebPlayback({client_id, onTokenRefreshed}) {
       const refreshToken = localStorage.getItem('refresh_token')
       const url = "https://accounts.spotify.com/api/token";
       let accessToken = ''
-      console.log('refreshing');
-      console.log('refreshing');
       await axios.post(url, {
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
@@ -44,11 +42,9 @@ function WebPlayback({client_id, onTokenRefreshed}) {
         localStorage.setItem('access_token', accessToken)
         localStorage.setItem('refresh_token', res.data.refresh_token)
         onTokenRefreshed(accessToken)
-        console.log("done refresh token")
       }).catch(err => {
         console.log("error refresh :", err)
       })
-      console.log("last access token", accessToken)
       return accessToken
     }
 
