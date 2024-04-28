@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import WebPlayback from './WebPlayback';
 import Login from './Login';
 import './App.css';
@@ -8,7 +8,7 @@ const spotify_client_id = '4570d2b0ba074a3da9a6ff13fd3643fa';
 const spotify_redirect_uri = 'http://localhost:3000';
 
 function App() {
-  const token = localStorage.getItem('token')
+	const [token, setToken] = useState('')
 	useEffect(() => {
 		async function requestToken() {
 			const codeVerifier = localStorage.getItem('code_verifier');
@@ -16,9 +16,7 @@ function App() {
 				'code'
 			);
 
-      console.log("auth",authCode)
-
-      if (authCode === null) return
+			if (authCode === null) return
 
 			axios.post(
 				'https://accounts.spotify.com/api/token',
@@ -35,19 +33,16 @@ function App() {
 					},
 				}
 			).then((res) => {
-        localStorage.setItem('token', res.data.access_token)
-        console.log(res)
-      }).catch(err => {
-        console.log(err)
-        console.log("verifier", codeVerifier)
-      })
+				localStorage.setItem('access_token', res.data.access_token)
+				localStorage.setItem('refresh_token', res.data.refresh_token)
+				setToken(res.data.access_token)
+			}).catch(err => {
+				console.log(err)
+			})
 		}
-
-		if (token == '' || token == null) {
-      console.log('request Token')
+		if (!token) {
 			requestToken();
 		}
-    console.log(token)
 	}, []);
 
 	return (
@@ -58,7 +53,7 @@ function App() {
 					redirectUri={spotify_redirect_uri}
 				/>
 			) : (
-				<WebPlayback token={token} />
+				<WebPlayback client_id={spotify_client_id} onTokenRefreshed={(token) => setToken(token)}/>
 			)}
 		</>
 	);
