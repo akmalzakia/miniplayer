@@ -1,5 +1,4 @@
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const track = {
   name: "",
@@ -13,7 +12,7 @@ const track = {
   ]
 }
 
-function WebPlayback({client_id, onTokenRefreshed}) {
+function WebPlayback() {
   const [currentPlayer, setPlayer] = useState(null)
 
   const [is_paused, setPaused] = useState(false)
@@ -25,42 +24,20 @@ function WebPlayback({client_id, onTokenRefreshed}) {
     script.src = "https://sdk.scdn.co/spotify-player.js"
     script.async = true;
 
-    const  fetchRefreshToken = async () => {
-      const refreshToken = localStorage.getItem('refresh_token')
-      const url = "https://accounts.spotify.com/api/token";
-      let accessToken = ''
-      await axios.post(url, {
-        grant_type: 'refresh_token',
-        refresh_token: refreshToken,
-        client_id
-      }, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        }
-      }).then(res => {
-        accessToken = res.data.access_token
-        localStorage.setItem('access_token', accessToken)
-        localStorage.setItem('refresh_token', res.data.refresh_token)
-        onTokenRefreshed(accessToken)
-      }).catch(err => {
-        console.log("error refresh :", err)
-      })
-      return accessToken
-    }
-
     document.body.appendChild(script)
 
     function onSDKReady() {
+      console.log("currentPlayer", currentPlayer)
       if (currentPlayer) return
-
+      console.log("trying to create new player")
       const player = new window.Spotify.Player({
         name: 'Web Playback SDK',
         getOAuthToken: cb => { 
-          cb(fetchRefreshToken());
+          cb(localStorage.getItem('access_token'));
          },
         volume: 0.5
       });
-
+      
       setPlayer(player)
 
       function onDeviceOnline(device_id) {
@@ -88,6 +65,23 @@ function WebPlayback({client_id, onTokenRefreshed}) {
       player.addListener('ready', onDeviceOnline)
       player.addListener('not_ready', onDeviceOffline)
       player.addListener('player_state_changed', onStateChange);
+
+      player.on('initialization_error', ({ message }) => {
+        console.error('Failed to initialize', message);
+      });
+
+      player.on('authentication_error', ({ message }) => {
+        console.error('Failed to authenticate', message);
+      });
+
+      player.on('playback_error', ({ message }) => {
+        console.error('Failed to perform playback', message);
+      });
+
+      player.on('account_error', ({ message }) => {
+        console.error('Failed to validate Spotify account', message);
+      });
+    
       player.connect()
     }
 
@@ -95,7 +89,7 @@ function WebPlayback({client_id, onTokenRefreshed}) {
     return () => {
       window.onSpotifyWebPlaybackSDKReady = null
     }
-  }, [])
+  }, [currentPlayer])
 
   if (!is_active) {
     return (
@@ -141,5 +135,7 @@ function WebPlayback({client_id, onTokenRefreshed}) {
 
 
 }
+
+
 
 export default WebPlayback

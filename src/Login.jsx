@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useContext } from 'react';
 import { base64encode, generateRandomString, sha256 } from './utils/util';
+import { ClientContext } from './context/clientContext';
 
-
-function Login({ clientId, redirectUri }) {
-
+function Login() {
+    const { id, redirectUri} = useContext(ClientContext)
     async function handleLogin() {
         const scope = 'streaming user-read-email user-read-private'
         const authUrl = new URL("https://accounts.spotify.com/authorize")
@@ -17,7 +16,7 @@ function Login({ clientId, redirectUri }) {
 
         const queryParam = {
             response_type: 'code',
-            client_id: clientId,
+            client_id: id,
             scope: scope,
             code_challenge_method: 'S256',
             code_challenge: codeChallenge,
