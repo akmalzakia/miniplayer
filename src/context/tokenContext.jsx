@@ -26,6 +26,7 @@ export function TokenProvider({ children }) {
       const newToken = data.access_token
       const refreshToken = data.refresh_token
       const expire = data.expires_in
+      const expires_in_epoch = data.expires_in * 1000 + Date.now() 
 
       setTimeout(() => {
         requestRefresh()
@@ -33,6 +34,7 @@ export function TokenProvider({ children }) {
 
       localStorage.setItem('access_token', newToken)
       localStorage.setItem('refresh_token', refreshToken)
+      localStorage.setItem('expires_in', expires_in_epoch)
       setToken(newToken)
 
     }).catch(err => {
@@ -78,8 +80,12 @@ export function TokenProvider({ children }) {
         requestRefresh()
       }, (expire - refreshOffset * 60) * 1000)
 
+      const expires_in_epoch = data.expires_in * 1000 + Date.now() 
+
       localStorage.setItem('access_token', newToken)
       localStorage.setItem('refresh_token', refreshToken)
+      localStorage.setItem('expires_in', expires_in_epoch)
+
       setToken(newToken)
     }).catch(err => {
       console.log("auth", err)
@@ -92,7 +98,29 @@ export function TokenProvider({ children }) {
     if (!savedToken) {
       requestToken()
     }
-  }, [requestToken, requestRefresh])
+  }, [requestToken])
+
+  useEffect(() => {
+    let refreshTimeout;
+    const savedToken = localStorage.getItem('access_token')
+    if (!savedToken) return
+    const expires_in_epoch = localStorage.getItem('expires_in')
+    const refreshOffsetMs = refreshOffset * 60 * 1000
+    const time_to_refresh = expires_in_epoch - Date.now() - refreshOffsetMs
+    console.log("refreshing in :", time_to_refresh)
+    if (time_to_refresh < 0) {
+      requestRefresh()
+    }
+    else {
+      refreshTimeout = setTimeout(() => {
+        requestRefresh()
+      }, time_to_refresh)
+    }
+    
+    return () => {
+      clearTimeout(refreshTimeout)
+    }
+  }, [requestRefresh])
   
   return (
     <TokenContext.Provider value={{ token, requestRefresh }}>
