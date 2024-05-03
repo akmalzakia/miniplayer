@@ -8,7 +8,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>
   <ClientProvider>
     <TokenProvider>
-      <App />
+      <App></App>
     </TokenProvider>
   </ClientProvider>
   // </React.StrictMode>
