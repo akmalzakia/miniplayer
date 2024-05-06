@@ -1,19 +1,19 @@
-import { createElement } from 'react';
+import { createElement } from "react";
 
 const SpotifyScript = () => {
-  const script = createElement('script', {
-    id: 'spotify-player',
-    type: 'text/javascript',
+  const script = createElement("script", {
+    id: "spotify-player",
+    type: "text/javascript",
     async: false,
     defer: true,
-    src: 'https://sdk.scdn.co/spotify-player.js',
+    src: "https://sdk.scdn.co/spotify-player.js",
     onLoad: () => {
-      console.log('Spotify loaded');
+      console.log("Spotify loaded");
     },
-    onError: console.error
+    onError: console.error,
   });
 
-  console.log('test')
+  console.log("test");
 
   return script;
 };
