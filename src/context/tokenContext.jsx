@@ -135,7 +135,7 @@ export function TokenProvider({ children }) {
   }, [requestRefresh]);
 
   return (
-    <TokenContext.Provider value={{ token, requestRefresh }}>
+    <TokenContext.Provider value={ token }>
       {children}
     </TokenContext.Provider>
   );
