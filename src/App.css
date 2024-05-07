@@ -21,7 +21,6 @@ body {
 .main-wrapper {
   align-items: stretch;
   display: flex;
-  height: 100%;
   margin: 0 auto;
   position: relative;
   width: 80%;

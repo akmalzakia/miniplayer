@@ -5,6 +5,7 @@ import {
   FiChevronRight,
   FiPause,
   FiPlay,
+  FiPlusCircle,
   FiVolume2,
 } from "react-icons/fi";
 
@@ -144,7 +145,7 @@ function WebPlayback() {
   } else {
     return (
       <>
-        <div className='w-full'>
+        <div className='w-full flex flex-col relative h-full'>
           <div className='main-wrapper my-10 bg-gray-900 p-10 rounded-md'>
             <img
               src={track.album.images[0].url}
@@ -222,6 +223,88 @@ function WebPlayback() {
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div className='w-full bg-gray-900 absolute bottom-0 p-2 flex'>
+            <div className='flex gap-3 w-1/4'>
+              <img
+                src={track.album.images[0].url}
+                className='w-14 h-14 rounded-sm'
+              ></img>
+              <div className='flex flex-col justify-center'>
+                <span className='text-sm font-bold'>{track.name}</span>
+                <span className='text-sm font-light text-gray-400'>
+                  {track.artists[0].name}
+                </span>
+              </div>
+              <div className='my-auto'>
+                <FiPlusCircle></FiPlusCircle>
+              </div>
+            </div>
+            <div className='flex flex-col w-1/2 items-center py-1'>
+              <div className='flex justify-center mb-2'>
+                <div className='flex gap-1 ml-auto mr-auto'>
+                  <button
+                    className='btn-spotify bg-spotify-green'
+                    onClick={() => {
+                      currentPlayer.previousTrack();
+                    }}
+                  >
+                    <FiChevronLeft></FiChevronLeft>
+                  </button>
+                  <button
+                    className='btn-spotify bg-spotify-green'
+                    onClick={() => {
+                      currentPlayer.togglePlay();
+                    }}
+                  >
+                    {isPaused ? <FiPlay></FiPlay> : <FiPause></FiPause>}
+                  </button>
+                  <button
+                    className='btn-spotify bg-spotify-green'
+                    onClick={() => {
+                      currentPlayer.nextTrack();
+                    }}
+                  >
+                    <FiChevronRight></FiChevronRight>
+                  </button>
+                </div>
+              </div>
+              <div className='flex justify-between gap-3 w-3/4'>
+                <div className='text-xs my-auto'>
+                  {millisToMinutesAndSeconds(position)}
+                </div>
+                <input
+                  type='range'
+                  className='flex-1 bg-gray-700 rounded-lg'
+                  value={progressBarValue()}
+                  onChange={(e) => {
+                    console.log("fired", e.target.value);
+                    const pos = progressToPositionMs(e.target.value);
+                    console.log("seek to", pos);
+                    currentPlayer.seek(pos);
+                  }}
+                ></input>
+                <div className='text-xs my-auto'>
+                  {millisToMinutesAndSeconds(track.duration_ms)}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end w-1/4">
+              <div className='flex gap-1 items-center text-xl'>
+                <FiVolume2></FiVolume2>
+                <input
+                  type='range'
+                  className='max-w-[40%] min-w-12 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
+                  onInput={(e) => {
+                    const vol = e.target.value;
+                    currentPlayer.setVolume(vol / 100).then(() => {
+                      setVolume(vol / 100);
+                    });
+                  }}
+                  value={volume * 100}
+                />
               </div>
             </div>
           </div>
