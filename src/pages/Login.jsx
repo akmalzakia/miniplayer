@@ -1,9 +1,6 @@
-import { useContext } from "react";
-import { base64encode, generateRandomString, sha256 } from "./utils/util";
-import { ClientContext } from "./context/clientContext";
+import { base64encode, generateRandomString, sha256 } from "../utils/util";
 
 function Login() {
-  const { id, redirectUri } = useContext(ClientContext);
   async function handleLogin() {
     const scope = "streaming user-read-email user-read-private";
     const authUrl = new URL("https://accounts.spotify.com/authorize");
@@ -16,11 +13,11 @@ function Login() {
 
     const queryParam = {
       response_type: "code",
-      client_id: id,
+      client_id: import.meta.env.VITE_SPOTIFY_CLIENT_ID,
       scope: scope,
       code_challenge_method: "S256",
       code_challenge: codeChallenge,
-      redirect_uri: redirectUri,
+      redirect_uri: import.meta.env.VITE_SPOTIFY_REDIRECT_URI,
     };
     authUrl.search = new URLSearchParams(queryParam).toString();
     window.location.href = authUrl.toString();

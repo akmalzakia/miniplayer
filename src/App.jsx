@@ -1,12 +1,9 @@
-import Login from "./Login";
 import "./App.css";
-import { useContext } from "react";
-import { TokenContext } from "./context/tokenContext";
-import Home from "./Home";
+import { RouterProvider } from "react-router-dom";
+import router from "./pages/Router";
 
 function App() {
-  const token = useContext(TokenContext);
-  return <>{token === "" || token === null ? <Login /> : <Home />}</>;
+  return <RouterProvider router={router} />;
 }
 
 export default App;

@@ -25,7 +25,6 @@ function Sidebar() {
         })
         .then((res) => {
           setPlaylists(res.data.items);
-          console.log(res.data);
         });
     }
 

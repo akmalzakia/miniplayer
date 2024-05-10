@@ -8,7 +8,9 @@ function PlaylistCard({
   const id = `playlist-${playlist.id}`;
   return (
     <div
-      className={`flex flex-col p-2 overflow-hidden hover:bg-slate-700 rounded-sm cursor-pointer ${className ?? ''}`}
+      className={`flex flex-col p-2 overflow-hidden hover:bg-slate-700 rounded-sm cursor-pointer ${
+        className ?? ""
+      }`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
