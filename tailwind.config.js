@@ -7,7 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        'spotify-green': '#1db954'
+        'spotify-green': '#1db954',
+        'spotify-black': '#191414'
       },
       gridTemplateColumns: {
         'auto-fill-100': 'repeat(auto-fill, minmax(100px, 1fr))',

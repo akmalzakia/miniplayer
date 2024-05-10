@@ -3,7 +3,6 @@ import { millisToMinutesAndSeconds } from "../utils/util";
 function ProgressBar({ player, position, duration, className }) {
   function progressBarValue() {
     const progress = position / duration;
-    console.log(position, duration);
     return progress * 100;
   }
 
@@ -21,9 +20,7 @@ function ProgressBar({ player, position, duration, className }) {
         className='flex-1 bg-gray-700 rounded-lg'
         value={progressBarValue()}
         onChange={(e) => {
-          console.log("fired", e.target.value);
           const pos = progressToPositionMs(e.target.value);
-          console.log("seek to", pos);
           player.seek(pos);
         }}
       ></input>

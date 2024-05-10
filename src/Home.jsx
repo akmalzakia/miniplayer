@@ -1,13 +1,14 @@
-import { FaHome, FaSearch } from "react-icons/fa";
 import WebPlayback from "./WebPlayback";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { TokenContext } from "./context/tokenContext";
 import PlaylistCard from "./component/PlaylistCard";
+import Sidebar from "./component/Sidebar";
 
 function Home() {
   const [featured, setFeatured] = useState([]);
   const token = useContext(TokenContext);
+  // please check how token refresh affect children components by investigating each component re-renders
 
   useEffect(() => {
     async function requestFeatured() {
@@ -29,25 +30,23 @@ function Home() {
         });
     }
 
-    requestFeatured();
-  }, [token]);
+    if (featured.length === 0) {
+      requestFeatured();
+    }
+  }, [token, featured]);
+
   return (
     <>
       <div className='w-full flex flex-col h-full'>
-        <div className='flex w-full h-full bg-black p-2 gap-2 overflow-hidden'>
-          <div className='w-20 h-full'>
-            <div className='flex flex-col gap-6 items-center rounded-md bg-gray-800 px-2 py-4 shadow-md'>
-              <FaHome className='text-2xl'></FaHome>
-              <FaSearch className='text-xl'></FaSearch>
-            </div>
-          </div>
-          <div className='w-full h-full rounded-md bg-gray-800 p-4 flex-1 overflow-auto'>
-            <div className='font-bold text-xl'>Featured for you</div>
+        <div className='flex w-full h-full bg-spotify-black p-2 gap-2 overflow-hidden'>
+          <Sidebar></Sidebar>
+          <div className={`w-full h-full rounded-md to-spotify-black p-4 flex-1`}>
+            <div className='font-bold text-xl px-2 mb-1'>Featured for you</div>
             <div
               className='grid'
               style={{
-                gridTemplateColumns: "repeat(auto-fill, 12em)",
-                gridTemplateRows: "repeat(2, 16em)",
+                gridTemplateColumns: "repeat(auto-fill, minmax(10em, 1fr))",
+                gridTemplateRows: "repeat(auto-fill, minmax(14em, 1fr))",
               }}
             >
               {featured.map((playlist, idx) => (

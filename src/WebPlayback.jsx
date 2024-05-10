@@ -121,7 +121,7 @@ function WebPlayback() {
 
   return (
     <>
-      <div className='w-full sticky bottom-0 bg-gray-900 p-2 flex'>
+      <div className='w-full sticky bottom-0 bg-spotify-black p-2 flex'>
         {isActive ? (
           <>
             <div className='flex gap-3 w-1/4'>
