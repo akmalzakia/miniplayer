@@ -1,7 +1,8 @@
-function Button({ onClick, children }) {
+function Button({ onClick, children, className }) {
+
   return (
     <button
-      className='inline-block text-white p-2 rounded-full border border-solid border-[#18ab29] no-underline bg-spotify-green'
+      className={`text-white p-2 rounded-full border border-solid no-underline bg-spotify-green ${className}`}
       onClick={onClick}
     >
       {children}

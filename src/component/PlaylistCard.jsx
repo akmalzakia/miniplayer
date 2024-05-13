@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 function PlaylistCard({
   playlist,
   imageOnly,
@@ -6,6 +8,7 @@ function PlaylistCard({
   onMouseLeave,
 }) {
   const id = `playlist-${playlist.id}`;
+  const navigate = useNavigate();
   return (
     <div
       className={`flex flex-col p-2 overflow-hidden hover:bg-slate-700 rounded-sm cursor-pointer ${
@@ -13,6 +16,9 @@ function PlaylistCard({
       }`}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onClick={() => {
+        navigate(`/playlist/${playlist.id}`, { state: playlist });
+      }}
     >
       <img
         id={`${id}-image`}

@@ -2,7 +2,7 @@ import { base64encode, generateRandomString, sha256 } from "../utils/util";
 
 function Login() {
   async function handleLogin() {
-    const scope = "streaming user-read-email user-read-private";
+    const scope = "streaming user-read-email user-read-private playlist-read-collaborative playlist-read-private";
     const authUrl = new URL("https://accounts.spotify.com/authorize");
 
     const codeVerifier = generateRandomString(64);

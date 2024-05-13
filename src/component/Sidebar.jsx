@@ -1,10 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import { AiFillHome, AiOutlineSearch } from "react-icons/ai";
+import { AiFillHome, AiOutlineHome, AiOutlineSearch } from "react-icons/ai";
 import { TokenContext } from "../context/tokenContext";
 import axios from "axios";
 import PlaylistCard from "./PlaylistCard";
 import "overlayscrollbars/overlayscrollbars.css";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import { NavLink } from "react-router-dom";
 
 function Sidebar() {
   const [playlists, setPlaylists] = useState([]);
@@ -38,7 +39,9 @@ function Sidebar() {
       <div
         className={`flex flex-col gap-6 items-center rounded-md px-2 py-4 shadow-md mr-3`}
       >
-        <AiFillHome className='text-2xl'></AiFillHome>
+        <NavLink to='/' className='text-2xl'>
+          { ({ isActive }) => isActive ? <AiFillHome></AiFillHome> : <AiOutlineHome></AiOutlineHome>}
+        </NavLink>
         <AiOutlineSearch className='text-xl'></AiOutlineSearch>
       </div>
       <OverlayScrollbarsComponent

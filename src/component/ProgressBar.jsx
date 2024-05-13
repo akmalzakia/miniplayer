@@ -1,4 +1,4 @@
-import { millisToMinutesAndSeconds } from "../utils/util";
+import { formatTimeMinSecond } from "../utils/util";
 
 function ProgressBar({ player, position, duration, className }) {
   function progressBarValue() {
@@ -10,10 +10,12 @@ function ProgressBar({ player, position, duration, className }) {
     const position = (progress / 100) * duration;
     return position;
   }
+
+
   return (
     <div className={`${className} flex justify-between gap-3`}>
       <div className='text-xs my-auto'>
-        {millisToMinutesAndSeconds(position)}
+        {formatTimeMinSecond(position)}
       </div>
       <input
         type='range'
@@ -25,7 +27,7 @@ function ProgressBar({ player, position, duration, className }) {
         }}
       ></input>
       <div className='text-xs my-auto'>
-        {millisToMinutesAndSeconds(duration)}
+        {formatTimeMinSecond(duration)}
       </div>
     </div>
   );
