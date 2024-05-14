@@ -1,6 +1,6 @@
-import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { TokenContext } from "./tokenContext";
+import { spotifyAPI } from "../api/spotifyAxios";
 
 export const UserContext = createContext("");
 
@@ -14,11 +14,7 @@ export function UserProvider({ children }) {
       console.log("requesting user data...");
 
       try {
-        const { data } = await axios.get("https://api.spotify.com/v1/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const data = await spotifyAPI.getCurrentUser(token)
         console.log("user", data);
         setUser(data);
         setIsLoading(false);

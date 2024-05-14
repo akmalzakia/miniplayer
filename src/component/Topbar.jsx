@@ -24,7 +24,7 @@ function Topbar() {
         <Button className='!bg-black'>
           <FaUsers />
         </Button>
-        <Button className='!bg-black p-0'>
+        <Button className='!bg-black !p-0'>
           {!isLoading && (
             <img
               className='rounded-full w-8'

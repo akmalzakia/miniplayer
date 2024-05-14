@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import PlaylistCard from "../component/PlaylistCard";
-import axios from "axios";
 import { TokenContext } from "../context/tokenContext";
+import { spotifyAPI } from "../api/spotifyAxios";
 
 function Featured() {
   const [featured, setFeatured] = useState([]);
@@ -10,19 +10,12 @@ function Featured() {
     async function requestFeatured() {
       console.log("requesting featured playlists...");
       try {
-        const { data } = await axios.get(
-          "https://api.spotify.com/v1/browse/featured-playlists",
-          {
-            params: {
-              locale: "en_EN",
-              limit: 10,
-              offset: 0,
-            },
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const params = {
+          locale: "en_EN",
+          limit: 10,
+          offset: 0,
+        }
+        const data = await spotifyAPI.getFeaturedPlaylists(token, params)
         setFeatured(data.playlists.items);
       } catch (err) {
         console.log(err);

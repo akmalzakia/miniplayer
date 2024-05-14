@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { AiFillHome, AiOutlineHome, AiOutlineSearch } from "react-icons/ai";
 import { TokenContext } from "../context/tokenContext";
-import axios from "axios";
 import PlaylistCard from "./PlaylistCard";
 import "overlayscrollbars/overlayscrollbars.css";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { NavLink } from "react-router-dom";
+import { spotifyAPI } from "../api/spotifyAxios";
 
 function Sidebar() {
   const [playlists, setPlaylists] = useState([]);
@@ -14,19 +14,16 @@ function Sidebar() {
   useEffect(() => {
     async function requestPlaylists() {
       console.log("requesting user playlists...");
-      await axios
-        .get("https://api.spotify.com/v1/me/playlists", {
-          params: {
-            limit: 10,
-            offset: 0,
-          },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => {
-          setPlaylists(res.data.items);
-        });
+      try {
+        const params = {
+          limit: 10,
+          offset: 0,
+        };
+        const data = await spotifyAPI.getUserPlaylists(token, params);
+        setPlaylists(data.items);
+      } catch (err) {
+        console.log(err)
+      }
     }
 
     if (playlists.length === 0) {
@@ -39,8 +36,17 @@ function Sidebar() {
       <div
         className={`flex flex-col gap-6 items-center rounded-md px-2 py-4 shadow-md mr-3`}
       >
-        <NavLink to='/' className='text-2xl'>
-          { ({ isActive }) => isActive ? <AiFillHome></AiFillHome> : <AiOutlineHome></AiOutlineHome>}
+        <NavLink
+          to='/'
+          className='text-2xl'
+        >
+          {({ isActive }) =>
+            isActive ? (
+              <AiFillHome></AiFillHome>
+            ) : (
+              <AiOutlineHome></AiOutlineHome>
+            )
+          }
         </NavLink>
         <AiOutlineSearch className='text-xl'></AiOutlineSearch>
       </div>

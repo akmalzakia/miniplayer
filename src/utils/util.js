@@ -22,6 +22,8 @@ const base64encode = (input) => {
 }
 
 function millisToMinutesAndSeconds(millis) {
+  if (!millis) return
+
   let res = {
     hours: 0,
     minutes: 0,
@@ -42,6 +44,8 @@ function millisToMinutesAndSeconds(millis) {
 }
 
 function formatTimeMinSecond(time) {
+  if (!time) return
+
   const timeDetails = millisToMinutesAndSeconds(time)
   return timeDetails.minutes + " : " + (timeDetails.seconds < 10 ? '0' : '') + timeDetails.seconds;
 }

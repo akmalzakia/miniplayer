@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   FiChevronLeft,
   FiChevronRight,
@@ -9,115 +9,50 @@ import {
 import ProgressBar from "./component/ProgressBar";
 import Button from "./component/Button";
 import VolumeBar from "./component/VolumeBar";
+import { PlayerContext } from "./context/playerContext";
+import { trackBase } from "./api/base";
 
-const initialTrack = {
-  name: "",
-  album: {
-    images: [{ url: "" }],
-  },
-  artists: [{ name: "" }],
-  duration_ms: 0,
-};
 
 function WebPlayback() {
-  const [currentPlayer, setPlayer] = useState(null);
-  const [isLoaded, setLoaded] = useState(false);
+  const { player, isActive } = useContext(PlayerContext);
   const [isPaused, setPaused] = useState(false);
-  const [isActive, setActive] = useState(false);
-  const [track, setTrack] = useState(initialTrack);
+  const [track, setTrack] = useState(trackBase);
   const [position, setPosition] = useState(0);
 
   const defaultVolume = 0.5;
   const [volume, setVolume] = useState(defaultVolume);
 
   useEffect(() => {
-    if (isLoaded) return;
-
-    const script = document.createElement("script");
-    script.src = "https://sdk.scdn.co/spotify-player.js";
-    script.async = true;
-
-    document.body.appendChild(script);
-
-    setLoaded(true);
-  }, [isLoaded]);
-
-  useEffect(() => {
-    function onSDKReady() {
-      console.log("currentPlayer", currentPlayer);
-      if (currentPlayer) return;
-      console.log("trying to create new player");
-      const player = new window.Spotify.Player({
-        name: "Web Playback SDK",
-        getOAuthToken: (cb) => {
-          cb(localStorage.getItem("access_token"));
-        },
-        volume: defaultVolume,
-      });
-
-      setPlayer(player);
-      setVolume(defaultVolume);
-
-      function onDeviceOnline(device_id) {
-        console.log("Ready with device ID", device_id);
+    function onStateChange(state) {
+      if (!state) {
+        return;
       }
-
-      function onDeviceOffline(device_id) {
-        console.log("Device ID has gone offline", device_id);
-      }
-
-      function onStateChange(state) {
-        if (!state) {
-          return;
-        }
-
-        setTrack(state.track_window.current_track);
-        setPaused(state.paused);
-        setPosition(state.position);
-        console.log(state);
-
-        player.getCurrentState().then((state) => {
-          !state ? setActive(false) : setActive(true);
-        });
-      }
-
-      player.addListener("ready", onDeviceOnline);
-      player.addListener("not_ready", onDeviceOffline);
-      player.addListener("player_state_changed", onStateChange);
-
-      player.on("initialization_error", ({ message }) => {
-        console.error("Failed to initialize", message);
-      });
-
-      player.on("authentication_error", ({ message }) => {
-        console.error("Failed to authenticate", message);
-      });
-
-      player.on("playback_error", ({ message }) => {
-        console.error("Failed to perform playback", message);
-      });
-
-      player.on("account_error", ({ message }) => {
-        console.error("Failed to validate Spotify account", message);
-      });
-
-      player.connect();
+      const currentTrack = state.track_window.current_track;
+      setTrack(currentTrack);
+      setPaused(state.paused);
+      setPosition(state.position);
+      console.log(state);
     }
 
-    window.onSpotifyWebPlaybackSDKReady = onSDKReady;
+    if (player) {
+      player.addListener("player_state_changed", onStateChange);
+    }
+
     return () => {
-      window.onSpotifyWebPlaybackSDKReady = null;
+      if (player) {
+        player.removeListener("player_state_changed", onStateChange);
+      }
     };
-  }, [currentPlayer]);
+  }, [player]);
 
   useEffect(() => {
     let interval = setInterval(() => {
-      if (!isPaused) setPosition((p) => p + 1000);
+      if (isActive && !isPaused) setPosition((p) => p + 1000);
     }, 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [isPaused]);
+  }, [isPaused, isActive]);
 
   return (
     <>
@@ -126,13 +61,13 @@ function WebPlayback() {
           <>
             <div className='flex gap-3 w-1/4'>
               <img
-                src={track.album.images[0].url}
+                src={track?.album.images[0].url}
                 className='w-14 h-14 rounded-sm'
               ></img>
               <div className='flex flex-col justify-center'>
-                <span className='text-sm font-bold'>{track.name}</span>
+                <span className='text-sm font-bold'>{track?.name}</span>
                 <span className='text-sm font-light text-gray-400'>
-                  {track.artists[0].name}
+                  {track?.artists[0].name}
                 </span>
               </div>
               <div className='my-auto'>
@@ -144,21 +79,21 @@ function WebPlayback() {
                 <div className='flex gap-1 ml-auto mr-auto'>
                   <Button
                     onClick={() => {
-                      currentPlayer.previousTrack();
+                      player.previousTrack();
                     }}
                   >
                     <FiChevronLeft></FiChevronLeft>
                   </Button>
                   <Button
                     onClick={() => {
-                      currentPlayer.togglePlay();
+                      player.togglePlay();
                     }}
                   >
                     {isPaused ? <FiPlay></FiPlay> : <FiPause></FiPause>}
                   </Button>
                   <Button
                     onClick={() => {
-                      currentPlayer.nextTrack();
+                      player.nextTrack();
                     }}
                   >
                     <FiChevronRight></FiChevronRight>
@@ -167,9 +102,9 @@ function WebPlayback() {
               </div>
               <ProgressBar
                 className={"w-3/4"}
-                player={currentPlayer}
+                player={player}
                 position={position}
-                duration={track.duration_ms}
+                duration={track?.duration_ms}
               ></ProgressBar>
             </div>
             <div className='flex justify-end w-1/4'>
@@ -177,7 +112,7 @@ function WebPlayback() {
                 value={volume * 100}
                 onVolumeChanged={(e) => {
                   const vol = e.target.value;
-                  currentPlayer.setVolume(vol / 100).then(() => {
+                  player.setVolume(vol / 100).then(() => {
                     setVolume(vol / 100);
                   });
                 }}

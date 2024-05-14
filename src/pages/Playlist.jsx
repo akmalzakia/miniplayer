@@ -1,16 +1,29 @@
-import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { TokenContext } from "../context/tokenContext";
 import { formatTimeMinSecond, millisToMinutesAndSeconds } from "../utils/util";
 import Button from "../component/Button";
-import { FiPlay } from "react-icons/fi";
+import { FiPause, FiPlay } from "react-icons/fi";
+import { PlayerContext } from "../context/playerContext";
+import { spotifyAPI } from "../api/spotifyAxios";
+import usePlaylist from "../hooks/usePlaylist";
 
 function Playlist() {
-  const [playlist, setPlaylist] = useState(null);
-  const token = useContext(TokenContext);
   const playlistId = useParams();
-  
+
+  const playlist = usePlaylist(playlistId.id);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [anotherDevice, setAnotherDevice] = useState(null);
+  const [currentTrackId, setCurrentTrackId] = useState("");
+  const { player, isActive } = useContext(PlayerContext);
+  const token = useContext(TokenContext);
+
+  const isTrackOnPlaylist = playlist.tracks.items.some(
+    (i) => i.track.id === currentTrackId
+  );
+
+  const isPlayedInAnotherDevice = !isActive && isPlaying;
+
   function calculateDuration(tracks) {
     if (!tracks) return;
 
@@ -20,6 +33,118 @@ function Playlist() {
     );
     return totalDuration;
   }
+
+  const getCurrentContext = useCallback(
+    (data) => {
+      const currentContext = data?.context;
+      if (!currentContext || currentContext?.uri !== playlist?.uri) {
+        setIsPlaying(false);
+        setCurrentTrackId(null);
+        return;
+      }
+
+      const currentTrack = data?.current_track;
+      setCurrentTrackId(currentTrack?.id);
+
+      const isPaused = data?.paused;
+      setIsPlaying(!isPaused);
+
+      const deviceData = {
+        id: data?.device?.id,
+        name: data?.device?.name,
+      };
+
+      setAnotherDevice(deviceData);
+    },
+    [playlist]
+  );
+
+  async function pause() {
+    if (player && isActive) {
+      player.pause();
+    } else {
+      try {
+        await spotifyAPI.pausePlayer(token);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+  async function play(playlistUri) {
+    if (player && isActive && isTrackOnPlaylist) {
+      player.resume();
+    } else {
+      try {
+        const data = {
+          context_uri: playlistUri,
+          offset: {
+            position: 0,
+          },
+          position_ms: 0,
+        };
+        await spotifyAPI.playPlayer(token, data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+  // need to check if still fetching playlist to prevent this effect to trigger twice
+  useEffect(() => {
+    async function requestPlayerState() {
+      console.log("requesting player state from playlist page...");
+      try {
+        let data;
+        if (player && isActive) {
+          console.log(player);
+          const res = await player.getCurrentState();
+          data = {
+            context: res.context,
+            paused: res.paused,
+            current_track: res.track_window.current_track,
+          };
+        } else {
+          const res = await spotifyAPI.getPlayerState(token);
+          console.log(res);
+          data = {
+            context: res.context,
+            paused: !res.is_playing,
+            current_track: res.item,
+            device: res.device,
+          };
+        }
+        getCurrentContext(data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    requestPlayerState();
+  }, [player, isActive, token, getCurrentContext]);
+
+  useEffect(() => {
+    function onStateChange(state) {
+      if (!state || !playlist) {
+        return;
+      }
+      const data = {
+        context: state.context,
+        paused: state.paused,
+        current_track: state.track_window.current_track,
+      };
+      getCurrentContext(data);
+    }
+
+    if (player) {
+      player.addListener("player_state_changed", onStateChange);
+    }
+    return () => {
+      if (player) {
+        player.removeListener("player_state_changed", onStateChange);
+      }
+    };
+  }, [playlist, player, getCurrentContext]);
 
   function formatPlaylistDuration(duration) {
     if (!duration) return;
@@ -65,29 +190,6 @@ function Playlist() {
     return arr.reverse().join(",");
   }
 
-  useEffect(() => {
-    async function requestPlaylist() {
-      console.log("requesting playlist with id: ", playlistId.id);
-      try {
-        const { data } = await axios.get(
-          `https://api.spotify.com/v1/playlists/${playlistId.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setPlaylist(data);
-      } catch (err) {
-        console.log("error fetching playlist id: ", playlistId);
-      }
-    }
-
-    if (playlist?.id !== playlistId.id) {
-      requestPlaylist();
-    }
-  }, [playlist, playlistId, token]);
-
   return (
     playlist && (
       <>
@@ -102,10 +204,10 @@ function Playlist() {
             <div className=''>
               {playlist.public ? "Public" : "Private"} Playlist
             </div>
-            <div className='font-bold sm:text-2xl md:text-6xl lg:text-8xl text-nowrap'>
+            <div className='font-bold text-6xl lg:text-7xl text-nowrap'>
               {playlist.name}
             </div>
-            <div className='text-gray-400'>{playlist.description}</div>
+            <div className='text-gray-400 mt-1'>{playlist.description}</div>
             <div className='flex text-gray-400'>
               <div className='font-bold text-white'>
                 {playlist.owner.display_name}
@@ -130,7 +232,25 @@ function Playlist() {
         </div>
         <div className='flex mt-4'>
           <Button className='p-3'>
-            <FiPlay className='text-xl'></FiPlay>
+            {isPlaying && isTrackOnPlaylist ? (
+              isPlayedInAnotherDevice ? (
+                <>
+                  Playing on {anotherDevice?.name}
+                </>
+              ) : (
+                <FiPause
+                  className='text-xl'
+                  onClick={pause}
+                ></FiPause>
+              )
+            ) : (
+              <FiPlay
+                className='text-xl'
+                onClick={() => {
+                  play(playlist.uri);
+                }}
+              ></FiPlay>
+            )}
           </Button>
         </div>
         <table className='table-fixed w-full text-sm text-gray-400'>
@@ -147,7 +267,11 @@ function Playlist() {
             {playlist.tracks.items.map((item, idx) => (
               <tr
                 key={item.track.id}
-                className='hover:bg-slate-800'
+                className={`hover:bg-slate-800 ${
+                  currentTrackId === item.track.id && isActive
+                    ? "border border-spotify-green"
+                    : ""
+                }`}
               >
                 <td className='text-right pr-3'>{idx + 1}</td>
                 <td className='flex items-center py-2 gap-2'>
