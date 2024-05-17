@@ -1,25 +1,26 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { TokenContext } from "../context/tokenContext";
-import { formatTimeMinSecond, millisToMinutesAndSeconds } from "../utils/util";
-import Button from "../component/Button";
+import { TokenContext } from "../../context/tokenContext";
+import { millisToMinutesAndSeconds } from "../../utils/util";
+import Button from "../../component/Button";
 import { FiPause, FiPlay } from "react-icons/fi";
-import { PlayerContext } from "../context/playerContext";
-import { spotifyAPI } from "../api/spotifyAxios";
-import usePlaylist from "../hooks/usePlaylist";
+import { PlayerContext } from "../../context/playerContext";
+import { spotifyAPI } from "../../api/spotifyAxios";
+import usePlaylist from "../../hooks/usePlaylist";
+import TrackList from "./components/TrackList";
 
 function Playlist() {
   const playlistId = useParams();
 
-  const playlist = usePlaylist(playlistId.id);
+  const [playlist] = usePlaylist(playlistId.id);
   const [isPlaying, setIsPlaying] = useState(false);
   const [anotherDevice, setAnotherDevice] = useState(null);
-  const [currentTrackId, setCurrentTrackId] = useState("");
-  const { player, isActive } = useContext(PlayerContext);
+  const [currentTrackUri, setCurrentTrackUri] = useState("");
+  const { player, playerId, isActive } = useContext(PlayerContext);
   const token = useContext(TokenContext);
 
   const isTrackOnPlaylist = playlist.tracks.items.some(
-    (i) => i.track.id === currentTrackId
+    (i) => i.track.uri === currentTrackUri
   );
 
   const isPlayedInAnotherDevice = !isActive && isPlaying;
@@ -39,12 +40,12 @@ function Playlist() {
       const currentContext = data?.context;
       if (!currentContext || currentContext?.uri !== playlist?.uri) {
         setIsPlaying(false);
-        setCurrentTrackId(null);
+        setCurrentTrackUri("");
         return;
       }
 
       const currentTrack = data?.current_track;
-      setCurrentTrackId(currentTrack?.id);
+      setCurrentTrackUri(currentTrack?.uri);
 
       const isPaused = data?.paused;
       setIsPlaying(!isPaused);
@@ -59,12 +60,25 @@ function Playlist() {
     [playlist]
   );
 
+  async function transferPlayback() {
+    if (playerId) {
+      try {
+        const data = {
+          device_ids: [playerId],
+        };
+        await spotifyAPI.transferPlayback(token, data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
   async function pause() {
     if (player && isActive) {
       player.pause();
     } else {
       try {
-        await spotifyAPI.pausePlayer(token);
+        await spotifyAPI.pausePlayer(token).then(setIsPlaying(false));
       } catch (err) {
         console.log(err);
       }
@@ -74,6 +88,18 @@ function Playlist() {
   async function play(playlistUri) {
     if (player && isActive && isTrackOnPlaylist) {
       player.resume();
+    } else if (isTrackOnPlaylist) {
+      const { progress_ms, item } = await spotifyAPI.getPlayerState(token);
+
+      const data = {
+        context_uri: playlistUri,
+        offset: {
+          uri: item.uri,
+        },
+        position_ms: progress_ms,
+      };
+
+      await spotifyAPI.playPlayer(token, data).then(setIsPlaying(true));
     } else {
       try {
         const data = {
@@ -83,14 +109,35 @@ function Playlist() {
           },
           position_ms: 0,
         };
-        await spotifyAPI.playPlayer(token, data);
+        await spotifyAPI.playPlayer(token, data).then(setIsPlaying(true));
       } catch (err) {
         console.log(err);
       }
     }
   }
 
-  // need to check if still fetching playlist to prevent this effect to trigger twice
+  async function playTrack(trackUri) {
+    const isCurrentTrack = trackUri === currentTrackUri;
+    if (player && isActive && isCurrentTrack) {
+      player.resume();
+    } else {
+      try {
+        const data = {
+          context_uri: playlist.uri,
+          offset: {
+            uri: trackUri,
+          },
+          position_ms: 0,
+        };
+
+        await spotifyAPI.playPlayer(token, data).then(setIsPlaying(true));
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+  
   useEffect(() => {
     async function requestPlayerState() {
       console.log("requesting player state from playlist page...");
@@ -106,7 +153,6 @@ function Playlist() {
           };
         } else {
           const res = await spotifyAPI.getPlayerState(token);
-          console.log(res);
           data = {
             context: res.context,
             paused: !res.is_playing,
@@ -157,28 +203,6 @@ function Playlist() {
     return res;
   }
 
-  function formatDateAdded(datetime) {
-    if (!datetime) return;
-
-    const date = new Date(datetime.split("T")[0]);
-    const dateDifference = Math.floor(
-      (Date.now() - date) / (1000 * 60 * 60 * 24)
-    );
-
-    const monthDifference = Math.floor(dateDifference / 30);
-    const yearDifference = Math.floor(monthDifference / 12);
-
-    if (yearDifference) {
-      return `${yearDifference > 1 ? yearDifference + "years" : "a year"} ago`;
-    } else if (monthDifference) {
-      return `${
-        monthDifference > 1 ? monthDifference + " months" : "a month"
-      } ago`;
-    } else {
-      return `${dateDifference > 1 ? dateDifference + " days" : "a day"} ago`;
-    }
-  }
-
   function formatFollowers(total) {
     if (!total) return;
 
@@ -194,7 +218,7 @@ function Playlist() {
     playlist && (
       <>
         <div className='w-full flex gap-2'>
-          <div className='w-[30%] max-w-fit min-w-36'>
+          <div className='w-[30%] min-w-36 max-w-72'>
             <img
               className='max-w-full max-h-full rounded-md shadow-md'
               src={playlist.images[0].url}
@@ -231,74 +255,40 @@ function Playlist() {
           </div>
         </div>
         <div className='flex mt-4'>
-          <Button className='p-3'>
+          <Button
+            className='p-3'
+            onClick={() => {
+              if (isPlaying && isTrackOnPlaylist) {
+                if (isPlayedInAnotherDevice) {
+                  transferPlayback();
+                } else {
+                  pause();
+                }
+              } else {
+                play(playlist.uri);
+              }
+              console.log(isPlayedInAnotherDevice);
+            }}
+          >
             {isPlaying && isTrackOnPlaylist ? (
               isPlayedInAnotherDevice ? (
-                <>
-                  Playing on {anotherDevice?.name}
-                </>
+                <>Playing on {anotherDevice?.name}</>
               ) : (
-                <FiPause
-                  className='text-xl'
-                  onClick={pause}
-                ></FiPause>
+                <FiPause className='text-xl'></FiPause>
               )
             ) : (
-              <FiPlay
-                className='text-xl'
-                onClick={() => {
-                  play(playlist.uri);
-                }}
-              ></FiPlay>
+              <FiPlay className='text-xl'></FiPlay>
             )}
           </Button>
         </div>
-        <table className='table-fixed w-full text-sm text-gray-400'>
-          <thead className='border-b'>
-            <tr className='text-left'>
-              <th className='text-right pr-3 font-normal w-8'>#</th>
-              <th className='font-normal w-1/3'>Title</th>
-              <th className='font-normal w-1/3'>Album</th>
-              <th className='py-1 pr-2 font-normal'>Date Added</th>
-              <th className='font-normal'>Duration</th>
-            </tr>
-          </thead>
-          <tbody>
-            {playlist.tracks.items.map((item, idx) => (
-              <tr
-                key={item.track.id}
-                className={`hover:bg-slate-800 ${
-                  currentTrackId === item.track.id && isActive
-                    ? "border border-spotify-green"
-                    : ""
-                }`}
-              >
-                <td className='text-right pr-3'>{idx + 1}</td>
-                <td className='flex items-center py-2 gap-2'>
-                  <div className='w-10 min-w-10'>
-                    <img
-                      className='max-w-full max-h-full rounded-md'
-                      src={item.track.album.images[0].url}
-                    />
-                  </div>
-                  <div>
-                    <div className='text-white'>{item.track.name}</div>
-                    <div className=''>
-                      {item.track.artists
-                        .map((artist) => artist.name)
-                        .join(", ")}
-                    </div>
-                  </div>
-                </td>
-                <td className='text-ellipsis overflow-hidden text-nowrap'>
-                  {item.track.album.name}
-                </td>
-                <td className='pr-2'>{formatDateAdded(item.added_at)}</td>
-                <td>{formatTimeMinSecond(item.track.duration_ms)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <TrackList
+          playlistUri={playlist.uri}
+          tracks={playlist.tracks}
+          currentTrackUri={currentTrackUri}
+          isPlaying={isPlaying}
+          onPause={pause}
+          onPlay={(trackUri) => playTrack(trackUri)}
+        ></TrackList>
       </>
     )
   );

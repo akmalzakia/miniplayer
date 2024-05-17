@@ -4,7 +4,7 @@ import Featured from "./Featured";
 import Login from "./Login";
 import ProtectedRoute from "./ProtectedRoute";
 import requestToken from "../router/loaders/homeLoader";
-import Playlist from "./Playlist";
+import Playlist from "./Playlist/Playlist";
 
 const router = createBrowserRouter([
   {

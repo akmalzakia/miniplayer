@@ -4,6 +4,7 @@ export const PlayerContext = createContext("");
 
 export function PlayerProvider({ children }) {
   const [player, setPlayer] = useState(null);
+  const [playerId, setPlayerId] = useState("");
   const [isActive, setIsActive] = useState(false);
 
   const defaultVolume = 0.5;
@@ -21,15 +22,17 @@ export function PlayerProvider({ children }) {
         volume: defaultVolume,
       });
 
-      function onDeviceOnline(device_id) {
+      function onDeviceOnline({ device_id }) {
         console.log("Ready with device ID", device_id);
         setPlayer(newPlayer);
+        setPlayerId(device_id);
       }
 
-      function onDeviceOffline(device_id) {
+      function onDeviceOffline({ device_id }) {
         console.log("Device ID has gone offline", device_id);
         setPlayer(null);
         setIsActive(false);
+        setPlayerId("");
       }
 
       function onStateChange(state) {
@@ -43,11 +46,11 @@ export function PlayerProvider({ children }) {
           state.playback_quality === "UNKNOWN"
         ) {
           newPlayer.disconnect();
-          setIsActive(false)
-          setPlayer(null)
+          setIsActive(false);
+          setPlayer(null);
           console.log("disconnecting");
         } else {
-          setIsActive(true)
+          setIsActive(true);
         }
       }
 
@@ -81,7 +84,7 @@ export function PlayerProvider({ children }) {
   }, [player]);
 
   return (
-    <PlayerContext.Provider value={{ player, isActive }}>
+    <PlayerContext.Provider value={{ player, playerId, isActive }}>
       {children}
     </PlayerContext.Provider>
   );

@@ -71,4 +71,8 @@ function resizeText({ el, minSize = 10, maxSize = 128, step = 1, unit = 'px' }) 
   return `${i - step}${unit}`
 }
 
-export { generateRandomString, sha256, base64encode, millisToMinutesAndSeconds, formatTimeMinSecond, resizeText }
+function getIdFromUri(spotifyUri) {
+  return spotifyUri.split(':').at(-1)
+}
+
+export { generateRandomString, sha256, base64encode, millisToMinutesAndSeconds, formatTimeMinSecond, resizeText, getIdFromUri }
