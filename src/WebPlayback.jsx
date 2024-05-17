@@ -11,10 +11,12 @@ import Button from "./component/Button";
 import VolumeBar from "./component/VolumeBar";
 import { PlayerContext } from "./context/playerContext";
 import { trackBase } from "./api/base";
-
+import { UserContext } from "./context/userContext";
+import { Link } from "react-router-dom";
 
 function WebPlayback() {
   const { player, isActive } = useContext(PlayerContext);
+  const { user, isLoading } = useContext(UserContext);
   const [isPaused, setPaused] = useState(false);
   const [track, setTrack] = useState(trackBase);
   const [position, setPosition] = useState(0);
@@ -57,77 +59,85 @@ function WebPlayback() {
   return (
     <>
       <div className='w-full sticky bottom-0 bg-spotify-black p-2 flex'>
-        {isActive ? (
-          <>
-            <div className='flex gap-3 w-1/4'>
-              <img
-                src={track?.album.images[0].url}
-                className='w-14 h-14 rounded-sm'
-              ></img>
-              <div className='flex flex-col justify-center'>
-                <span className='text-sm font-bold'>{track?.name}</span>
-                <span className='text-sm font-light text-gray-400'>
-                  {track?.artists[0].name}
-                </span>
-              </div>
-              <div className='my-auto'>
-                <FiPlusCircle></FiPlusCircle>
-              </div>
-            </div>
-            <div className='flex flex-col w-1/2 items-center py-1'>
-              <div className='flex justify-center mb-2'>
-                <div className='flex gap-1 ml-auto mr-auto'>
-                  <Button
-                    onClick={() => {
-                      player.previousTrack();
-                    }}
-                  >
-                    <FiChevronLeft></FiChevronLeft>
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      player.togglePlay();
-                    }}
-                  >
-                    {isPaused ? <FiPlay></FiPlay> : <FiPause></FiPause>}
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      player.nextTrack();
-                    }}
-                  >
-                    <FiChevronRight></FiChevronRight>
-                  </Button>
+        {user.product === "premium" ? (
+          isActive ? (
+            <>
+              <div className='flex gap-3 w-1/4'>
+                <img
+                  src={track?.album.images[0].url}
+                  className='w-14 h-14 rounded-sm'
+                ></img>
+                <div className='flex flex-col justify-center'>
+                  <span className='text-sm font-bold'>{track?.name}</span>
+                  <span className='text-sm font-light text-gray-400'>
+                    {track?.artists[0].name}
+                  </span>
+                </div>
+                <div className='my-auto'>
+                  <FiPlusCircle></FiPlusCircle>
                 </div>
               </div>
-              <ProgressBar
-                className={"w-3/4"}
-                player={player}
-                position={position}
-                duration={track?.duration_ms}
-              ></ProgressBar>
-            </div>
-            <div className='flex justify-end w-1/4'>
-              <VolumeBar
-                value={volume * 100}
-                onVolumeChanged={(e) => {
-                  const vol = e.target.value;
-                  player.setVolume(vol / 100).then(() => {
-                    setVolume(vol / 100);
-                  });
-                }}
-              ></VolumeBar>
-            </div>
-          </>
+              <div className='flex flex-col w-1/2 items-center py-1'>
+                <div className='flex justify-center mb-2'>
+                  <div className='flex gap-1 ml-auto mr-auto'>
+                    <Button
+                      onClick={() => {
+                        player.previousTrack();
+                      }}
+                    >
+                      <FiChevronLeft></FiChevronLeft>
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        player.togglePlay();
+                      }}
+                    >
+                      {isPaused ? <FiPlay></FiPlay> : <FiPause></FiPause>}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        player.nextTrack();
+                      }}
+                    >
+                      <FiChevronRight></FiChevronRight>
+                    </Button>
+                  </div>
+                </div>
+                <ProgressBar
+                  className={"w-3/4"}
+                  player={player}
+                  position={position}
+                  duration={track?.duration_ms}
+                ></ProgressBar>
+              </div>
+              <div className='flex justify-end w-1/4'>
+                <VolumeBar
+                  value={volume * 100}
+                  onVolumeChanged={(e) => {
+                    const vol = e.target.value;
+                    player.setVolume(vol / 100).then(() => {
+                      setVolume(vol / 100);
+                    });
+                  }}
+                ></VolumeBar>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className='flex justify-center w-full'>
+                <b>
+                  Instances not active. Transfer your playback using your
+                  Spotify app
+                </b>
+              </div>
+            </>
+          )
         ) : (
-          <>
-            <div className='flex justify-center w-full'>
-              <b>
-                Instances not active. Transfer your playback using your Spotify
-                app
-              </b>
-            </div>
-          </>
+          <div className='flex justify-center w-full'>
+            <b>
+              <Link to="https://www.spotify.com/premium/" className="underline text-spotify-green">Upgrade to Premium</Link> to access Spotify Playback
+            </b>
+          </div>
         )}
       </div>
     </>

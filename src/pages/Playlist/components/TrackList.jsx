@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { PlayerContext } from "../../../context/playerContext";
-import { formatTimeMinSecond, getIdFromUri } from "../../../utils/util";
+import { formatTimeMinSecond } from "../../../utils/util";
 import { FiPause, FiPlay } from "react-icons/fi";
 
 function TrackList({ tracks, currentTrackUri, isPlaying, onPause, onPlay }) {

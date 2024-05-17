@@ -4,15 +4,18 @@ import { Outlet } from "react-router-dom";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import Topbar from "../component/Topbar";
 import { TokenProvider } from "../context/tokenContext";
-import { UserProvider } from "../context/userContext";
+import { UserContext, UserProvider } from "../context/userContext";
 import { PlayerProvider } from "../context/playerContext";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 function Home() {
   const [isLoaded, setLoaded] = useState(false)
 
+  const {user, isLoading} = useContext(UserContext)
+
   useEffect(() => {
-    if (isLoaded) return;
+    const isPremium = user.product === 'premium'
+    if (!isPremium || isLoaded) return;
 
     const script = document.createElement("script");
     script.src = "https://sdk.scdn.co/spotify-player.js";
@@ -21,7 +24,7 @@ function Home() {
     document.body.appendChild(script);
 
     setLoaded(true);
-  }, [isLoaded]);
+  }, [user, isLoaded]);
 
   return (
     <TokenProvider>

@@ -1,4 +1,5 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { UserContext } from "./userContext";
 
 export const PlayerContext = createContext("");
 
@@ -6,6 +7,8 @@ export function PlayerProvider({ children }) {
   const [player, setPlayer] = useState(null);
   const [playerId, setPlayerId] = useState("");
   const [isActive, setIsActive] = useState(false);
+
+  const { user, isLoading } = useContext(UserContext)
 
   const defaultVolume = 0.5;
 
@@ -76,12 +79,14 @@ export function PlayerProvider({ children }) {
 
       newPlayer.connect();
     }
+    if (user.product === 'premium') {
+      window.onSpotifyWebPlaybackSDKReady = onSDKReady;
+    }
 
-    window.onSpotifyWebPlaybackSDKReady = onSDKReady;
     return () => {
       window.onSpotifyWebPlaybackSDKReady = null;
     };
-  }, [player]);
+  }, [player, user]);
 
   return (
     <PlayerContext.Provider value={{ player, playerId, isActive }}>

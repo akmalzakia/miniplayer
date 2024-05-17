@@ -50,29 +50,9 @@ function formatTimeMinSecond(time) {
   return timeDetails.minutes + " : " + (timeDetails.seconds < 10 ? '0' : '') + timeDetails.seconds;
 }
 
-function isOverflown({ clientWidth, clientHeight, scrollWidth, scrollHeight }) {
-  return (scrollWidth > clientWidth) || (scrollHeight > clientHeight)
-}
-
-function resizeText({ el, minSize = 10, maxSize = 128, step = 1, unit = 'px' }) {
-  if (!el) return
-
-  console.log(el)
-  let i = minSize
-  let overflow = false
-
-  const parent = el.parentNode
-  console.log(parent)
-  while (!overflow && i < maxSize) {
-    overflow = isOverflown(parent)
-    if (!overflow) i += step
-  }
-
-  return `${i - step}${unit}`
-}
 
 function getIdFromUri(spotifyUri) {
   return spotifyUri.split(':').at(-1)
 }
 
-export { generateRandomString, sha256, base64encode, millisToMinutesAndSeconds, formatTimeMinSecond, resizeText, getIdFromUri }
+export { generateRandomString, sha256, base64encode, millisToMinutesAndSeconds, formatTimeMinSecond, getIdFromUri }

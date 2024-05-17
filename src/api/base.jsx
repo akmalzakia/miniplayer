@@ -123,6 +123,24 @@ const playlistBase = {
   uri: "",
 };
 
+const userBase = {
+  country: "",
+  display_name: "",
+  email: "",
+  explicit_content: {
+    filter_enabled: false,
+    filter_locked: false,
+  },
+  external_urls: externalUrlsBase,
+  followers: followersBase,
+  href: "",
+  id: "",
+  images: [imageBase],
+  product: "",
+  type: "",
+  uri: "",
+};
+
 export {
   externalIdsBase,
   externalUrlsBase,
@@ -134,4 +152,5 @@ export {
   artistBase,
   trackBase,
   playlistBase,
+  userBase,
 };
