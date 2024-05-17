@@ -6,9 +6,11 @@ import "overlayscrollbars/overlayscrollbars.css";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { NavLink } from "react-router-dom";
 import { spotifyAPI } from "../api/spotifyAxios";
+import PlaylistCardSkeleton from "./PlaylistCardSkeleton";
 
 function Sidebar() {
   const [playlists, setPlaylists] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const token = useContext(TokenContext);
 
   useEffect(() => {
@@ -21,13 +23,17 @@ function Sidebar() {
         };
         const data = await spotifyAPI.getUserPlaylists(token, params);
         setPlaylists(data.items);
+        setIsLoading(false);
       } catch (err) {
-        console.log(err)
+        console.log(err);
+        setIsLoading(true);
       }
     }
 
     if (playlists.length === 0) {
       requestPlaylists();
+    } else {
+      setIsLoading(false);
     }
   }, [token, playlists]);
 
@@ -56,15 +62,22 @@ function Sidebar() {
           scrollbars: { autoHide: "leave", theme: "os-theme-light" },
         }}
       >
-        {playlists.map((playlist, idx) => (
-          <PlaylistCard
-            key={idx}
-            className={"min-w-14 min-h-14 p-1"}
-            playlist={playlist}
-            imageOnly={true}
-            onMouseEnter={() => {}}
-          ></PlaylistCard>
-        ))}
+        {isLoading
+          ? [...Array(6)].map((x, i) => (
+              <PlaylistCardSkeleton
+                key={i}
+                imageOnly={true}
+              />
+            ))
+          : playlists.map((playlist, idx) => (
+              <PlaylistCard
+                key={idx}
+                className={"min-w-14 min-h-14 p-1"}
+                playlist={playlist}
+                imageOnly={true}
+                onMouseEnter={() => {}}
+              ></PlaylistCard>
+            ))}
       </OverlayScrollbarsComponent>
     </div>
   );
