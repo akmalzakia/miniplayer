@@ -1,7 +1,11 @@
 import { useEffect } from "react";
 import { Navigate, Outlet, useSearchParams } from "react-router-dom";
 
-const ProtectedRoute = ({ redirectPath = "/login", children }) => {
+interface Props extends React.PropsWithChildren {
+  redirectPath?: string;
+}
+
+const ProtectedRoute = ({ redirectPath = "/login", children }: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const token = localStorage.getItem("access_token");
   console.log("protected route");

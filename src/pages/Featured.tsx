@@ -5,7 +5,9 @@ import { spotifyAPI } from "../api/spotifyAxios";
 import PlaylistCardSkeleton from "../component/PlaylistCardSkeleton";
 
 function Featured() {
-  const [featured, setFeatured] = useState([]);
+  const [featured, setFeatured] = useState<
+    SpotifyApi.PlaylistObjectSimplified[]
+  >([]);
   const [isLoading, setIsLoading] = useState(true);
   const token = useContext(TokenContext);
   useEffect(() => {
@@ -43,15 +45,15 @@ function Featured() {
           gridTemplateRows: "repeat(auto-fill, minmax(14em, 1fr))",
         }}
       >
-        {isLoading ? [...Array(6)].map((x, i) => <PlaylistCardSkeleton key={i}/>) : (
-          featured &&
-          featured.map((playlist, idx) => (
-            <PlaylistCard
-              key={idx}
-              playlist={playlist}
-            ></PlaylistCard>
-          ))
-        )}
+        {isLoading
+          ? [...Array(6)].map((x, i) => <PlaylistCardSkeleton key={i} />)
+          : featured &&
+            featured.map((playlist, idx) => (
+              <PlaylistCard
+                key={idx}
+                playlist={playlist}
+              ></PlaylistCard>
+            ))}
       </div>
     </>
   );

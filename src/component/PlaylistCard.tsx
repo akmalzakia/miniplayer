@@ -1,12 +1,20 @@
 import { useNavigate } from "react-router-dom";
 
+interface Props extends React.PropsWithChildren {
+  playlist: SpotifyApi.PlaylistObjectFull | SpotifyApi.PlaylistObjectSimplified;
+  imageOnly?: boolean;
+  className?: string;
+  onMouseEnter?(): void;
+  onMouseLeave?(): void;
+}
+
 function PlaylistCard({
   playlist,
   imageOnly,
   className,
   onMouseEnter,
   onMouseLeave,
-}) {
+}: Props) {
   const id = `playlist-${playlist.id}`;
   const navigate = useNavigate();
   return (

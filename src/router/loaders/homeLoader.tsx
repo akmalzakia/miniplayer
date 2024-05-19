@@ -1,6 +1,10 @@
 import axios from "axios";
 
-const requestToken = async ({ request }) => {
+interface Props {
+  request: Request
+}
+
+const requestToken = async ({ request } : Props) => {
   const codeVerifier = localStorage.getItem("code_verifier");
   const url = new URL(request.url);
   const authCode = url.searchParams.get("code");
@@ -42,7 +46,7 @@ const requestToken = async ({ request }) => {
 
     localStorage.setItem("access_token", newToken);
     localStorage.setItem("refresh_token", refreshToken);
-    localStorage.setItem("expires_in", expires_in_epoch);
+    localStorage.setItem("expires_in", expires_in_epoch.toString());
     return tokenDetails;
   } catch (err) {
     console.log("auth", err);

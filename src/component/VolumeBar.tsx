@@ -1,6 +1,11 @@
 import { FiVolume, FiVolume1, FiVolume2, FiVolumeX } from "react-icons/fi";
 
-function VolumeBar({ onVolumeChanged, value }) {
+interface Props {
+  onVolumeChanged(e: React.ChangeEvent<HTMLInputElement>): void;
+  value: number;
+}
+
+function VolumeBar({ onVolumeChanged, value }: Props) {
   return (
     <div className='flex gap-1 items-center text-xl'>
       {value > 60 ? (
@@ -15,7 +20,7 @@ function VolumeBar({ onVolumeChanged, value }) {
       <input
         type='range'
         className='max-w-[40%] min-w-12 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
-        onInput={(e) => {
+        onChange={(e) => {
           onVolumeChanged(e);
         }}
         value={value}

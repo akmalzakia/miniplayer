@@ -1,15 +1,31 @@
-import { useContext, useState } from "react";
-import { PlayerContext } from "../../../context/playerContext";
+import { useState } from "react";
+import { usePlayerContext } from "../../../context/playerContext";
 import { formatTimeMinSecond } from "../../../utils/util";
 import { FiPause, FiPlay } from "react-icons/fi";
 
-function TrackList({ tracks, currentTrackUri, isPlaying, onPause, onPlay }) {
-  const { player, isActive } = useContext(PlayerContext);
-  const [currentHover, setCurrentHover] = useState(null);
+interface Props {
+  tracks: SpotifyApi.PagingObject<SpotifyApi.PlaylistTrackObject>;
+  currentTrackUri: string;
+  isPlaying: boolean;
+  onPause(): void;
+  onPlay(uri: string): void;
+}
 
-  const isTrackPlayed = (trackId) => isActive && currentTrackUri === trackId;
+function TrackList({
+  tracks,
+  currentTrackUri,
+  isPlaying,
+  onPause,
+  onPlay,
+}: Props) {
+  const { isActive } = usePlayerContext();
+  const [currentHover, setCurrentHover] = useState("");
 
-  function play(trackUri) {
+  const isTrackPlayed = (trackId?: string) =>
+    isActive && currentTrackUri === trackId;
+
+  function play(trackUri?: string) {
+    if (!trackUri) return;
     onPlay(trackUri);
   }
 
@@ -17,12 +33,12 @@ function TrackList({ tracks, currentTrackUri, isPlaying, onPause, onPlay }) {
     onPause();
   }
 
-  function formatDateAdded(datetime) {
+  function formatDateAdded(datetime?: string) {
     if (!datetime) return;
 
     const date = new Date(datetime.split("T")[0]);
     const dateDifference = Math.floor(
-      (Date.now() - date) / (1000 * 60 * 60 * 24)
+      (Date.now() - date.getTime()) / (1000 * 60 * 60 * 24)
     );
 
     const monthDifference = Math.floor(dateDifference / 30);
@@ -53,30 +69,32 @@ function TrackList({ tracks, currentTrackUri, isPlaying, onPause, onPlay }) {
       <tbody>
         {tracks.items.map((item, idx) => (
           <tr
-            key={item.track.id}
+            key={item.track?.id}
             className={`hover:bg-slate-800 ${
-              isTrackPlayed(item.track.uri) ? "border border-spotify-green" : ""
+              isTrackPlayed(item.track?.uri)
+                ? "border border-spotify-green"
+                : ""
             }`}
             onMouseEnter={() => {
-              setCurrentHover(item.track.id);
+              setCurrentHover(item.track?.id || "");
             }}
             onMouseLeave={() => {
-              setCurrentHover(null);
+              setCurrentHover("");
             }}
           >
             <td
               className={`text-right px-3 ${
-                isTrackPlayed(item.track.uri) ? "text-spotify-green" : ""
+                isTrackPlayed(item.track?.uri) ? "text-spotify-green" : ""
               }`}
             >
-              {isTrackPlayed(item.track.uri) ? (
+              {isTrackPlayed(item.track?.uri) ? (
                 isPlaying ? (
                   <FiPause onClick={pause} />
                 ) : (
-                  <FiPlay onClick={() => play(item.track.uri)} />
+                  <FiPlay onClick={() => play(item.track?.uri)} />
                 )
-              ) : currentHover === item.track.id ? (
-                <FiPlay onClick={() => play(item.track.uri)}/>
+              ) : currentHover === item.track?.id ? (
+                <FiPlay onClick={() => play(item.track?.uri)} />
               ) : (
                 idx + 1
               )}
@@ -85,29 +103,29 @@ function TrackList({ tracks, currentTrackUri, isPlaying, onPause, onPlay }) {
               <div className='w-10 min-w-10'>
                 <img
                   className='max-w-full max-h-full rounded-md'
-                  src={item.track.album.images[0].url}
+                  src={item.track?.album.images[0].url}
                 />
               </div>
               <div>
                 <div
                   className={`${
-                    isTrackPlayed(item.track.uri)
+                    isTrackPlayed(item.track?.uri)
                       ? "text-spotify-green"
                       : "text-white"
                   }`}
                 >
-                  {item.track.name}
+                  {item.track?.name}
                 </div>
                 <div className=''>
-                  {item.track.artists.map((artist) => artist.name).join(", ")}
+                  {item.track?.artists.map((artist) => artist.name).join(", ")}
                 </div>
               </div>
             </td>
             <td className='text-ellipsis overflow-hidden text-nowrap'>
-              {item.track.album.name}
+              {item.track?.album.name}
             </td>
             <td className='pr-2'>{formatDateAdded(item.added_at)}</td>
-            <td>{formatTimeMinSecond(item.track.duration_ms)}</td>
+            <td>{formatTimeMinSecond(item.track?.duration_ms)}</td>
           </tr>
         ))}
       </tbody>

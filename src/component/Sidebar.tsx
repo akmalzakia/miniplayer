@@ -9,10 +9,11 @@ import { spotifyAPI } from "../api/spotifyAxios";
 import PlaylistCardSkeleton from "./PlaylistCardSkeleton";
 
 function Sidebar() {
-  const [playlists, setPlaylists] = useState([]);
+  const [playlists, setPlaylists] = useState<
+    SpotifyApi.PlaylistObjectSimplified[] | null
+  >(null);
   const [isLoading, setIsLoading] = useState(true);
   const token = useContext(TokenContext);
-
   useEffect(() => {
     async function requestPlaylists() {
       console.log("requesting user playlists...");
@@ -30,11 +31,12 @@ function Sidebar() {
       }
     }
 
-    if (playlists.length === 0) {
+    if (!playlists || playlists.length === 0) {
       requestPlaylists();
-    } else {
-      setIsLoading(false);
+      return;
     }
+
+    setIsLoading(false);
   }, [token, playlists]);
 
   return (
@@ -69,13 +71,12 @@ function Sidebar() {
                 imageOnly={true}
               />
             ))
-          : playlists.map((playlist, idx) => (
+          : playlists?.map((playlist, idx) => (
               <PlaylistCard
                 key={idx}
                 className={"min-w-14 min-h-14 p-1"}
                 playlist={playlist}
                 imageOnly={true}
-                onMouseEnter={() => {}}
               ></PlaylistCard>
             ))}
       </OverlayScrollbarsComponent>

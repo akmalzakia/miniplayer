@@ -18,11 +18,13 @@ const LoadingDiv = styled.div`
   }
 `;
 
-function PlaylistCardSkeleton({ imageOnly }) {
+interface Props {
+  imageOnly?: boolean;
+}
+
+function PlaylistCardSkeleton({ imageOnly }: Props) {
   return (
-    <div
-      className={`flex flex-col p-2 overflow-hidden rounded-sm gap-2`}
-    >
+    <div className={`flex flex-col p-2 overflow-hidden rounded-sm gap-2`}>
       <LoadingDiv className='max-w-full max-h-full  w-full pb-[100%] rounded-md'></LoadingDiv>
       {!imageOnly && (
         <>

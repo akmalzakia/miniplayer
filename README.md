@@ -1,8 +1,19 @@
-# React + Vite
+# Known Bugs / Unimplemented Features
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Play Playlist when Webplayer and Spotify inactive (no active devices)
 
-Currently, two official plugins are available:
+Returned a 404 Response
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```json
+{
+  "error": {
+    "status": 404,
+    "message": "Player command failed: No active device found",
+    "reason": "NO_ACTIVE_DEVICE"
+  }
+}
+```
+
+Possible Fix:  
+Catch the error in `play()` function in [Playlist.tsx](./src/pages/Playlist/Playlist.tsx#L106)  
+Then, show a modal / popup to display the error message

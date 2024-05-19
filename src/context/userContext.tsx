@@ -1,12 +1,28 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { TokenContext } from "./tokenContext";
 import { spotifyAPI } from "../api/spotifyAxios";
-import { userBase } from "../api/base";
 
-export const UserContext = createContext({ user: userBase, isLoading: true});
+interface UserContextType {
+  user: SpotifyApi.UserObjectPrivate | null;
+  isLoading: boolean;
+}
 
-export function UserProvider({ children }) {
-  const [user, setUser] = useState(userBase);
+export const UserContext = createContext<UserContextType | null>(null);
+
+export const useUserContext = () => {
+  const obj = useContext(UserContext);
+  if (!obj) {
+    throw new Error("useUserContext must be used within a Provider");
+  }
+  return obj;
+};
+
+interface Props {
+  children?: React.ReactNode;
+}
+
+export function UserProvider({ children }: Props) {
+  const [user, setUser] = useState<SpotifyApi.UserObjectPrivate | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const token = useContext(TokenContext);
 
@@ -15,7 +31,7 @@ export function UserProvider({ children }) {
       console.log("requesting user data...");
 
       try {
-        const data = await spotifyAPI.getCurrentUser(token)
+        const data = await spotifyAPI.getCurrentUser(token);
         setUser(data);
         setIsLoading(false);
       } catch (err) {
@@ -24,7 +40,7 @@ export function UserProvider({ children }) {
       }
     }
 
-    if (user === userBase) {
+    if (!user) {
       requestUser();
     }
   }, [user, token]);

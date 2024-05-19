@@ -5,6 +5,8 @@ import Login from "./Login";
 import ProtectedRoute from "./ProtectedRoute";
 import requestToken from "../router/loaders/homeLoader";
 import Playlist from "./Playlist/Playlist";
+import { TokenProvider } from "../context/tokenContext";
+import { UserProvider } from "../context/userContext";
 
 const router = createBrowserRouter([
   {
@@ -12,7 +14,11 @@ const router = createBrowserRouter([
     loader: requestToken,
     element: (
       <ProtectedRoute>
-        <Home></Home>
+        <TokenProvider>
+          <UserProvider>
+            <Home></Home>
+          </UserProvider>
+        </TokenProvider>
       </ProtectedRoute>
     ),
     children: [

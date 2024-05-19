@@ -1,13 +1,20 @@
 import { formatTimeMinSecond } from "../utils/util";
 
-function ProgressBar({ player, position, duration, className }) {
+interface Props {
+  player: Spotify.Player | null;
+  position: number;
+  duration: number;
+  className: string;
+}
+
+function ProgressBar({ player, position, duration, className }: Props) {
   function progressBarValue() {
-    if (!position || !duration) return 0
+    if (!position || !duration) return 0;
     const progress = position / duration;
     return progress * 100;
   }
 
-  function progressToPositionMs(progress) {
+  function progressToPositionMs(progress: number) {
     const position = (progress / 100) * duration;
     return position;
   }
@@ -21,7 +28,7 @@ function ProgressBar({ player, position, duration, className }) {
           className='flex-1 bg-gray-700 rounded-lg'
           value={progressBarValue()}
           onChange={(e) => {
-            const pos = progressToPositionMs(e.target.value);
+            const pos = progressToPositionMs(parseInt(e.target.value));
             player?.seek(pos);
           }}
         ></input>

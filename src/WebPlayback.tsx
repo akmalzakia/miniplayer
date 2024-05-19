@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import {
   FiChevronLeft,
   FiChevronRight,
@@ -9,23 +9,22 @@ import {
 import ProgressBar from "./component/ProgressBar";
 import Button from "./component/Button";
 import VolumeBar from "./component/VolumeBar";
-import { PlayerContext } from "./context/playerContext";
-import { trackBase } from "./api/base";
-import { UserContext } from "./context/userContext";
+import { usePlayerContext } from "./context/playerContext";
+import { useUserContext } from "./context/userContext";
 import { Link } from "react-router-dom";
 
 function WebPlayback() {
-  const { player, isActive } = useContext(PlayerContext);
-  const { user, isLoading } = useContext(UserContext);
+  const { player, isActive } = usePlayerContext();
+  const { user, isLoading } = useUserContext();
   const [isPaused, setPaused] = useState(false);
-  const [track, setTrack] = useState(trackBase);
+  const [track, setTrack] = useState<Spotify.Track | null>(null);
   const [position, setPosition] = useState(0);
 
   const defaultVolume = 0.5;
   const [volume, setVolume] = useState(defaultVolume);
 
   useEffect(() => {
-    function onStateChange(state) {
+    function onStateChange(state: Spotify.PlaybackState) {
       if (!state) {
         return;
       }
@@ -59,7 +58,7 @@ function WebPlayback() {
   return (
     <>
       <div className='w-full sticky bottom-0 bg-spotify-black p-2 flex'>
-        {user.product === "premium" ? (
+        {user?.product === "premium" ? (
           isActive ? (
             <>
               <div className='flex gap-3 w-1/4'>
@@ -82,40 +81,42 @@ function WebPlayback() {
                   <div className='flex gap-1 ml-auto mr-auto'>
                     <Button
                       onClick={() => {
-                        player.previousTrack();
+                        player?.previousTrack();
                       }}
                     >
                       <FiChevronLeft></FiChevronLeft>
                     </Button>
                     <Button
                       onClick={() => {
-                        player.togglePlay();
+                        player?.togglePlay();
                       }}
                     >
                       {isPaused ? <FiPlay></FiPlay> : <FiPause></FiPause>}
                     </Button>
                     <Button
                       onClick={() => {
-                        player.nextTrack();
+                        player?.nextTrack();
                       }}
                     >
                       <FiChevronRight></FiChevronRight>
                     </Button>
                   </div>
                 </div>
-                <ProgressBar
-                  className={"w-3/4"}
-                  player={player}
-                  position={position}
-                  duration={track?.duration_ms}
-                ></ProgressBar>
+                {player && (
+                  <ProgressBar
+                    className={"w-3/4"}
+                    player={player}
+                    position={position}
+                    duration={track?.duration_ms || 0}
+                  ></ProgressBar>
+                )}
               </div>
               <div className='flex justify-end w-1/4'>
                 <VolumeBar
                   value={volume * 100}
                   onVolumeChanged={(e) => {
-                    const vol = e.target.value;
-                    player.setVolume(vol / 100).then(() => {
+                    const vol = parseInt(e.target.value);
+                    player?.setVolume(vol / 100).then(() => {
                       setVolume(vol / 100);
                     });
                   }}
@@ -135,7 +136,13 @@ function WebPlayback() {
         ) : (
           <div className='flex justify-center w-full'>
             <b>
-              <Link to="https://www.spotify.com/premium/" className="underline text-spotify-green">Upgrade to Premium</Link> to access Spotify Playback
+              <Link
+                to='https://www.spotify.com/premium/'
+                className='underline text-spotify-green'
+              >
+                Upgrade to Premium
+              </Link>{" "}
+              to access Spotify Playback
             </b>
           </div>
         )}

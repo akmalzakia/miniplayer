@@ -1,12 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import { FaAngleLeft, FaBell, FaUsers } from "react-icons/fa";
-import { useContext } from "react";
-import { UserContext } from "../context/userContext";
+import { useUserContext } from "../context/userContext";
 
 function Topbar() {
-  const { user, isLoading } = useContext(UserContext)
-  const navigate = useNavigate()
+  const { user, isLoading } = useUserContext();
+  const navigate = useNavigate();
   return (
     <div className='flex items-center p-4 justify-between'>
       <Button
@@ -28,7 +27,7 @@ function Topbar() {
           {!isLoading && (
             <img
               className='rounded-full w-8'
-              src={user?.images[0].url}
+              src={user?.images?.[0].url}
             ></img>
           )}
         </Button>
