@@ -35,6 +35,11 @@ async function getCurrentUser(token: string) {
   return res.data;
 }
 
+async function getUserById(id: string, token: string) {
+  const res = await spotifyAxios(token).get<SpotifyApi.UserProfileResponse>(`/users/${id}`)
+  return res.data
+}
+
 async function getFeaturedPlaylists(
   token: string,
   params: {
@@ -59,6 +64,7 @@ const get = {
   getPlayerState,
   getUserPlaylists,
   getCurrentUser,
+  getUserById,
   getFeaturedPlaylists,
 };
 

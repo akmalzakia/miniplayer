@@ -11,10 +11,12 @@ function usePlaylist(id: string) {
   useEffect(() => {
     async function requestPlaylist() {
       console.log("requesting playlist with id: ", id);
+      setIsLoading(true)
       try {
         const data = await spotifyAPI.getPlaylistWithId(id, token);
         setPlaylist(data);
         setIsLoading(false);
+        console.log(data)
       } catch (err) {
         console.log("error fetching playlist id: ", id);
         setIsLoading(true);

@@ -9,6 +9,7 @@ import { spotifyAPI } from "../../api/spotifyAxios";
 import usePlaylist from "../../hooks/usePlaylist";
 import TrackList from "./components/TrackList";
 import { PlayerStateContext, Track } from "../../api/base";
+import OwnerImage from "./components/OwnerImage";
 
 interface DataContext {
   context: Spotify.PlaybackContext | PlayerStateContext;
@@ -230,7 +231,7 @@ function Playlist() {
   function formatFollowers(total: number) {
     if (!total) return;
 
-    let arr = [];
+    const arr = [];
     while (total) {
       arr.push(total % 1000);
       total = Math.floor(total / 1000);
@@ -256,17 +257,18 @@ function Playlist() {
               {playlist.name}
             </div>
             <div className='text-gray-400 mt-1'>{playlist.description}</div>
-            <div className='flex text-gray-400'>
+            <div className='flex text-gray-400 items-center gap-1'>
+              {!isLoading && <OwnerImage userId={playlist.owner.id}/>}
               <div className='font-bold text-white'>
                 {playlist.owner.display_name}
               </div>
-              <div className='mx-1'>&#xb7;</div>
+              <div>&#xb7;</div>
               {playlist.followers && playlist.followers.total !== 0 && (
                 <>
                   <div className=''>
                     {formatFollowers(playlist.followers.total)} likes
                   </div>
-                  <div className='mx-1'>&#xb7;</div>
+                  <div>&#xb7;</div>
                 </>
               )}
               <div className=''>
