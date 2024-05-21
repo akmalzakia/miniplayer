@@ -28,14 +28,14 @@ function Home() {
   return (
     <PlayerProvider>
       <div className='w-full flex flex-col h-full min-w-[800px] min-h-[600px]'>
-        <div className='flex w-full h-full bg-spotify-black p-2 gap-2 overflow-hidden'>
+        <div className='flex w-full h-full bg-spotify-black py-2 gap-2 overflow-hidden'>
           <Sidebar></Sidebar>
           <div
-            className={`flex flex-col w-full h-full rounded-md to-spotify-black p-4 flex-1`}
+            className={`flex flex-col h-full rounded-md to-spotify-black py-4 pl-4 w-[calc(100%-6rem)]`}
           >
             <Topbar />
             <OverlayScrollbarsComponent
-              className='gap-2 overlow-y p-2'
+              className='gap-2 overlow-y'
               options={{
                 scrollbars: { autoHide: "leave", theme: "os-theme-light" },
               }}
