@@ -1,4 +1,4 @@
-import WebPlayback from "../WebPlayback";
+import WebPlayback from "../component/WebPlayback/WebPlayback";
 import Sidebar from "../component/Sidebar";
 import { Outlet } from "react-router-dom";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";

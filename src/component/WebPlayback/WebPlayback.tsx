@@ -6,11 +6,11 @@ import {
   FiPlay,
   FiPlusCircle,
 } from "react-icons/fi";
-import ProgressBar from "./component/ProgressBar";
-import Button from "./component/Button";
-import VolumeBar from "./component/VolumeBar";
-import { usePlayerContext } from "./context/playerContext";
-import { useUserContext } from "./context/userContext";
+import ProgressBar from "./components/ProgressBar";
+import Button from "../Button";
+import VolumeBar from "./components/VolumeBar";
+import { usePlayerContext } from "../../context/playerContext";
+import { useUserContext } from "../../context/userContext";
 import { Link } from "react-router-dom";
 
 function WebPlayback() {
@@ -47,7 +47,7 @@ function WebPlayback() {
   }, [player]);
 
   useEffect(() => {
-    let interval = setInterval(() => {
+    const interval = setInterval(() => {
       if (isActive && !isPaused) setPosition((p) => p + 1000);
     }, 1000);
     return () => {

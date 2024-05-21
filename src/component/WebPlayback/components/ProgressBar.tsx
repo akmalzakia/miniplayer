@@ -1,4 +1,4 @@
-import { formatTimeMinSecond } from "../utils/util";
+import { formatTimeMinSecond } from "../../../utils/util";
 
 interface Props {
   player: Spotify.Player | null;
