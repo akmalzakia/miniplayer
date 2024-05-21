@@ -1,15 +1,24 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { TokenContext } from "../../context/tokenContext";
-import { millisToMinutesAndSeconds } from "../../utils/util";
-import Button from "../../component/Button";
+import { usePlayerContext } from "../../../context/playerContext";
+import { TokenContext } from "../../../context/tokenContext";
+import { spotifyAPI } from "../../../api/spotifyAxios";
+import { PlayerStateContext, Track } from "../../../api/base";
+import { millisToMinutesAndSeconds } from "../../../utils/util";
+import Button from "../../../component/Button";
 import { FiPause, FiPlay } from "react-icons/fi";
-import { usePlayerContext } from "../../context/playerContext";
-import { spotifyAPI } from "../../api/spotifyAxios";
-import usePlaylist from "../../hooks/usePlaylist";
 import TrackList from "./components/TrackList";
-import { PlayerStateContext, Track } from "../../api/base";
-import OwnerImage from "./components/OwnerImage";
+import { CollectionType } from "../../../utils/enums";
+import CollectionOwnerImage from "./components/CollectionOwnerImage";
+
+interface Props {
+  type: CollectionType;
+  collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull | null;
+}
+
+interface DeviceData {
+  id: string;
+  name: string;
+}
 
 interface DataContext {
   context: Spotify.PlaybackContext | PlayerStateContext;
@@ -18,35 +27,54 @@ interface DataContext {
   device?: DeviceData;
 }
 
-interface DeviceData {
-  id: string;
-  name: string;
-}
-
-function Playlist() {
-  const playlistId = useParams();
-
-  const [playlist, isLoading] = usePlaylist(playlistId.id || "");
+function CollectionsTemplate({ type, collection }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [anotherDevice, setAnotherDevice] = useState<DeviceData | null>(null);
   const [currentTrackUri, setCurrentTrackUri] = useState("");
   const { player, playerId, isActive } = usePlayerContext();
   const token = useContext(TokenContext);
+  console.log(collection);
 
-  const isTrackOnPlaylist = playlist?.tracks.items.some(
-    (i) => i.track?.uri === currentTrackUri
-  );
+  function isPlaylistTrack(
+    item: SpotifyApi.TrackObjectSimplified | SpotifyApi.PlaylistTrackObject
+  ): item is SpotifyApi.PlaylistTrackObject {
+    return (item as SpotifyApi.PlaylistTrackObject).track !== undefined;
+  }
+
+  function isPlaylist(
+    collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull
+  ): collection is SpotifyApi.PlaylistObjectFull {
+    return (collection as SpotifyApi.PlaylistObjectFull).type === "playlist";
+  }
+
+  const isTrackOnCollection = collection?.tracks.items.some((i) => {
+    return isPlaylistTrack(i)
+      ? i.track?.uri === currentTrackUri
+      : i.uri === currentTrackUri;
+  });
 
   const isPlayedInAnotherDevice = !isActive && isPlaying;
 
-  function calculateDuration(tracks: SpotifyApi.PlaylistTrackObject[]) {
+  function calculateDuration(
+    tracks:
+      | SpotifyApi.PlaylistTrackObject[]
+      | SpotifyApi.TrackObjectSimplified[]
+  ) {
     if (!tracks) return;
 
     const totalDuration = tracks.reduce((acc, obj) => {
-      if (obj.track) {
-        return acc + obj.track.duration_ms;
+      if (isPlaylistTrack(obj)) {
+        if (obj.track) {
+          return acc + obj.track.duration_ms;
+        } else {
+          return acc + 0;
+        }
       } else {
-        return acc + 0;
+        if (obj) {
+          return acc + obj.duration_ms;
+        } else {
+          return acc + 0;
+        }
       }
     }, 0);
     return totalDuration;
@@ -55,13 +83,14 @@ function Playlist() {
   const getCurrentContext = useCallback(
     (data: DataContext) => {
       const currentContext = data?.context;
-      if (!currentContext || currentContext?.uri !== playlist?.uri) {
+      if (!currentContext || currentContext?.uri !== collection?.uri) {
         setIsPlaying(false);
         setCurrentTrackUri("");
         return;
       }
 
       const currentTrack = data?.current_track;
+      console.log(currentTrack);
 
       setCurrentTrackUri(currentTrack?.uri || "");
 
@@ -76,7 +105,7 @@ function Playlist() {
         setAnotherDevice(deviceData);
       }
     },
-    [playlist]
+    [collection]
   );
 
   async function transferPlayback() {
@@ -105,9 +134,9 @@ function Playlist() {
   }
 
   async function play(playlistUri: string) {
-    if (player && isActive && isTrackOnPlaylist) {
+    if (player && isActive && isTrackOnCollection) {
       player.resume();
-    } else if (isTrackOnPlaylist) {
+    } else if (isTrackOnCollection) {
       const { progress_ms, item } = await spotifyAPI.getPlayerState(token);
 
       const data = {
@@ -144,7 +173,7 @@ function Playlist() {
     } else {
       try {
         const data = {
-          context_uri: playlist?.uri,
+          context_uri: collection?.uri,
           offset: {
             uri: trackUri,
           },
@@ -184,6 +213,7 @@ function Playlist() {
             current_track: res.item,
             device: res.device,
           };
+          console.log(res);
         }
         getCurrentContext(data);
       } catch (err) {
@@ -196,7 +226,7 @@ function Playlist() {
 
   useEffect(() => {
     function onStateChange(state: Spotify.PlaybackState) {
-      if (!state || !playlist) {
+      if (!state || !collection) {
         return;
       }
       const data = {
@@ -215,14 +245,14 @@ function Playlist() {
         player.removeListener("player_state_changed", onStateChange);
       }
     };
-  }, [playlist, player, getCurrentContext]);
+  }, [collection, player, getCurrentContext]);
 
-  function formatPlaylistDuration(duration: number) {
+  function formatCollectionDuration(duration: number) {
     if (!duration) return;
 
     const timeDetails = millisToMinutesAndSeconds(duration);
     let res = `${timeDetails.hours ? timeDetails.hours + " hr" : ""} `;
-    res += `${timeDetails.minutes} min`;
+    res += `${timeDetails.minutes} min `;
     res += `${!timeDetails.hours ? timeDetails.seconds + " sec" : ""} `;
 
     return res;
@@ -240,41 +270,61 @@ function Playlist() {
   }
 
   return (
-    playlist && (
+    collection && (
       <>
         <div className='w-full flex gap-2'>
           <div className='w-[30%] min-w-36 max-w-72'>
             <img
               className='max-w-full max-h-full rounded-md shadow-md'
-              src={playlist.images[0].url}
+              src={collection.images[0].url}
             ></img>
           </div>
-          <div className='flex flex-col justify-end text-sm gap-2'>
-            <div className=''>
-              {playlist.public ? "Public" : "Private"} Playlist
+          <div className='flex flex-col justify-end text-sm gap-2 w-[70%] min-w-[calc(100%-18rem)] max-w-[calc(100%-9rem)]'>
+            {isPlaylist(collection) && (
+              <div className=''>
+                {collection.public ? "Public" : "Private"} Playlist
+              </div>
+            )}
+
+            <div className='font-bold text-4xl lg:text-6xl'>
+              {collection.name}
             </div>
-            <div className='font-bold text-6xl lg:text-7xl text-nowrap'>
-              {playlist.name}
+            <div className='text-gray-400 mt-1'>
+              {isPlaylist(collection) && collection.description}
             </div>
-            <div className='text-gray-400 mt-1'>{playlist.description}</div>
             <div className='flex text-gray-400 items-center gap-1'>
-              {!isLoading && <OwnerImage userId={playlist.owner.id}/>}
+              {/* need to handle artists! */}
+              {
+                <CollectionOwnerImage
+                  type={type}
+                  ownerId={
+                    isPlaylist(collection)
+                      ? collection.owner.id
+                      : collection.artists[0].id
+                  }
+                />
+              }
               <div className='font-bold text-white'>
-                {playlist.owner.display_name}
+                {/* handle multiple artists */}
+                {isPlaylist(collection)
+                  ? collection.owner.display_name
+                  : collection.artists[0].name}
               </div>
               <div>&#xb7;</div>
-              {playlist.followers && playlist.followers.total !== 0 && (
-                <>
-                  <div className=''>
-                    {formatFollowers(playlist.followers.total)} likes
-                  </div>
-                  <div>&#xb7;</div>
-                </>
-              )}
+              {isPlaylist(collection) &&
+                collection.followers &&
+                collection.followers.total !== 0 && (
+                  <>
+                    <div className=''>
+                      {formatFollowers(collection.followers.total)} likes
+                    </div>
+                    <div>&#xb7;</div>
+                  </>
+                )}
               <div className=''>
-                {playlist.tracks.total} songs,{" "}
-                {formatPlaylistDuration(
-                  calculateDuration(playlist.tracks.items) || 0
+                {collection.tracks.total} songs,{" "}
+                {formatCollectionDuration(
+                  calculateDuration(collection.tracks.items) || 0
                 )}
               </div>
             </div>
@@ -284,19 +334,19 @@ function Playlist() {
           <Button
             className='p-3'
             onClick={() => {
-              if (isPlaying && isTrackOnPlaylist) {
+              if (isPlaying && isTrackOnCollection) {
                 if (isPlayedInAnotherDevice) {
                   transferPlayback();
                 } else {
                   pause();
                 }
               } else {
-                play(playlist.uri);
+                play(collection.uri);
               }
               console.log(isPlayedInAnotherDevice);
             }}
           >
-            {isPlaying && isTrackOnPlaylist ? (
+            {isPlaying && isTrackOnCollection ? (
               isPlayedInAnotherDevice ? (
                 <>Playing on {anotherDevice?.name}</>
               ) : (
@@ -308,7 +358,8 @@ function Playlist() {
           </Button>
         </div>
         <TrackList
-          tracks={playlist.tracks}
+          type={type}
+          tracks={collection.tracks}
           currentTrackUri={currentTrackUri}
           isPlaying={isPlaying}
           onPause={pause}
@@ -319,4 +370,4 @@ function Playlist() {
   );
 }
 
-export default Playlist;
+export default CollectionsTemplate;

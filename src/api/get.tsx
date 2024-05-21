@@ -67,6 +67,12 @@ async function getAlbumWithId(id: string, token: string) {
   return res.data;
 }
 //#endregion
+//#region Artist
+async function getArtistById(id:string, token: string) {
+  const res = await spotifyAxios(token).get<SpotifyApi.SingleArtistResponse>(`/artists/${id}`)
+  return res.data
+}
+//#endregion
 //#region Player
 
 async function getPlayerState(token: string) {
@@ -75,6 +81,7 @@ async function getPlayerState(token: string) {
 }
 //#endregion
 
+
 const get = {
   getCurrentUser,
   getUserById,
@@ -82,6 +89,7 @@ const get = {
   getFeaturedPlaylists,
   getUserPlaylists,
   getAlbumWithId,
+  getArtistById,
   getPlayerState,
 };
 

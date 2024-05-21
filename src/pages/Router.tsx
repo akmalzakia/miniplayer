@@ -4,9 +4,10 @@ import Featured from "./Featured";
 import Login from "./Login";
 import ProtectedRoute from "./ProtectedRoute";
 import requestToken from "../router/loaders/homeLoader";
-import Playlist from "./Playlist/Playlist";
+import Playlist from "./Playlist";
 import { TokenProvider } from "../context/tokenContext";
 import { UserProvider } from "../context/userContext";
+import Album from "./Album";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
         path: "/playlist/:id",
         element: <Playlist />,
       },
+      {
+        path: "/album/:id",
+        element: <Album/>
+      }
     ],
   },
   {
