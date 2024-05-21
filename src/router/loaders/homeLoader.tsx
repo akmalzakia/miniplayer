@@ -1,10 +1,10 @@
 import axios from "axios";
 
-interface Props {
+interface Params {
   request: Request
 }
 
-const requestToken = async ({ request } : Props) => {
+const requestToken = async ({ request } : Params) => {
   const codeVerifier = localStorage.getItem("code_verifier");
   const url = new URL(request.url);
   const authCode = url.searchParams.get("code");
