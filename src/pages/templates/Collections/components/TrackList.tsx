@@ -68,7 +68,7 @@ function TrackList({
   }
 
   return (
-    <div className="pr-4">
+    <div className='pr-4'>
       <table className='table-fixed w-full text-sm text-gray-400'>
         <thead className='border-b border-gray-500'>
           <tr className='text-left'>
@@ -102,17 +102,21 @@ function TrackList({
                 }}
               >
                 <td
-                  className={`text-right ${
-                    currentHover !== trackItem?.id ? "pr-3" : ""
-                  } rounded-l-md ${
+                  className={`text-right rounded-l-md ${
                     isTrackPlayed(trackItem?.uri) ? "text-spotify-green" : ""
                   }`}
                 >
                   {isTrackPlayed(trackItem?.uri) ? (
                     isPlaying ? (
-                      <FiPause onClick={pause} />
+                      <FiPause
+                        className='m-auto'
+                        onClick={pause}
+                      />
                     ) : (
-                      <FiPlay onClick={() => play(trackItem?.uri)} />
+                      <FiPlay
+                        className='m-auto'
+                        onClick={() => play(trackItem?.uri)}
+                      />
                     )
                   ) : currentHover === trackItem?.id ? (
                     <FiPlay
@@ -120,7 +124,7 @@ function TrackList({
                       onClick={() => play(trackItem?.uri)}
                     />
                   ) : (
-                    idx + 1
+                    <div className='pr-3'>{idx + 1}</div>
                   )}
                 </td>
                 <td className='flex items-center py-2 gap-2'>
@@ -142,21 +146,20 @@ function TrackList({
                     >
                       {trackItem?.name}
                     </div>
-                    <div className=''>
+                    <div className='flex gap-1'>
                       {trackItem?.artists.map((artist, idx) => {
                         const separator = trackItem.artists.length >
                           idx + 1 && <>, </>;
                         return (
-                          <>
+                          <div key={artist.id}>
                             <Link
-                              key={idx}
                               className='hover:underline'
                               to={`/artist/${artist.id}`}
                             >
                               {artist.name}
                             </Link>
                             {separator}
-                          </>
+                          </div>
                         );
                       })}
                     </div>
