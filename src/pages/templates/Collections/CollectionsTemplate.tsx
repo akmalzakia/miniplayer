@@ -3,12 +3,16 @@ import { usePlayerContext } from "../../../context/playerContext";
 import { TokenContext } from "../../../context/tokenContext";
 import { spotifyAPI } from "../../../api/spotifyAxios";
 import { PlayerStateContext, Track } from "../../../api/base";
-import { formatFollowers, millisToMinutesAndSeconds } from "../../../utils/util";
+import {
+  formatFollowers,
+  millisToMinutesAndSeconds,
+} from "../../../utils/util";
 import Button from "../../../component/Button";
 import { FiPause, FiPlay } from "react-icons/fi";
 import TrackList from "./components/TrackList";
 import { CollectionType } from "../../../utils/enums";
 import CollectionOwnerImage from "./components/CollectionOwnerImage";
+import { Textfit } from "react-textfit";
 
 interface Props {
   type: CollectionType;
@@ -268,16 +272,23 @@ function CollectionsTemplate({ type, collection }: Props) {
               src={collection.images[0].url}
             ></img>
           </div>
-          <div className='flex flex-col justify-end text-sm gap-2 w-[70%] min-w-[calc(100%-18rem)] max-w-[calc(100%-9rem)]'>
+          <div className='flex flex-col justify-end gap-2 w-[70%] min-w-[calc(100%-18rem)] max-w-[calc(100%-9rem)]'>
             {isPlaylist(collection) && (
               <div className=''>
                 {collection.public ? "Public" : "Private"} Playlist
               </div>
             )}
 
-            <div className='font-bold text-4xl lg:text-6xl'>
-              {collection.name}
+            <div className='font-bold'>
+              <Textfit
+                mode='single'
+                min={36}
+                max={90}
+              >
+                {collection?.name}
+              </Textfit>
             </div>
+
             <div className='text-gray-400 mt-1'>
               {isPlaylist(collection) && collection.description}
             </div>
