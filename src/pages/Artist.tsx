@@ -9,74 +9,19 @@ import { spotifyAPI } from "../api/spotifyAxios";
 import { TokenContext } from "../context/tokenContext";
 import { AlbumGroup, SpotifyObjectType } from "../utils/enums";
 import SingleDisplay from "../component/SingleDisplay";
+import useTopTracks from "../hooks/Artist/useTopTracks";
+import useAlbum from "../hooks/useAlbum";
+import useArtistAlbums from "../hooks/Artist/useArtistAlbums";
+import useRelatedArtists from "../hooks/Artist/useRelatedArtists";
 
 function Artist() {
   const { id: artistId } = useParams();
-  const [artist, isLoading] = useArtist(artistId || "");
-  const [topTracks, setTopTracks] = useState<
-    SpotifyApi.TrackObjectFull[] | null
-  >(null);
-  const [albums, setAlbums] = useState<SpotifyApi.ArtistsAlbumsResponse | null>(
-    null
-  );
-  const [relatedArtists, setRelatedArtists] = useState<
-    SpotifyApi.ArtistObjectFull[] | null
-  >(null);
-  const [isExpanded, setIsExpanded] = useState(false);
   const token = useContext(TokenContext);
-
-  useEffect(() => {
-    async function requestTopTracks() {
-      if (!artistId) return;
-
-      try {
-        const res = await spotifyAPI.getArtistTopTracks(artistId, token);
-        setTopTracks(res);
-        console.log(res);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    requestTopTracks();
-  }, [artistId, token]);
-
-  useEffect(() => {
-    async function requestAlbums() {
-      if (!artistId) return;
-
-      try {
-        const params = {
-          include_groups: [AlbumGroup.Album, AlbumGroup.Single],
-          limit: 10,
-          offset: 0,
-        };
-        const res = await spotifyAPI.getArtistAlbums(artistId, params, token);
-        setAlbums(res);
-        console.log(res);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    requestAlbums();
-  }, [artistId, token]);
-
-  useEffect(() => {
-    async function requestRelatedArtists() {
-      if (!artistId) return;
-
-      try {
-        const res = await spotifyAPI.getRelatedArtists(artistId, token);
-        setRelatedArtists(res);
-        console.log(res);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    requestRelatedArtists();
-  }, [artistId, token]);
+  const [artist, isLoading] = useArtist(artistId);
+  const [topTracks, isTrackLoading] = useTopTracks(token, artistId);
+  const [albums, isAlbumsLoading] = useArtistAlbums(token, artistId);
+  const [relatedArtists, isRelatedArtistLoading] = useRelatedArtists(token, artistId)
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className='px-2'>
