@@ -3,7 +3,7 @@ import { usePlayerContext } from "../../../context/playerContext";
 import { TokenContext } from "../../../context/tokenContext";
 import { spotifyAPI } from "../../../api/spotifyAxios";
 import { PlayerStateContext, Track } from "../../../api/base";
-import { millisToMinutesAndSeconds } from "../../../utils/util";
+import { formatFollowers, millisToMinutesAndSeconds } from "../../../utils/util";
 import Button from "../../../component/Button";
 import { FiPause, FiPlay } from "react-icons/fi";
 import TrackList from "./components/TrackList";
@@ -258,17 +258,6 @@ function CollectionsTemplate({ type, collection }: Props) {
     return res;
   }
 
-  function formatFollowers(total: number) {
-    if (!total) return;
-
-    const arr = [];
-    while (total) {
-      arr.push(total % 1000);
-      total = Math.floor(total / 1000);
-    }
-    return arr.reverse().join(",");
-  }
-
   return (
     collection && (
       <>
@@ -293,7 +282,6 @@ function CollectionsTemplate({ type, collection }: Props) {
               {isPlaylist(collection) && collection.description}
             </div>
             <div className='flex text-gray-400 items-center gap-1'>
-              {/* need to handle artists! */}
               {
                 <CollectionOwnerImage
                   type={type}
@@ -305,7 +293,6 @@ function CollectionsTemplate({ type, collection }: Props) {
                 />
               }
               <div className='font-bold text-white'>
-                {/* handle multiple artists */}
                 {isPlaylist(collection)
                   ? collection.owner.display_name
                   : collection.artists[0].name}

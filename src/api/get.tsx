@@ -1,3 +1,4 @@
+import { AlbumGroup } from "../utils/enums";
 import { PlaybackStateAPI } from "./base";
 import { spotifyAxios } from "./spotifyAxios";
 
@@ -68,9 +69,48 @@ async function getAlbumWithId(id: string, token: string) {
 }
 //#endregion
 //#region Artist
-async function getArtistById(id:string, token: string) {
-  const res = await spotifyAxios(token).get<SpotifyApi.SingleArtistResponse>(`/artists/${id}`)
-  return res.data
+
+interface ArtistAlbumParams {
+  include_groups: string[];
+  limit: number;
+  offset: number;
+}
+
+async function getArtistById(id: string, token: string) {
+  const res = await spotifyAxios(token).get<SpotifyApi.SingleArtistResponse>(
+    `/artists/${id}`
+  );
+  return res.data;
+}
+
+async function getArtistTopTracks(id: string, token: string) {
+  const res = await spotifyAxios(
+    token
+  ).get<SpotifyApi.ArtistsTopTracksResponse>(`/artists/${id}/top-tracks`);
+  return res.data.tracks;
+}
+
+async function getArtistAlbums(
+  id: string,
+  params: ArtistAlbumParams,
+  token: string
+) {
+  const res = await spotifyAxios(token).get<SpotifyApi.ArtistsAlbumsResponse>(
+    `artists/${id}/albums`,
+    {
+      params: {
+        include_groups: params.include_groups.map((group) => group).join(","),
+        limit: params.limit,
+        offset: params.offset,
+      },
+    }
+  );
+  return res.data;
+}
+
+async function getRelatedArtists(id : string, token: string) {
+  const res = await spotifyAxios(token).get<SpotifyApi.ArtistsRelatedArtistsResponse>(`artists/${id}/related-artists`)
+  return res.data.artists
 }
 //#endregion
 //#region Player
@@ -81,7 +121,6 @@ async function getPlayerState(token: string) {
 }
 //#endregion
 
-
 const get = {
   getCurrentUser,
   getUserById,
@@ -90,6 +129,9 @@ const get = {
   getUserPlaylists,
   getAlbumWithId,
   getArtistById,
+  getArtistTopTracks,
+  getArtistAlbums,
+  getRelatedArtists,
   getPlayerState,
 };
 

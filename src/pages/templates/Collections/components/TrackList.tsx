@@ -68,98 +68,122 @@ function TrackList({
   }
 
   return (
-    <table className='table-fixed w-full text-sm text-gray-400'>
-      <thead className='border-b border-gray-500'>
-        <tr className='text-left'>
-          <th className='text-right pr-3 font-normal w-8'>#</th>
-          <th className='font-normal'>Title</th>
-          {type === CollectionType.Playlist && (
-            <>
-              <th className='font-normal w-1/3'>Album</th>
-              <th className='py-1 pr-2 font-normal w-32'>Date Added</th>
-            </>
-          )}
-          <th className='font-normal w-20'>Duration</th>
-        </tr>
-      </thead>
-      <tbody>
-        {tracks.items.map((item, idx) => {
-          const trackItem = isPlaylistTrack(item) ? item.track : item;
-          return (
-            <tr
-              key={trackItem?.id}
-              className={`hover:bg-slate-800 ${
-                isTrackPlayed(trackItem?.uri)
-                  ? "border border-spotify-green"
-                  : ""
-              }`}
-              onMouseEnter={() => {
-                setCurrentHover(trackItem?.id || "");
-              }}
-              onMouseLeave={() => {
-                setCurrentHover("");
-              }}
-            >
-              <td
-                className={`text-right px-3 ${
-                  isTrackPlayed(trackItem?.uri) ? "text-spotify-green" : ""
+    <div className="pr-4">
+      <table className='table-fixed w-full text-sm text-gray-400'>
+        <thead className='border-b border-gray-500'>
+          <tr className='text-left'>
+            <th className='text-right pr-3 font-normal w-8'>#</th>
+            <th className='font-normal'>Title</th>
+            {type === CollectionType.Playlist && (
+              <>
+                <th className='font-normal w-1/3'>Album</th>
+                <th className='py-1 pr-2 font-normal w-32'>Date Added</th>
+              </>
+            )}
+            <th className='font-normal w-20'>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {tracks.items.map((item, idx) => {
+            const trackItem = isPlaylistTrack(item) ? item.track : item;
+            return (
+              <tr
+                key={trackItem?.id}
+                className={`hover:bg-white hover:bg-opacity-5 ${
+                  isTrackPlayed(trackItem?.uri)
+                    ? "border border-spotify-green"
+                    : ""
                 }`}
+                onMouseEnter={() => {
+                  setCurrentHover(trackItem?.id || "");
+                }}
+                onMouseLeave={() => {
+                  setCurrentHover("");
+                }}
               >
-                {isTrackPlayed(trackItem?.uri) ? (
-                  isPlaying ? (
-                    <FiPause onClick={pause} />
-                  ) : (
-                    <FiPlay onClick={() => play(trackItem?.uri)} />
-                  )
-                ) : currentHover === trackItem?.id ? (
-                  <FiPlay onClick={() => play(trackItem?.uri)} />
-                ) : (
-                  idx + 1
-                )}
-              </td>
-              <td className='flex items-center py-2 gap-2'>
-                {isPlaylistTrack(item) && (
-                  <div className='w-10 min-w-10'>
-                    <img
-                      className='max-w-full max-h-full rounded-md'
-                      src={item.track?.album.images[0].url}
+                <td
+                  className={`text-right ${
+                    currentHover !== trackItem?.id ? "pr-3" : ""
+                  } rounded-l-md ${
+                    isTrackPlayed(trackItem?.uri) ? "text-spotify-green" : ""
+                  }`}
+                >
+                  {isTrackPlayed(trackItem?.uri) ? (
+                    isPlaying ? (
+                      <FiPause onClick={pause} />
+                    ) : (
+                      <FiPlay onClick={() => play(trackItem?.uri)} />
+                    )
+                  ) : currentHover === trackItem?.id ? (
+                    <FiPlay
+                      className='m-auto'
+                      onClick={() => play(trackItem?.uri)}
                     />
-                  </div>
-                )}
-                <div>
-                  <div
-                    className={`${
-                      isTrackPlayed(trackItem?.uri)
-                        ? "text-spotify-green"
-                        : "text-white"
-                    }`}
-                  >
-                    {trackItem?.name}
-                  </div>
-                  <div className=''>
-                    {trackItem?.artists.map((artist) => artist.name).join(", ")}
-                  </div>
-                </div>
-              </td>
-              {isPlaylistTrack(item) && (
-                <>
-                  <td className='text-ellipsis overflow-hidden text-nowrap'>
-                    <Link
-                      to={`/album/${item.track?.album.id}`}
-                      className='hover:underline'
+                  ) : (
+                    idx + 1
+                  )}
+                </td>
+                <td className='flex items-center py-2 gap-2'>
+                  {isPlaylistTrack(item) && (
+                    <div className='w-10 min-w-10'>
+                      <img
+                        className='max-w-full max-h-full rounded-md'
+                        src={item.track?.album.images[0].url}
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <div
+                      className={`${
+                        isTrackPlayed(trackItem?.uri)
+                          ? "text-spotify-green"
+                          : "text-white"
+                      }`}
                     >
-                      {item.track?.album.name}
-                    </Link>
-                  </td>
-                  <td className='pr-2'>{formatDateAdded(item.added_at)}</td>
-                </>
-              )}
-              <td>{formatTimeMinSecond(trackItem?.duration_ms)}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+                      {trackItem?.name}
+                    </div>
+                    <div className=''>
+                      {trackItem?.artists.map((artist, idx) => {
+                        const separator = trackItem.artists.length >
+                          idx + 1 && <>, </>;
+                        return (
+                          <>
+                            <Link
+                              key={idx}
+                              className='hover:underline'
+                              to={`/artist/${artist.id}`}
+                            >
+                              {artist.name}
+                            </Link>
+                            {separator}
+                          </>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </td>
+                {isPlaylistTrack(item) && (
+                  <>
+                    <td className='text-ellipsis overflow-hidden text-nowrap'>
+                      <Link
+                        to={`/album/${item.track?.album.id}`}
+                        className='hover:underline'
+                      >
+                        {item.track?.album.name}
+                      </Link>
+                    </td>
+                    <td className='pr-2'>{formatDateAdded(item.added_at)}</td>
+                  </>
+                )}
+                <td className='rounded-r-md'>
+                  {formatTimeMinSecond(trackItem?.duration_ms)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

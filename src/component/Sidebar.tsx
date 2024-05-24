@@ -1,12 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { AiFillHome, AiOutlineHome, AiOutlineSearch } from "react-icons/ai";
 import { TokenContext } from "../context/tokenContext";
-import PlaylistCard from "./PlaylistCard";
+import SpotifyObjectCard from "./SpotifyObjectCard";
 import "overlayscrollbars/overlayscrollbars.css";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { NavLink } from "react-router-dom";
 import { spotifyAPI } from "../api/spotifyAxios";
-import PlaylistCardSkeleton from "./PlaylistCardSkeleton";
+import SpotifyObjectCardSkeleton from "./SpotifyObjectCardSkeleton";
+import { SpotifyObjectType } from "../utils/enums";
 
 function Sidebar() {
   const [playlists, setPlaylists] = useState<
@@ -40,7 +41,7 @@ function Sidebar() {
   }, [token, playlists]);
 
   return (
-    <div className='w-24 h-full flex flex-col justify-between px-2'>
+    <div className='w-24 h-full flex flex-col justify-between pr-2'>
       <div
         className={`flex flex-col gap-6 items-center rounded-md px-2 py-6 shadow-md bg-gray-500 bg-opacity-10`}
       >
@@ -66,18 +67,19 @@ function Sidebar() {
       >
         {isLoading
           ? [...Array(6)].map((x, i) => (
-              <PlaylistCardSkeleton
+              <SpotifyObjectCardSkeleton
                 key={i}
                 imageOnly={true}
               />
             ))
           : playlists?.map((playlist, idx) => (
-              <PlaylistCard
+              <SpotifyObjectCard
+                type={SpotifyObjectType.Playlist}
                 key={idx}
                 className={"min-w-14 min-h-14 p-1"}
-                playlist={playlist}
+                data={playlist}
                 imageOnly={true}
-              ></PlaylistCard>
+              ></SpotifyObjectCard>
             ))}
       </OverlayScrollbarsComponent>
     </div>

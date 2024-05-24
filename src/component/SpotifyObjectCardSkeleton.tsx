@@ -20,12 +20,17 @@ const LoadingDiv = styled.div`
 
 interface Props {
   imageOnly?: boolean;
+  rounded?: boolean;
 }
 
-function PlaylistCardSkeleton({ imageOnly }: Props) {
+function SpotifyObjectCardSkeleton({ imageOnly, rounded }: Props) {
   return (
     <div className={`flex flex-col p-2 overflow-hidden rounded-sm gap-2`}>
-      <LoadingDiv className='max-w-full max-h-full  w-full pb-[100%] rounded-md'></LoadingDiv>
+      <LoadingDiv
+        className={`max-w-full max-h-full w-full pb-[100%] ${
+          rounded ? "rounded-full" : "rounded-md"
+        }`}
+      ></LoadingDiv>
       {!imageOnly && (
         <>
           <LoadingDiv className='font-bold text-base bg-gray-500 w-full h-4 rounded-lg'></LoadingDiv>
@@ -36,4 +41,4 @@ function PlaylistCardSkeleton({ imageOnly }: Props) {
   );
 }
 
-export default PlaylistCardSkeleton;
+export default SpotifyObjectCardSkeleton;

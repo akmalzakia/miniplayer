@@ -8,6 +8,7 @@ import Playlist from "./Playlist";
 import { TokenProvider } from "../context/tokenContext";
 import { UserProvider } from "../context/userContext";
 import Album from "./Album";
+import Artist from "./Artist";
 
 const router = createBrowserRouter([
   {
@@ -33,8 +34,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/album/:id",
-        element: <Album/>
-      }
+        element: <Album />,
+      },
+      {
+        path: "/artist/:id",
+        element: <Artist />,
+      },
     ],
   },
   {

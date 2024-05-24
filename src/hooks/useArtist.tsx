@@ -2,18 +2,20 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { TokenContext } from "../context/tokenContext";
 import { spotifyAPI } from "../api/spotifyAxios";
 
-function useAlbum(id: string) {
-  const [album, setAlbum] = useState<SpotifyApi.AlbumObjectFull | null>(null);
+function useArtist(id: string) {
+  const [artist, setArtist] = useState<SpotifyApi.ArtistObjectFull | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const token = useContext(TokenContext);
 
   useEffect(() => {
-    async function requestAlbum() {
+    async function requestArtist() {
       console.log("requesting album with id :", id);
       setIsLoading(true);
       try {
-        const res = await spotifyAPI.getAlbumWithId(id, token);
-        setAlbum(res);
+        const res = await spotifyAPI.getArtistById(id, token);
+        setArtist(res);
         setIsLoading(false);
       } catch (error) {
         console.log(error);
@@ -21,14 +23,14 @@ function useAlbum(id: string) {
       }
     }
 
-    if (album?.id !== id) {
-      requestAlbum();
+    if (artist?.id !== id) {
+      requestArtist();
     }
-  }, [album, id, token]);
+  }, [artist, id, token]);
 
-  const cachedAlbum = useMemo(() => album, [album]);
+  const cachedArtist = useMemo(() => artist, [artist]);
 
-  return [cachedAlbum, isLoading] as const;
+  return [cachedArtist, isLoading] as const;
 }
 
-export default useAlbum;
+export default useArtist;

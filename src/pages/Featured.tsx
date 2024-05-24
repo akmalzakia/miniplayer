@@ -1,8 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import PlaylistCard from "../component/PlaylistCard";
+import SpotifyObjectCard from "../component/SpotifyObjectCard";
 import { TokenContext } from "../context/tokenContext";
 import { spotifyAPI } from "../api/spotifyAxios";
-import PlaylistCardSkeleton from "../component/PlaylistCardSkeleton";
+import SpotifyObjectCardSkeleton from "../component/SpotifyObjectCardSkeleton";
+import { SpotifyObjectType } from "../utils/enums";
+import SingleDisplay from "../component/SingleDisplay";
 
 function Featured() {
   const [featured, setFeatured] = useState<
@@ -37,24 +39,12 @@ function Featured() {
 
   return (
     <>
-      <div className='font-bold text-xl px-2 mb-1'>Featured for you</div>
-      <div
-        className='grid'
-        style={{
-          gridTemplateColumns: "repeat(auto-fill, minmax(10em, 1fr))",
-          gridTemplateRows: "repeat(auto-fill, minmax(14em, 1fr))",
-        }}
-      >
-        {isLoading
-          ? [...Array(6)].map((x, i) => <PlaylistCardSkeleton key={i} />)
-          : featured &&
-            featured.map((playlist, idx) => (
-              <PlaylistCard
-                key={idx}
-                playlist={playlist}
-              ></PlaylistCard>
-            ))}
-      </div>
+      <SingleDisplay
+        title='Featured'
+        data={featured}
+        type={SpotifyObjectType.Playlist}
+        isLoading={isLoading}
+      />
     </>
   );
 }

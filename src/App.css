@@ -11,7 +11,7 @@ html, body {
 body {
   background-color: #333;
   color: #eee;
-  font-family: Helvetica, Arial;
+  font-family: sans-serif;
 }
 
 .hidden {

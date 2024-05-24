@@ -23,7 +23,7 @@ const base64encode = (input: ArrayBuffer) => {
 
 function millisToMinutesAndSeconds(millis: number) {
 
-  let res = {
+  const res = {
     hours: 0,
     minutes: 0,
     seconds: 0
@@ -51,9 +51,26 @@ function formatTimeMinSecond(time?: number) {
   return timeDetails.minutes + " : " + (timeDetails?.seconds < 10 ? '0' : '') + timeDetails.seconds;
 }
 
+function formatFollowers(total: number) {
+  if (!total) return;
 
-function getIdFromUri(spotifyUri : string) {
+  const arr = [];
+  while (total) {
+    arr.push(total % 1000);
+    total = Math.floor(total / 1000);
+  }
+  return arr.reverse().join(",");
+}
+
+
+function getIdFromUri(spotifyUri: string | undefined) {
+  if (!spotifyUri) return
   return spotifyUri.split(':').at(-1)
 }
 
-export { generateRandomString, sha256, base64encode, millisToMinutesAndSeconds, formatTimeMinSecond, getIdFromUri }
+function upperFirstLetter(id: string | undefined) {
+  if (!id) return
+  return id.at(0)?.toUpperCase() + id.slice(1)
+}
+
+export { generateRandomString, sha256, base64encode, millisToMinutesAndSeconds, formatTimeMinSecond, getIdFromUri, formatFollowers, upperFirstLetter }

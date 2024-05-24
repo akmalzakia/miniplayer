@@ -1,16 +1,39 @@
 import WebPlayback from "../component/WebPlayback/WebPlayback";
 import Sidebar from "../component/Sidebar";
-import { Outlet } from "react-router-dom";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import { Outlet, useLocation } from "react-router-dom";
+import {
+  OverlayScrollbarsComponent,
+  OverlayScrollbarsComponentRef,
+} from "overlayscrollbars-react";
 import Topbar from "../component/Topbar";
 import { useUserContext } from "../context/userContext";
 import { PlayerProvider } from "../context/playerContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function Home() {
   const [isLoaded, setLoaded] = useState(false);
 
   const { user, isLoading } = useUserContext();
+  const location = useLocation();
+  const scrollRef = useRef<OverlayScrollbarsComponentRef>(null);
+
+  useEffect(() => {
+    console.log("location changes");
+
+    function scrollToTop() {
+      const { viewport } = scrollRef.current?.osInstance()?.elements() || {}
+
+      console.log(viewport)
+
+      if (viewport) {
+        window.scrollTo({top: 0, behavior: "smooth"})
+        viewport.scrollTo({top: 0, behavior: "smooth"})
+      }
+    }
+    if (!scrollRef.current) return;
+    
+    scrollToTop()
+  }, [location]);
 
   useEffect(() => {
     const isPremium = user?.product === "premium";
@@ -27,20 +50,21 @@ function Home() {
 
   return (
     <PlayerProvider>
-      <div className='w-full flex flex-col h-full min-w-[800px] min-h-[600px]'>
-        <div className='flex w-full h-full bg-spotify-black py-2 gap-2 overflow-hidden'>
+      <div className='w-full flex flex-col bg-spotify-black h-full min-w-[800px] min-h-[600px]'>
+        <div className='flex w-full h-full py-2 gap-2 overflow-hidden p-1'>
           <Sidebar></Sidebar>
           <div
-            className={`flex flex-col h-full rounded-md to-spotify-black py-4 pl-4 w-[calc(100%-6rem)]`}
+            className={`flex flex-col h-full rounded-md to-spotify-black w-[calc(100%-6rem)] bg-gray-500 bg-opacity-10`}
           >
             <Topbar />
             <OverlayScrollbarsComponent
-              className='gap-2 overlow-y'
+              className='gap-2 overlow-y p-4'
               options={{
                 scrollbars: { autoHide: "leave", theme: "os-theme-light" },
               }}
+              ref={scrollRef}
             >
-              {<Outlet></Outlet>}
+              <Outlet></Outlet>
             </OverlayScrollbarsComponent>
           </div>
           {/* <div className='w-1/3'>
