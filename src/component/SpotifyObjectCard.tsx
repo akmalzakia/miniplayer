@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { SpotifyObjectType } from "../utils/enums";
-import { upperFirstLetter } from "../utils/util";
+import utils from "../utils/util";
+import React from "react";
+import { isAlbum, isPlaylist } from "../utils/matchers";
 
 interface Props extends React.PropsWithChildren {
   type: SpotifyObjectType;
@@ -19,30 +21,9 @@ function SpotifyObjectCard({
   data,
   imageOnly,
   rounded,
-  className
+  className,
 }: Props) {
   const navigate = useNavigate();
-
-  function isPlaylist(
-    data:
-      | SpotifyApi.PlaylistObjectFull
-      | SpotifyApi.PlaylistObjectSimplified
-      | SpotifyApi.ArtistObjectFull
-      | SpotifyApi.AlbumObjectSimplified
-  ): data is SpotifyApi.PlaylistObjectFull {
-    return (data as SpotifyApi.PlaylistObjectFull).type === "playlist";
-  }
-
-  function isAlbum(
-    data:
-      | SpotifyApi.PlaylistObjectFull
-      | SpotifyApi.PlaylistObjectSimplified
-      | SpotifyApi.ArtistObjectFull
-      | SpotifyApi.AlbumObjectSimplified
-  ): data is SpotifyApi.AlbumObjectSimplified {
-    return (data as SpotifyApi.AlbumObjectSimplified).type === "album";
-  }
-
 
   return (
     <div
@@ -72,10 +53,12 @@ function SpotifyObjectCard({
             <div className='flex gap-2 text-sm text-gray-400'>
               <div>{data.release_date.split("-")[0]}</div>
               <div>&#xb7;</div>
-              <div>{upperFirstLetter(data.album_group)}</div>
+              <div>{utils.upperFirstLetter(data.album_group)}</div>
             </div>
           ) : (
-            <div className="text-gray-400 text-sm">{upperFirstLetter(data.type)}</div>
+            <div className='text-gray-400 text-sm'>
+              {utils.upperFirstLetter(data.type)}
+            </div>
           )}
         </>
       )}

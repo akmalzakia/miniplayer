@@ -9,9 +9,9 @@ import {
 import ProgressBar from "./components/ProgressBar";
 import Button from "../Button";
 import VolumeBar from "./components/VolumeBar";
-import { usePlayerContext } from "../../context/playerContext";
-import { useUserContext } from "../../context/userContext";
 import { Link } from "react-router-dom";
+import usePlayerContext from "../../hooks/usePlayerContext";
+import useUserContext from "../../hooks/useUserContext";
 
 function WebPlayback() {
   const { player, isActive } = usePlayerContext();
@@ -35,13 +35,13 @@ function WebPlayback() {
       console.log(state);
     }
 
-    if (player) {
-      player.addListener("player_state_changed", onStateChange);
+    if (player.instance) {
+      player.instance.addListener("player_state_changed", onStateChange);
     }
 
     return () => {
-      if (player) {
-        player.removeListener("player_state_changed", onStateChange);
+      if (player.instance) {
+        player.instance.removeListener("player_state_changed", onStateChange);
       }
     };
   }, [player]);
@@ -81,21 +81,21 @@ function WebPlayback() {
                   <div className='flex gap-1 ml-auto mr-auto'>
                     <Button
                       onClick={() => {
-                        player?.previousTrack();
+                        player?.instance?.previousTrack();
                       }}
                     >
                       <FiChevronLeft></FiChevronLeft>
                     </Button>
                     <Button
                       onClick={() => {
-                        player?.togglePlay();
+                        player?.instance?.togglePlay();
                       }}
                     >
                       {isPaused ? <FiPlay></FiPlay> : <FiPause></FiPause>}
                     </Button>
                     <Button
                       onClick={() => {
-                        player?.nextTrack();
+                        player?.instance?.nextTrack();
                       }}
                     >
                       <FiChevronRight></FiChevronRight>
@@ -105,7 +105,7 @@ function WebPlayback() {
                 {player && (
                   <ProgressBar
                     className={"w-3/4"}
-                    player={player}
+                    player={player.instance}
                     position={position}
                     duration={track?.duration_ms || 0}
                   ></ProgressBar>
@@ -116,7 +116,7 @@ function WebPlayback() {
                   value={volume * 100}
                   onVolumeChanged={(e) => {
                     const vol = parseInt(e.target.value);
-                    player?.setVolume(vol / 100).then(() => {
+                    player?.instance?.setVolume(vol / 100).then(() => {
                       setVolume(vol / 100);
                     });
                   }}

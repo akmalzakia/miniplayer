@@ -1,48 +1,43 @@
 import { useState } from "react";
-import { usePlayerContext } from "../../../../context/playerContext";
-import { formatTimeMinSecond } from "../../../../utils/util";
 import { FiPause, FiPlay } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { CollectionType } from "../../../../utils/enums";
+import usePlayerContext from "../../../../hooks/usePlayerContext";
+import utils from "../../../../utils/util";
+import { isPlaylistTrack } from "../../../../utils/matchers";
 
 interface Props {
   type: CollectionType;
+  collectionUri: string
   tracks:
     | SpotifyApi.PagingObject<SpotifyApi.PlaylistTrackObject>
     | SpotifyApi.PagingObject<SpotifyApi.TrackObjectSimplified>;
   currentTrackUri: string;
   isPlaying: boolean;
-  onPause(): void;
-  onPlay(uri: string): void;
 }
 
 function TrackList({
   type,
   tracks,
+  collectionUri,
   currentTrackUri,
   isPlaying,
-  onPause,
-  onPlay,
 }: Props) {
-  const { isActive } = usePlayerContext();
+  const { playerDispatcher, isActive, currentContext } = usePlayerContext();
   const [currentHover, setCurrentHover] = useState("");
 
-  const isTrackPlayed = (trackId?: string) =>
-    isActive && currentTrackUri === trackId;
+  const isSameContext = collectionUri === currentContext?.context.uri
 
-  function isPlaylistTrack(
-    item: SpotifyApi.TrackObjectSimplified | SpotifyApi.PlaylistTrackObject
-  ): item is SpotifyApi.PlaylistTrackObject {
-    return (item as SpotifyApi.PlaylistTrackObject).track !== undefined;
-  }
+  const isTrackPlayed = (trackId?: string) =>
+    isActive && currentTrackUri === trackId && isSameContext
 
   function play(trackUri?: string) {
     if (!trackUri) return;
-    onPlay(trackUri);
+    playerDispatcher.playCollectionTrack(collectionUri, trackUri)
   }
 
   function pause() {
-    onPause();
+   playerDispatcher.pause()
   }
 
   function formatDateAdded(datetime?: string) {
@@ -179,7 +174,7 @@ function TrackList({
                   </>
                 )}
                 <td className='rounded-r-md'>
-                  {formatTimeMinSecond(trackItem?.duration_ms)}
+                  {utils.formatTimeMinSecond(trackItem?.duration_ms)}
                 </td>
               </tr>
             );

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import { FaAngleLeft, FaBell, FaUsers } from "react-icons/fa";
-import { useUserContext } from "../context/userContext";
+import useUserContext from "../hooks/useUserContext";
 
 function Topbar() {
   const { user, isLoading } = useUserContext();

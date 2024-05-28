@@ -1,21 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { TokenContext } from "./tokenContext";
 import { spotifyAPI } from "../api/spotifyAxios";
+import { UserContextType } from "../utils/interfaces";
 
-interface UserContextType {
-  user: SpotifyApi.UserObjectPrivate | null;
-  isLoading: boolean;
-}
+
 
 export const UserContext = createContext<UserContextType | null>(null);
-
-export const useUserContext = () => {
-  const obj = useContext(UserContext);
-  if (!obj) {
-    throw new Error("useUserContext must be used within a Provider");
-  }
-  return obj;
-};
 
 interface Props {
   children?: React.ReactNode;

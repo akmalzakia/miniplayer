@@ -1,4 +1,4 @@
-import { base64encode, generateRandomString, sha256 } from "../utils/util";
+import utils from "../utils/util";
 
 function Login() {
   async function handleLogin() {
@@ -6,11 +6,11 @@ function Login() {
       "streaming user-read-email user-read-private playlist-read-collaborative playlist-read-private user-read-playback-state";
     const authUrl = new URL("https://accounts.spotify.com/authorize");
 
-    const codeVerifier = generateRandomString(64);
+    const codeVerifier = utils.generateRandomString(64);
     localStorage.setItem("code_verifier", codeVerifier);
     console.log(codeVerifier);
-    const hashed = await sha256(codeVerifier);
-    const codeChallenge = base64encode(hashed);
+    const hashed = await utils.sha256(codeVerifier);
+    const codeChallenge = utils.base64encode(hashed);
 
     const queryParam = {
       response_type: "code",

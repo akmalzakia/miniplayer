@@ -1,31 +1,18 @@
 import { useParams } from "react-router-dom";
 import useArtist from "../hooks/useArtist";
-import { formatFollowers, formatTimeMinSecond } from "../utils/util";
+import utils from "../utils/util";
 import { Textfit } from "react-textfit";
 import { FiPause, FiPlay } from "react-icons/fi";
 import Button from "../component/Button";
-import { useCallback, useContext, useEffect, useState } from "react";
-import { spotifyAPI } from "../api/spotifyAxios";
+import { useContext, useState } from "react";
 import { TokenContext } from "../context/tokenContext";
 import { SpotifyObjectType } from "../utils/enums";
 import SingleDisplay from "../component/SingleDisplay";
 import useTopTracks from "../hooks/Artist/useTopTracks";
 import useArtistAlbums from "../hooks/Artist/useArtistAlbums";
 import useRelatedArtists from "../hooks/Artist/useRelatedArtists";
-import { usePlayerContext } from "../context/playerContext";
-import { PlayerStateContext, Track } from "../api/base";
-
-interface DeviceData {
-  id: string;
-  name: string;
-}
-
-interface DataContext {
-  context: Spotify.PlaybackContext | PlayerStateContext;
-  paused: boolean;
-  current_track?: Spotify.Track | Track;
-  device?: DeviceData;
-}
+import usePlayerContext from "../hooks/usePlayerContext";
+import usePlayerStateFetcher from "../hooks/usePlayerStateFetcher";
 
 function Artist() {
   const { id: artistId } = useParams();
@@ -39,164 +26,21 @@ function Artist() {
   );
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { player, playerId, isActive } = usePlayerContext();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [anotherDevice, setAnotherDevice] = useState<DeviceData | null>(null);
-  const [currentTrackUri, setCurrentTrackUri] = useState("");
+  const { playerDispatcher, currentContext, isActive } = usePlayerContext();
   const [currentHover, setCurrentHover] = useState("");
 
-  const isTrackOnTopTracks = topTracks?.some((i) => {
-    return i.uri === currentTrackUri;
-  });
+  const isTrackOnTopTracks =
+    topTracks &&
+    topTracks?.some((i) => {
+      return i.uri === currentContext?.current_track?.uri;
+    });
 
   const isTrackPlayed = (trackId?: string) =>
-    isActive && currentTrackUri === trackId;
+    isActive && currentContext?.current_track?.uri === trackId;
 
-  const isPlayedInAnotherDevice = !isActive && isPlaying;
+  const isPlayedInAnotherDevice = !isActive && !currentContext?.paused;
 
-  async function play(artistUri: string) {
-    if (player && isActive && isTrackOnTopTracks) {
-      player.resume();
-    } else {
-      try {
-        const data = {
-          context_uri: artistUri,
-          position_ms: 0,
-        };
-        await spotifyAPI.playPlayer(token, data).then(() => setIsPlaying(true));
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }
-
-  async function playTrack(trackUri: string) {
-    const isCurrentTrack = trackUri === currentTrackUri;
-    if (player && isActive && isCurrentTrack) {
-      player.resume();
-    } else {
-      try {
-        const data = {
-          uris: [trackUri],
-          position_ms: 0,
-        };
-
-        await spotifyAPI.playPlayer(token, data).then(() => setIsPlaying(true));
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }
-
-  async function pause() {
-    if (player && isActive) {
-      player.pause();
-    } else {
-      try {
-        await spotifyAPI.pausePlayer(token).then(() => setIsPlaying(false));
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }
-
-  async function transferPlayback() {
-    if (playerId) {
-      try {
-        const data = {
-          device_ids: [playerId],
-        };
-        await spotifyAPI.transferPlayback(token, data);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }
-
-  const getCurrentContext = useCallback((data: DataContext) => {
-    const currentContext = data?.context;
-    if (!currentContext) {
-      setIsPlaying(false);
-      setCurrentTrackUri("");
-      return;
-    }
-
-    const currentTrack = data?.current_track;
-    setCurrentTrackUri(currentTrack?.uri || "");
-    console.log(currentTrack);
-
-    const isPaused = data?.paused;
-    setIsPlaying(!isPaused);
-
-    if (data.device) {
-      const deviceData = {
-        id: data.device.id,
-        name: data.device.name,
-      };
-      setAnotherDevice(deviceData);
-    }
-  }, []);
-
-  useEffect(() => {
-    async function requestPlayerState() {
-      console.log("requesting player state from playlist page...");
-      try {
-        let data: DataContext;
-        if (player && isActive) {
-          console.log(player);
-          const res = await player.getCurrentState();
-
-          if (!res) return;
-
-          data = {
-            context: res.context,
-            paused: res.paused,
-            current_track: res.track_window.current_track,
-          };
-        } else {
-          const res = await spotifyAPI.getPlayerState(token);
-
-          if (!res) return;
-          data = {
-            context: res.context,
-            paused: !res.is_playing,
-            current_track: res.item,
-            device: res.device,
-          };
-          console.log(res);
-        }
-        getCurrentContext(data);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    requestPlayerState();
-  }, [player, isActive, token, getCurrentContext]);
-
-  useEffect(() => {
-    function onStateChange(state: Spotify.PlaybackState) {
-      if (!state || !artist) {
-        return;
-      }
-      const data = {
-        context: state.context,
-        paused: state.paused,
-        current_track: state.track_window.current_track,
-      };
-      getCurrentContext(data);
-    }
-
-    if (player) {
-      player.addListener("player_state_changed", onStateChange);
-    }
-
-    return () => {
-      if (player) {
-        player.removeListener("player_state_changed", onStateChange);
-      }
-    };
-  }, [artist, player, getCurrentContext]);
+  usePlayerStateFetcher(token, artist);
 
   return (
     <div className='px-2'>
@@ -221,7 +65,8 @@ function Artist() {
             </Textfit>
           </div>
           <div className='font-normal'>
-            {formatFollowers(artist?.followers.total || 0)} monthly listeners
+            {utils.formatFollowers(artist?.followers.total || 0)} monthly
+            listeners
           </div>
         </div>
       </div>
@@ -229,20 +74,23 @@ function Artist() {
         <Button
           className='p-3'
           onClick={() => {
-            if (isPlaying && isTrackOnTopTracks) {
+            if (!currentContext?.paused && isTrackOnTopTracks) {
               if (isPlayedInAnotherDevice) {
-                transferPlayback();
+                playerDispatcher.transferPlayback();
               } else {
-                pause();
+                playerDispatcher.pause();
               }
             } else {
-              play(artist?.uri || "");
+              playerDispatcher.playArtist(
+                artist?.uri || "",
+                isTrackOnTopTracks ?? false
+              );
             }
           }}
         >
-          {isPlaying && isTrackOnTopTracks ? (
+          {!currentContext?.paused && isTrackOnTopTracks ? (
             isPlayedInAnotherDevice ? (
-              <>Playing on {anotherDevice?.name}</>
+              <>Playing on {currentContext?.device?.name}</>
             ) : (
               <FiPause className='text-xl' />
             )
@@ -276,21 +124,25 @@ function Artist() {
                     }`}
                   >
                     {isTrackPlayed(track?.uri) ? (
-                      isPlaying ? (
+                      !currentContext?.paused ? (
                         <FiPause
                           className='my-1'
-                          onClick={pause}
+                          onClick={playerDispatcher.pause}
                         />
                       ) : (
                         <FiPlay
                           className='my-1'
-                          onClick={() => playTrack(track.uri)}
+                          onClick={() =>
+                            playerDispatcher.playTrackOnly(track.uri)
+                          }
                         />
                       )
                     ) : currentHover === track?.id ? (
                       <FiPlay
                         className='my-1'
-                        onClick={() => playTrack(track.uri)}
+                        onClick={() =>
+                          playerDispatcher.playTrackOnly(track.uri)
+                        }
                       />
                     ) : (
                       idx + 1
@@ -317,7 +169,7 @@ function Artist() {
                   </div>
                 </div>
                 <div className='self-center'>
-                  {formatTimeMinSecond(track.duration_ms)}
+                  {utils.formatTimeMinSecond(track.duration_ms)}
                 </div>
               </div>
             ))}

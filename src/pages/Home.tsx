@@ -6,9 +6,9 @@ import {
   OverlayScrollbarsComponentRef,
 } from "overlayscrollbars-react";
 import Topbar from "../component/Topbar";
-import { useUserContext } from "../context/userContext";
 import { PlayerProvider } from "../context/playerContext";
 import { useEffect, useRef, useState } from "react";
+import useUserContext from "../hooks/useUserContext";
 
 function Home() {
   const [isLoaded, setLoaded] = useState(false);

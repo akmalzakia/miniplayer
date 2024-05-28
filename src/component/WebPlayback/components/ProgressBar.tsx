@@ -1,4 +1,5 @@
-import { formatTimeMinSecond } from "../../../utils/util";
+import utils from "../../../utils/util";
+
 
 interface Props {
   player: Spotify.Player | null;
@@ -22,7 +23,7 @@ function ProgressBar({ player, position, duration, className }: Props) {
   return (
     player && (
       <div className={`${className} flex justify-between gap-3`}>
-        <div className='text-xs my-auto'>{formatTimeMinSecond(position)}</div>
+        <div className='text-xs my-auto'>{utils.formatTimeMinSecond(position)}</div>
         <input
           type='range'
           className='flex-1 bg-gray-700 rounded-lg'
@@ -32,7 +33,7 @@ function ProgressBar({ player, position, duration, className }: Props) {
             player?.seek(pos);
           }}
         ></input>
-        <div className='text-xs my-auto'>{formatTimeMinSecond(duration)}</div>
+        <div className='text-xs my-auto'>{utils.formatTimeMinSecond(duration)}</div>
       </div>
     )
   );

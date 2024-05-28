@@ -1,8 +1,8 @@
 const generateRandomString = function (length: number) {
-  var text = '';
-  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let text = '';
+  const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-  for (var i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
   }
   return text;
@@ -45,7 +45,7 @@ function millisToMinutesAndSeconds(millis: number) {
 }
 
 function formatTimeMinSecond(time?: number) {
-  if (!time) return
+  if (!time) return "00 : 00"
 
   const timeDetails = millisToMinutesAndSeconds(time)
   return timeDetails.minutes + " : " + (timeDetails?.seconds < 10 ? '0' : '') + timeDetails.seconds;
@@ -73,4 +73,15 @@ function upperFirstLetter(id: string | undefined) {
   return id.at(0)?.toUpperCase() + id.slice(1)
 }
 
-export { generateRandomString, sha256, base64encode, millisToMinutesAndSeconds, formatTimeMinSecond, getIdFromUri, formatFollowers, upperFirstLetter }
+const utils = {
+  generateRandomString,
+  sha256,
+  base64encode,
+  millisToMinutesAndSeconds,
+  formatTimeMinSecond,
+  getIdFromUri,
+  formatFollowers,
+  upperFirstLetter
+}
+
+export default utils

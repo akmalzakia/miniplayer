@@ -1,41 +1,63 @@
 import {
   createContext,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
-import { useUserContext } from "./userContext";
+import { spotifyAPI } from "../api/spotifyAxios";
+import { TokenContext } from "./tokenContext";
+import { DataContext } from "../utils/interfaces";
+import useUserContext from "../hooks/useUserContext";
 
 interface PlayerContextType {
-  player?: Spotify.Player | null;
-  playerId: string;
+  player: {
+    id: string;
+    instance: Spotify.Player | null;
+  };
+  playerDispatcher: {
+    pause(): void;
+    transferPlayback(): void;
+    playCollection(
+      collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull,
+      isTrackOnCollection: boolean
+    ): void;
+    playCollectionTrack(collectionUri: string, trackUri: string): void;
+    playArtist(artistUri: string, isTrackOnTopTracks: boolean): void;
+    playTrackOnly(trackUri: string): void;
+  };
+  currentContext: DataContext | null;
+  setSpotifyContext(context: DataContext | null): void;
   isActive: boolean;
 }
 
 export const PlayerContext = createContext<PlayerContextType | null>(null);
 
-export const usePlayerContext = () => {
-  const obj = useContext(PlayerContext);
-  if (!obj) {
-    throw new Error("usePlayerContext must be used within a Provider");
-  }
-  return obj;
-};
-
 export function PlayerProvider({ children }: PropsWithChildren) {
-  const [player, setPlayer] = useState<Spotify.Player | null>(null);
+  const [playerInstance, setPlayerInstance] = useState<Spotify.Player | null>(
+    null
+  );
   const [playerId, setPlayerId] = useState("");
   const [isActive, setIsActive] = useState(false);
+  const [currentContext, setCurrentContext] = useState<DataContext | null>(
+    null
+  );
 
   const { user, isLoading } = useUserContext();
+  const token = useContext(TokenContext);
 
   const defaultVolume = 0.5;
 
   useEffect(() => {
+    console.log("playerContext:", currentContext);
+  }, [currentContext]);
+
+  useEffect(() => {
     function onSDKReady() {
-      console.log("currentPlayer", player);
-      if (player) return;
+      console.log("currentPlayer", playerInstance);
+      if (playerInstance) return;
       console.log("trying to create new player");
       const newPlayer = new window.Spotify.Player({
         name: "Web Playback SDK",
@@ -47,13 +69,13 @@ export function PlayerProvider({ children }: PropsWithChildren) {
 
       function onDeviceOnline({ device_id }: Spotify.WebPlaybackInstance) {
         console.log("Ready with device ID", device_id);
-        setPlayer(newPlayer);
+        setPlayerInstance(newPlayer);
         setPlayerId(device_id);
       }
 
       function onDeviceOffline({ device_id }: Spotify.WebPlaybackInstance) {
         console.log("Device ID has gone offline", device_id);
-        setPlayer(null);
+        setPlayerInstance(null);
         setIsActive(false);
         setPlayerId("");
       }
@@ -63,10 +85,19 @@ export function PlayerProvider({ children }: PropsWithChildren) {
           return;
         }
 
+        const data = {
+          context: state.context,
+          paused: state.paused,
+          current_track: state.track_window.current_track,
+        };
+        setCurrentContext(data);
+
+        console.log("xd", data);
+
         if (!state.playback_id && state.playback_quality === "UNKNOWN") {
           newPlayer.disconnect();
           setIsActive(false);
-          setPlayer(null);
+          setPlayerInstance(null);
           console.log("disconnecting");
         } else {
           setIsActive(true);
@@ -100,10 +131,201 @@ export function PlayerProvider({ children }: PropsWithChildren) {
       window.onSpotifyWebPlaybackSDKReady = onSDKReady;
     }
     // removed cleanup function, need to check if triggered twice
-  }, [player, user]);
+  }, [playerInstance, user]);
+
+  const player = useMemo(() => {
+    return {
+      id: playerId,
+      instance: playerInstance,
+    };
+  }, [playerId, playerInstance]);
+
+  const pause = useCallback(async () => {
+    if (player.instance && isActive) {
+      player.instance.pause();
+    } else {
+      try {
+        await spotifyAPI.pausePlayer(token).then(() => {
+          if (currentContext) {
+            setCurrentContext({ ...currentContext, paused: true });
+          }
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, [token, isActive, player, currentContext]);
+
+  const transferPlayback = useCallback(async () => {
+    if (player.id) {
+      try {
+        const data = {
+          device_ids: [player.id],
+        };
+        await spotifyAPI.transferPlayback(token, data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }, [player, token]);
+
+  const playCollection = useCallback(
+    async (
+      collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull,
+      isTrackOnCollection: boolean
+    ) => {
+      if (player.instance && isActive && isTrackOnCollection) {
+        player.instance.resume();
+      } else if (isTrackOnCollection) {
+        const { progress_ms, item } = await spotifyAPI.getPlayerState(token);
+
+        const data = {
+          context_uri: collection.uri,
+          offset: {
+            uri: item?.uri,
+          },
+          position_ms: progress_ms,
+        };
+
+        console.log(data);
+
+        await spotifyAPI.playPlayer(token, data).then(() => {
+          if (currentContext) {
+            setCurrentContext({ ...currentContext, paused: false });
+          }
+        });
+      } else {
+        try {
+          const data = {
+            context_uri: collection.uri,
+            offset: {
+              position: 0,
+            },
+            position_ms: 0,
+          };
+          await spotifyAPI.playPlayer(token, data).then(() => {
+            if (currentContext) {
+              setCurrentContext({ ...currentContext, paused: false });
+            }
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    },
+    [currentContext, isActive, player, token]
+  );
+
+  const playCollectionTrack = useCallback(
+    async (collectionUri: string, trackUri: string) => {
+      const isCurrentTrack = trackUri === currentContext?.current_track?.uri;
+      if (player.instance && isActive && isCurrentTrack) {
+        player.instance.resume();
+      } else {
+        try {
+          const data = {
+            context_uri: collectionUri,
+            offset: {
+              uri: trackUri,
+            },
+            position_ms: 0,
+          };
+
+          await spotifyAPI.playPlayer(token, data).then(() => {
+            if (currentContext) {
+              setCurrentContext({ ...currentContext, paused: false });
+            }
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    },
+    [currentContext, isActive, player, token]
+  );
+
+  const playArtist = useCallback(
+    async (artistUri: string, isTrackOnTopTracks: boolean) => {
+      if (player.instance && isActive && isTrackOnTopTracks) {
+        player.instance.resume();
+      } else {
+        try {
+          const data = {
+            context_uri: artistUri,
+            position_ms: 0,
+          };
+          await spotifyAPI.playPlayer(token, data).then(() => {
+            if (currentContext) {
+              setCurrentContext({ ...currentContext, paused: false });
+            }
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    },
+    [currentContext, isActive, player, token]
+  );
+
+  const playTrackOnly = useCallback(
+    async (trackUri: string) => {
+      const isCurrentTrack = trackUri === currentContext?.current_track?.uri;
+      console.log(currentContext);
+
+      if (player.instance && isActive && isCurrentTrack) {
+        player.instance.resume();
+      } else {
+        try {
+          const data = {
+            uris: [trackUri],
+            position_ms: 0,
+          };
+
+          await spotifyAPI.playPlayer(token, data).then(() => {
+            if (currentContext) {
+              setCurrentContext({ ...currentContext, paused: false });
+            }
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    },
+    [currentContext, isActive, player, token]
+  );
+
+  const setSpotifyContext = useCallback((context: DataContext) => {
+    setCurrentContext(context);
+  }, []);
+
+  const playerDispatcher = useMemo(() => {
+    return {
+      pause,
+      transferPlayback,
+      playCollection,
+      playCollectionTrack,
+      playArtist,
+      playTrackOnly,
+    };
+  }, [
+    pause,
+    transferPlayback,
+    playCollection,
+    playCollectionTrack,
+    playArtist,
+    playTrackOnly,
+  ]);
 
   return (
-    <PlayerContext.Provider value={{ player, playerId, isActive }}>
+    <PlayerContext.Provider
+      value={{
+        player,
+        playerDispatcher,
+        currentContext,
+        setSpotifyContext,
+        isActive,
+      }}
+    >
       {children}
     </PlayerContext.Provider>
   );

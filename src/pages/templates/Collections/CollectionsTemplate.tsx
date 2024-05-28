@@ -1,63 +1,34 @@
-import { useCallback, useContext, useEffect, useState } from "react";
-import { usePlayerContext } from "../../../context/playerContext";
-import { TokenContext } from "../../../context/tokenContext";
-import { spotifyAPI } from "../../../api/spotifyAxios";
-import { PlayerStateContext, Track } from "../../../api/base";
-import {
-  formatFollowers,
-  millisToMinutesAndSeconds,
-} from "../../../utils/util";
+import { useContext } from "react";
 import Button from "../../../component/Button";
 import { FiPause, FiPlay } from "react-icons/fi";
 import TrackList from "./components/TrackList";
 import { CollectionType } from "../../../utils/enums";
 import CollectionOwnerImage from "./components/CollectionOwnerImage";
 import { Textfit } from "react-textfit";
+import usePlayerContext from "../../../hooks/usePlayerContext";
+import utils from "../../../utils/util";
+import { TokenContext } from "../../../context/tokenContext";
+import { isPlaylist, isPlaylistTrack } from "../../../utils/matchers";
+import usePlayerStateFetcher from "../../../hooks/usePlayerStateFetcher";
 
 interface Props {
   type: CollectionType;
   collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull | null;
 }
 
-interface DeviceData {
-  id: string;
-  name: string;
-}
-
-interface DataContext {
-  context: Spotify.PlaybackContext | PlayerStateContext;
-  paused: boolean;
-  current_track?: Spotify.Track | Track;
-  device?: DeviceData;
-}
-
 function CollectionsTemplate({ type, collection }: Props) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [anotherDevice, setAnotherDevice] = useState<DeviceData | null>(null);
-  const [currentTrackUri, setCurrentTrackUri] = useState("");
-  const { player, playerId, isActive } = usePlayerContext();
+  const { playerDispatcher, currentContext } = usePlayerContext();
   const token = useContext(TokenContext);
-  console.log(collection);
 
-  function isPlaylistTrack(
-    item: SpotifyApi.TrackObjectSimplified | SpotifyApi.PlaylistTrackObject
-  ): item is SpotifyApi.PlaylistTrackObject {
-    return (item as SpotifyApi.PlaylistTrackObject).track !== undefined;
-  }
+  const isTrackOnCollection =
+    collection &&
+    collection?.tracks.items.some((i) => {
+      return isPlaylistTrack(i)
+        ? i.track?.uri === currentContext?.current_track?.uri
+        : i.uri === currentContext?.current_track?.uri;
+    });
 
-  function isPlaylist(
-    collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull
-  ): collection is SpotifyApi.PlaylistObjectFull {
-    return (collection as SpotifyApi.PlaylistObjectFull).type === "playlist";
-  }
-
-  const isTrackOnCollection = collection?.tracks.items.some((i) => {
-    return isPlaylistTrack(i)
-      ? i.track?.uri === currentTrackUri
-      : i.uri === currentTrackUri;
-  });
-
-  const isPlayedInAnotherDevice = !isActive && isPlaying;
+  const isPlayedInAnotherDevice = !!currentContext?.device;
 
   function calculateDuration(
     tracks:
@@ -84,177 +55,12 @@ function CollectionsTemplate({ type, collection }: Props) {
     return totalDuration;
   }
 
-  const getCurrentContext = useCallback(
-    (data: DataContext) => {
-      const currentContext = data?.context;
-      if (!currentContext || currentContext?.uri !== collection?.uri) {
-        setIsPlaying(false);
-        setCurrentTrackUri("");
-        return;
-      }
-
-      const currentTrack = data?.current_track;
-      console.log(currentTrack);
-
-      setCurrentTrackUri(currentTrack?.uri || "");
-
-      const isPaused = data?.paused;
-      setIsPlaying(!isPaused);
-
-      if (data.device) {
-        const deviceData = {
-          id: data.device.id,
-          name: data.device.name,
-        };
-        setAnotherDevice(deviceData);
-      }
-    },
-    [collection]
-  );
-
-  async function transferPlayback() {
-    if (playerId) {
-      try {
-        const data = {
-          device_ids: [playerId],
-        };
-        await spotifyAPI.transferPlayback(token, data);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }
-
-  async function pause() {
-    if (player && isActive) {
-      player.pause();
-    } else {
-      try {
-        await spotifyAPI.pausePlayer(token).then(() => setIsPlaying(false));
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }
-
-  async function play(playlistUri: string) {
-    if (player && isActive && isTrackOnCollection) {
-      player.resume();
-    } else if (isTrackOnCollection) {
-      const { progress_ms, item } = await spotifyAPI.getPlayerState(token);
-
-      const data = {
-        context_uri: playlistUri,
-        offset: {
-          uri: item?.uri,
-        },
-        position_ms: progress_ms,
-      };
-
-      console.log(data);
-
-      await spotifyAPI.playPlayer(token, data).then(() => setIsPlaying(true));
-    } else {
-      try {
-        const data = {
-          context_uri: playlistUri,
-          offset: {
-            position: 0,
-          },
-          position_ms: 0,
-        };
-        await spotifyAPI.playPlayer(token, data).then(() => setIsPlaying(true));
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }
-
-  async function playTrack(trackUri: string) {
-    const isCurrentTrack = trackUri === currentTrackUri;
-    if (player && isActive && isCurrentTrack) {
-      player.resume();
-    } else {
-      try {
-        const data = {
-          context_uri: collection?.uri,
-          offset: {
-            uri: trackUri,
-          },
-          position_ms: 0,
-        };
-
-        await spotifyAPI.playPlayer(token, data).then(() => setIsPlaying(true));
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  }
-
-  useEffect(() => {
-    async function requestPlayerState() {
-      console.log("requesting player state from playlist page...");
-      try {
-        let data: DataContext;
-        if (player && isActive) {
-          console.log(player);
-          const res = await player.getCurrentState();
-
-          if (!res) return;
-
-          data = {
-            context: res.context,
-            paused: res.paused,
-            current_track: res.track_window.current_track,
-          };
-        } else {
-          const res = await spotifyAPI.getPlayerState(token);
-
-          if (!res) return;
-          data = {
-            context: res.context,
-            paused: !res.is_playing,
-            current_track: res.item,
-            device: res.device,
-          };
-          console.log(res);
-        }
-        getCurrentContext(data);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    requestPlayerState();
-  }, [player, isActive, token, getCurrentContext]);
-
-  useEffect(() => {
-    function onStateChange(state: Spotify.PlaybackState) {
-      if (!state || !collection) {
-        return;
-      }
-      const data = {
-        context: state.context,
-        paused: state.paused,
-        current_track: state.track_window.current_track,
-      };
-      getCurrentContext(data);
-    }
-
-    if (player) {
-      player.addListener("player_state_changed", onStateChange);
-    }
-    return () => {
-      if (player) {
-        player.removeListener("player_state_changed", onStateChange);
-      }
-    };
-  }, [collection, player, getCurrentContext]);
+  usePlayerStateFetcher(token, collection);
 
   function formatCollectionDuration(duration: number) {
     if (!duration) return;
 
-    const timeDetails = millisToMinutesAndSeconds(duration);
+    const timeDetails = utils.millisToMinutesAndSeconds(duration);
     let res = `${timeDetails.hours ? timeDetails.hours + " hr" : ""} `;
     res += `${timeDetails.minutes} min `;
     res += `${!timeDetails.hours ? timeDetails.seconds + " sec" : ""} `;
@@ -314,7 +120,7 @@ function CollectionsTemplate({ type, collection }: Props) {
                 collection.followers.total !== 0 && (
                   <>
                     <div className=''>
-                      {formatFollowers(collection.followers.total)} likes
+                      {utils.formatFollowers(collection.followers.total)} likes
                     </div>
                     <div>&#xb7;</div>
                   </>
@@ -332,21 +138,24 @@ function CollectionsTemplate({ type, collection }: Props) {
           <Button
             className='p-3'
             onClick={() => {
-              if (isPlaying && isTrackOnCollection) {
+              if (!currentContext?.paused && isTrackOnCollection) {
                 if (isPlayedInAnotherDevice) {
-                  transferPlayback();
+                  playerDispatcher.transferPlayback();
                 } else {
-                  pause();
+                  playerDispatcher.pause();
                 }
               } else {
-                play(collection.uri);
+                playerDispatcher.playCollection(
+                  collection,
+                  isTrackOnCollection ?? false
+                );
               }
               console.log(isPlayedInAnotherDevice);
             }}
           >
-            {isPlaying && isTrackOnCollection ? (
+            {!currentContext?.paused && isTrackOnCollection ? (
               isPlayedInAnotherDevice ? (
-                <>Playing on {anotherDevice?.name}</>
+                <>Playing on {currentContext?.device?.name}</>
               ) : (
                 <FiPause className='text-xl'></FiPause>
               )
@@ -358,10 +167,9 @@ function CollectionsTemplate({ type, collection }: Props) {
         <TrackList
           type={type}
           tracks={collection.tracks}
-          currentTrackUri={currentTrackUri}
-          isPlaying={isPlaying}
-          onPause={pause}
-          onPlay={(trackUri) => playTrack(trackUri)}
+          collectionUri={collection.uri}
+          currentTrackUri={currentContext?.current_track?.uri || ""}
+          isPlaying={!currentContext?.paused}
         ></TrackList>
       </>
     )

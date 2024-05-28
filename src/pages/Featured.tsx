@@ -1,8 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import SpotifyObjectCard from "../component/SpotifyObjectCard";
 import { TokenContext } from "../context/tokenContext";
 import { spotifyAPI } from "../api/spotifyAxios";
-import SpotifyObjectCardSkeleton from "../component/SpotifyObjectCardSkeleton";
 import { SpotifyObjectType } from "../utils/enums";
 import SingleDisplay from "../component/SingleDisplay";
 
@@ -38,14 +36,12 @@ function Featured() {
   }, [featured, token]);
 
   return (
-    <>
-      <SingleDisplay
-        title='Featured'
-        data={featured}
-        type={SpotifyObjectType.Playlist}
-        isLoading={isLoading}
-      />
-    </>
+    <SingleDisplay
+      title='Featured'
+      data={featured}
+      type={SpotifyObjectType.Playlist}
+      isLoading={isLoading}
+    />
   );
 }
 
