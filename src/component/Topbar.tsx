@@ -7,7 +7,7 @@ function Topbar() {
   const { user, isLoading } = useUserContext();
   const navigate = useNavigate();
   return (
-    <div className='flex items-center p-4 justify-between'>
+    <div className='flex sticky top-0 items-center p-4 justify-between'>
       <Button
         className='!bg-black'
         onClick={() => {

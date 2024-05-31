@@ -27,7 +27,7 @@ function SpotifyObjectCard({
 
   return (
     <div
-      className={`flex flex-col p-2 overflow-hidden hover:bg-white hover:bg-opacity-5 rounded-sm cursor-pointer ${
+      className={`flex flex-col p-2 overflow-hidden hover:bg-spotify-hover rounded-sm cursor-pointer ${
         className ?? ""
       }`}
       onClick={() => {

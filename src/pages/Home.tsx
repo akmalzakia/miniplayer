@@ -54,7 +54,7 @@ function Home() {
         <div className='flex w-full h-full py-2 gap-2 overflow-hidden p-1'>
           <Sidebar></Sidebar>
           <div
-            className={`flex flex-col h-full rounded-md to-spotify-black w-[calc(100%-6rem)] bg-gray-500 bg-opacity-10`}
+            className={`flex flex-col h-full rounded-md w-[calc(100%-6rem)] bg-spotify-card`}
           >
             <Topbar />
             <OverlayScrollbarsComponent

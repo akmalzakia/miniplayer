@@ -84,7 +84,7 @@ function TrackList({
             return (
               <tr
                 key={trackItem?.id}
-                className={`hover:bg-white hover:bg-opacity-5 ${
+                className={`hover:bg-spotify-hover ${
                   isTrackPlayed(trackItem?.uri)
                     ? "border border-spotify-green"
                     : ""

@@ -19,7 +19,7 @@ function SingleDisplay({ title, type, data, isLoading }: Props) {
     <div className='py-2'>
       <div className='font-bold text-xl'>{title}</div>
       <div
-        className='grid w-full -mx-2 mt-3'
+        className='grid -mx-2 mt-3'
         style={{
           gridTemplateColumns: `repeat(${columnSize}, minmax(10em, 1fr))`,
         }}

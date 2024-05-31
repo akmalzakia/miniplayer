@@ -43,7 +43,7 @@ function Sidebar() {
   return (
     <div className='w-24 h-full flex flex-col justify-between pr-2'>
       <div
-        className={`flex flex-col gap-6 items-center rounded-md px-2 py-6 shadow-md bg-gray-500 bg-opacity-10`}
+        className={`flex flex-col gap-6 items-center rounded-md px-2 py-6 shadow-md bg-spotify-card`}
       >
         <NavLink
           to='/'
@@ -60,7 +60,7 @@ function Sidebar() {
         <AiOutlineSearch className='text-xl'></AiOutlineSearch>
       </div>
       <OverlayScrollbarsComponent
-        className='gap-2 overlow-y h-3/4 p-2 bg-gray-500 bg-opacity-10 rounded-md shadow-md'
+        className='gap-2 overlow-y h-3/4 p-2 bg-spotify-card rounded-md shadow-md'
         options={{
           scrollbars: { autoHide: "leave", theme: "os-theme-light" },
         }}
