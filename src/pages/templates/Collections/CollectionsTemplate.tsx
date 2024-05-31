@@ -95,10 +95,10 @@ function CollectionsTemplate({ type, collection }: Props) {
               </Textfit>
             </div>
 
-            <div className='text-gray-400 mt-1'>
+            <div className='text-spotify-gray mt-1'>
               {isPlaylist(collection) && collection.description}
             </div>
-            <div className='flex text-gray-400 items-center gap-1'>
+            <div className='flex text-spotify-gray items-center gap-1'>
               {
                 <CollectionOwnerImage
                   type={type}

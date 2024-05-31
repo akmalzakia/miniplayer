@@ -64,7 +64,7 @@ function TrackList({
 
   return (
     <div className='pr-4'>
-      <table className='table-fixed w-full text-sm text-gray-400'>
+      <table className='table-fixed w-full text-sm text-spotify-gray'>
         <thead className='border-b border-gray-500'>
           <tr className='text-left'>
             <th className='text-right pr-3 font-normal w-8'>#</th>

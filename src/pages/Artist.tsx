@@ -107,7 +107,7 @@ function Artist() {
             .map((track, idx) => (
               <div
                 key={track.id}
-                className={`flex justify-between p-2 gap-2 hover:bg-spotify-hover text-sm text-gray-400 rounded-md ${
+                className={`flex justify-between p-2 gap-2 hover:bg-spotify-hover text-sm text-spotify-gray rounded-md ${
                   isTrackPlayed(track.uri) ? "border border-spotify-green" : ""
                 }`}
                 onMouseEnter={() => {
@@ -175,7 +175,7 @@ function Artist() {
             ))}
         </div>
         <button
-          className='text-sm font-bold text-gray-600 pointer hover:text-white'
+          className='text-sm font-bold text-spotify-gray pointer hover:text-white'
           onClick={() => setIsExpanded((s) => !s)}
         >
           {isExpanded ? "See less" : "See more"}

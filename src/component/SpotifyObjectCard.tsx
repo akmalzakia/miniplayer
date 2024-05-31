@@ -46,17 +46,17 @@ function SpotifyObjectCard({
             {data.name}
           </div>
           {isPlaylist(data) ? (
-            <div className='text-gray-400 text-sm text-ellipsis line-clamp-2'>
+            <div className='text-spotify-gray text-sm text-ellipsis line-clamp-2'>
               {data.description}
             </div>
           ) : isAlbum(data) ? (
-            <div className='flex gap-2 text-sm text-gray-400'>
+            <div className='flex gap-2 text-sm text-spotify-gray'>
               <div>{data.release_date.split("-")[0]}</div>
               <div>&#xb7;</div>
               <div>{utils.upperFirstLetter(data.album_group)}</div>
             </div>
           ) : (
-            <div className='text-gray-400 text-sm'>
+            <div className='text-spotify-gray text-sm'>
               {utils.upperFirstLetter(data.type)}
             </div>
           )}

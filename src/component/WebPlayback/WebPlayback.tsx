@@ -68,7 +68,7 @@ function WebPlayback() {
                 ></img>
                 <div className='flex flex-col justify-center'>
                   <span className='text-sm font-bold'>{track?.name}</span>
-                  <span className='text-sm font-light text-gray-400'>
+                  <span className='text-sm font-light text-spotify-gray'>
                     {track?.artists[0].name}
                   </span>
                 </div>
