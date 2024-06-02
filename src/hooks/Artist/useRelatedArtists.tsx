@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { spotifyAPI } from "../../api/spotifyAxios";
+import { TokenContext } from "../../context/tokenContext";
 
-function useRelatedArtists(token: string, artistId?: string) {
+function useRelatedArtists(artistId?: string) {
   const [relatedArtists, setRelatedArtists] = useState<
     SpotifyApi.ArtistObjectFull[] | null
   >(null);
   const [isLoading, setIsLoading] = useState(true);
+  const token = useContext(TokenContext);
 
   useEffect(() => {
     async function requestRelatedArtists() {

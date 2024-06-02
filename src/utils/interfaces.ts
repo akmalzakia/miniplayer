@@ -14,3 +14,9 @@ export interface UserContextType {
   user: SpotifyApi.UserObjectPrivate | null;
   isLoading: boolean;
 }
+
+export interface ArtistAlbumParams {
+  include_groups: string[];
+  limit: number;
+  offset: number;
+}

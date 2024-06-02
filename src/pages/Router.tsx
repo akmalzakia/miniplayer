@@ -9,6 +9,7 @@ import { TokenProvider } from "../context/tokenContext";
 import { UserProvider } from "../context/userContext";
 import Album from "./Album";
 import Artist from "./Artist";
+import AlbumList from "./AlbumList";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: "/artist/:id",
         element: <Artist />,
+      },
+      {
+        path: "/artist/:id/discography/all",
+        element: <AlbumList />,
       },
     ],
   },

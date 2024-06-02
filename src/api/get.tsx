@@ -1,4 +1,4 @@
-import { AlbumGroup } from "../utils/enums";
+import { ArtistAlbumParams } from "../utils/interfaces";
 import { PlaybackStateAPI } from "./base";
 import { spotifyAxios } from "./spotifyAxios";
 
@@ -67,14 +67,15 @@ async function getAlbumWithId(id: string, token: string) {
   );
   return res.data;
 }
+
+async function getAlbumTracks(id: string, token: string) {
+  const res = await spotifyAxios(token).get<SpotifyApi.AlbumTracksResponse>(
+    `/albums/${id}/tracks`
+  );
+  return res.data;
+}
 //#endregion
 //#region Artist
-
-interface ArtistAlbumParams {
-  include_groups: string[];
-  limit: number;
-  offset: number;
-}
 
 async function getArtistById(id: string, token: string) {
   const res = await spotifyAxios(token).get<SpotifyApi.SingleArtistResponse>(
@@ -108,9 +109,13 @@ async function getArtistAlbums(
   return res.data;
 }
 
-async function getRelatedArtists(id : string, token: string) {
-  const res = await spotifyAxios(token).get<SpotifyApi.ArtistsRelatedArtistsResponse>(`artists/${id}/related-artists`)
-  return res.data.artists
+async function getRelatedArtists(id: string, token: string) {
+  const res = await spotifyAxios(
+    token
+  ).get<SpotifyApi.ArtistsRelatedArtistsResponse>(
+    `artists/${id}/related-artists`
+  );
+  return res.data.artists;
 }
 //#endregion
 //#region Player
@@ -128,6 +133,7 @@ const get = {
   getFeaturedPlaylists,
   getUserPlaylists,
   getAlbumWithId,
+  getAlbumTracks,
   getArtistById,
   getArtistTopTracks,
   getArtistAlbums,

@@ -8,12 +8,17 @@ export enum CollectionType {
   Playlist = SpotifyObjectType.Playlist,
 }
 
+export enum PaginatedRequestMode {
+  Next,
+  Previous
+}
 
 export enum AlbumGroup {
   Album = 'album',
   Single = 'single',
   AppearsOn = 'appears_on',
-  Compilation = 'compilation'
+  Compilation = 'compilation',
+  All = 'album,single,appears_on,compilation'
 }
 
 export enum PlayMode {

@@ -21,7 +21,7 @@ interface PlayerContextType {
     pause(): void;
     transferPlayback(): void;
     playCollection(
-      collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull,
+      collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull | SpotifyApi.AlbumObjectSimplified,
       isTrackOnCollection: boolean
     ): void;
     playCollectionTrack(collectionUri: string, trackUri: string): void;
@@ -171,7 +171,7 @@ export function PlayerProvider({ children }: PropsWithChildren) {
 
   const playCollection = useCallback(
     async (
-      collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull,
+      collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull | SpotifyApi.AlbumObjectSimplified,
       isTrackOnCollection: boolean
     ) => {
       if (player.instance && isActive && isTrackOnCollection) {

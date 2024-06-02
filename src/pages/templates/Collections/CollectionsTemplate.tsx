@@ -1,4 +1,3 @@
-import { useContext } from "react";
 import Button from "../../../component/Button";
 import { FiPause, FiPlay } from "react-icons/fi";
 import TrackList from "./components/TrackList";
@@ -7,7 +6,6 @@ import CollectionOwnerImage from "./components/CollectionOwnerImage";
 import { Textfit } from "react-textfit";
 import usePlayerContext from "../../../hooks/usePlayerContext";
 import utils from "../../../utils/util";
-import { TokenContext } from "../../../context/tokenContext";
 import { isPlaylist, isPlaylistTrack } from "../../../utils/matchers";
 import usePlayerStateFetcher from "../../../hooks/usePlayerStateFetcher";
 
@@ -18,7 +16,6 @@ interface Props {
 
 function CollectionsTemplate({ type, collection }: Props) {
   const { playerDispatcher, currentContext } = usePlayerContext();
-  const token = useContext(TokenContext);
 
   const isTrackOnCollection =
     collection &&
@@ -55,7 +52,7 @@ function CollectionsTemplate({ type, collection }: Props) {
     return totalDuration;
   }
 
-  usePlayerStateFetcher(token, collection);
+  usePlayerStateFetcher(collection);
 
   function formatCollectionDuration(duration: number) {
     if (!duration) return;
@@ -166,7 +163,7 @@ function CollectionsTemplate({ type, collection }: Props) {
         </div>
         <TrackList
           type={type}
-          tracks={collection.tracks}
+          tracks={collection.tracks.items}
           collectionUri={collection.uri}
           currentTrackUri={currentContext?.current_track?.uri || ""}
           isPlaying={!currentContext?.paused}

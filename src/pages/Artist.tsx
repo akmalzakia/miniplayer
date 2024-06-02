@@ -4,8 +4,7 @@ import utils from "../utils/util";
 import { Textfit } from "react-textfit";
 import { FiPause, FiPlay } from "react-icons/fi";
 import Button from "../component/Button";
-import { useContext, useState } from "react";
-import { TokenContext } from "../context/tokenContext";
+import { useState } from "react";
 import { SpotifyObjectType } from "../utils/enums";
 import SingleDisplay from "../component/SingleDisplay";
 import useTopTracks from "../hooks/Artist/useTopTracks";
@@ -16,14 +15,10 @@ import usePlayerStateFetcher from "../hooks/usePlayerStateFetcher";
 
 function Artist() {
   const { id: artistId } = useParams();
-  const token = useContext(TokenContext);
   const [artist, isLoading] = useArtist(artistId || "");
-  const [topTracks, isTrackLoading] = useTopTracks(token, artistId);
-  const [albums, isAlbumsLoading] = useArtistAlbums(token, artistId);
-  const [relatedArtists, isRelatedArtistLoading] = useRelatedArtists(
-    token,
-    artistId
-  );
+  const [topTracks, isTrackLoading] = useTopTracks(artistId);
+  const [albums, isAlbumsLoading] = useArtistAlbums(artistId || "", 10);
+  const [relatedArtists, isRelatedArtistLoading] = useRelatedArtists(artistId);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { playerDispatcher, currentContext, isActive } = usePlayerContext();
@@ -40,7 +35,7 @@ function Artist() {
 
   const isPlayedInAnotherDevice = !isActive && !currentContext?.paused;
 
-  usePlayerStateFetcher(token, artist);
+  usePlayerStateFetcher(artist);
 
   return (
     <div className='px-2'>
@@ -184,8 +179,10 @@ function Artist() {
       {albums && (
         <SingleDisplay
           title='Albums'
-          data={albums.items}
+          data={albums}
           type={SpotifyObjectType.Album}
+          isLoading={isAlbumsLoading}
+          detailLink='discography/all'
         />
       )}
       {relatedArtists && (
@@ -193,6 +190,7 @@ function Artist() {
           title='Related Artists'
           data={relatedArtists}
           type={SpotifyObjectType.Artist}
+          isLoading={isRelatedArtistLoading}
         />
       )}
     </div>

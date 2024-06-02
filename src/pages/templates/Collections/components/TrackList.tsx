@@ -10,8 +10,8 @@ interface Props {
   type: CollectionType;
   collectionUri: string
   tracks:
-    | SpotifyApi.PagingObject<SpotifyApi.PlaylistTrackObject>
-    | SpotifyApi.PagingObject<SpotifyApi.TrackObjectSimplified>;
+    | SpotifyApi.PlaylistTrackObject[]
+    | SpotifyApi.TrackObjectSimplified[];
   currentTrackUri: string;
   isPlaying: boolean;
 }
@@ -79,7 +79,7 @@ function TrackList({
           </tr>
         </thead>
         <tbody>
-          {tracks.items.map((item, idx) => {
+          {tracks.map((item, idx) => {
             const trackItem = isPlaylistTrack(item) ? item.track : item;
             return (
               <tr

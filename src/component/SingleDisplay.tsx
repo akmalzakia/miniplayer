@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import useSingleColumnDisplay from "../hooks/useSingleColumnDisplay";
 import { SpotifyObjectType } from "../utils/enums";
 import SpotifyObjectCard from "./SpotifyObjectCard";
@@ -11,13 +12,25 @@ interface Props {
     | SpotifyApi.ArtistObjectFull[]
     | SpotifyApi.PlaylistObjectSimplified[];
   isLoading?: boolean;
+  detailLink?: string;
 }
 
-function SingleDisplay({ title, type, data, isLoading }: Props) {
+function SingleDisplay({ title, type, data, isLoading, detailLink }: Props) {
   const [columnSize, columnRef] = useSingleColumnDisplay(180);
+  const isShowAllNeeded = data.length > columnSize && detailLink;
   return (
     <div className='py-2'>
-      <div className='font-bold text-xl'>{title}</div>
+      <div className='flex justify-between'>
+        <div className='font-bold text-xl'>{title}</div>
+        {isShowAllNeeded && (
+          <Link
+            to={detailLink}
+            className='font-bold text-spotify-gray text-sm'
+          >
+            Show all
+          </Link>
+        )}
+      </div>
       <div
         className='grid -mx-2 mt-3'
         style={{

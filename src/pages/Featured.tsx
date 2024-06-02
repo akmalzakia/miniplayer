@@ -36,12 +36,14 @@ function Featured() {
   }, [featured, token]);
 
   return (
-    <SingleDisplay
-      title='Featured'
-      data={featured}
-      type={SpotifyObjectType.Playlist}
-      isLoading={isLoading}
-    />
+    <div className="bg-spotify-card h-full w-full px-2">
+      <SingleDisplay
+        title='Featured'
+        data={featured}
+        type={SpotifyObjectType.Playlist}
+        isLoading={isLoading}
+      />
+    </div>
   );
 }
 

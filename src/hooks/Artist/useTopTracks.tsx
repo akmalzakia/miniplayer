@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { spotifyAPI } from "../../api/spotifyAxios";
+import { TokenContext } from "../../context/tokenContext";
 
-function useTopTracks(token: string, artistId?: string) {
+function useTopTracks(artistId?: string) {
   const [topTracks, setTopTracks] = useState<
     SpotifyApi.TrackObjectFull[] | null
   >(null);
   const [isLoading, setIsLoading] = useState(true);
+  const token = useContext(TokenContext)
 
   useEffect(() => {
     async function requestTopTracks() {

@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import usePlayerContext from "./usePlayerContext";
 import { DataContext } from "../utils/interfaces";
 import { spotifyAPI } from "../api/spotifyAxios";
+import { TokenContext } from "../context/tokenContext";
 
-function usePlayerStateFetcher(token: string, dependency?: object | null) {
+function usePlayerStateFetcher(dependency?: object | null) {
   const { player, setSpotifyContext, isActive } = usePlayerContext();
+  const token = useContext(TokenContext)
   useEffect(() => {
     async function requestPlayerState() {
       console.log("requesting player state...");
