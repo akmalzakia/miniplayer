@@ -1,7 +1,6 @@
 import DivSkeleton from "./DivSkeleton";
 
 interface Props {
-  rounded?: boolean;
   className?: string;
 }
 
