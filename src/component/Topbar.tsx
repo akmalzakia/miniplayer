@@ -25,7 +25,10 @@ function Topbar() {
         <Button className='!bg-black w-10 h-10 hover:text-xl text-gray-400 hover:text-white'>
           <HiOutlineUsers className='m-auto' />
         </Button>
-        <Button className='!bg-black !p-0 w-10 h-10 border border-gray-400'>
+        <Button
+          className='!bg-black !p-0 w-10 h-10 border border-gray-400'
+          tooltipContent={user?.display_name}
+        >
           {isLoading ? (
             <ImageSkeleton className='rounded-full' />
           ) : (

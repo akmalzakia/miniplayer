@@ -26,3 +26,10 @@ export enum PlayMode {
   CollectionTrack,
   TrackOnly
 }
+
+export enum TooltipPosition {
+  Top,
+  Bottom,
+  Left,
+  Right
+}
