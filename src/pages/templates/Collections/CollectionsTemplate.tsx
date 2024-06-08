@@ -8,22 +8,19 @@ import usePlayerContext from "../../../hooks/usePlayerContext";
 import utils from "../../../utils/util";
 import { isPlaylist, isPlaylistTrack } from "../../../utils/matchers";
 import usePlayerStateFetcher from "../../../hooks/usePlayerStateFetcher";
+import LoadingDots from "../../../component/LoadingDots";
 
 interface Props {
   type: CollectionType;
   collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull | null;
+  isDataLoading: boolean;
 }
 
-function CollectionsTemplate({ type, collection }: Props) {
+function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
   const { playerDispatcher, currentContext } = usePlayerContext();
 
   const isTrackOnCollection =
-    collection &&
-    collection?.tracks.items.some((i) => {
-      return isPlaylistTrack(i)
-        ? i.track?.uri === currentContext?.current_track?.uri
-        : i.uri === currentContext?.current_track?.uri;
-    });
+    currentContext && currentContext.context.uri === collection?.uri;
 
   const isPlayedInAnotherDevice = !!currentContext?.device;
 
@@ -63,6 +60,14 @@ function CollectionsTemplate({ type, collection }: Props) {
     res += `${!timeDetails.hours ? timeDetails.seconds + " sec" : ""} `;
 
     return res;
+  }
+
+  if (isDataLoading) {
+    return (
+      <div className='w-full h-full flex'>
+        <LoadingDots className='h-[15px] w-full m-auto' />
+      </div>
+    );
   }
 
   return (
@@ -165,8 +170,6 @@ function CollectionsTemplate({ type, collection }: Props) {
           type={type}
           tracks={collection.tracks.items}
           collectionUri={collection.uri}
-          currentTrackUri={currentContext?.current_track?.uri || ""}
-          isPlaying={!currentContext?.paused}
         ></TrackList>
       </>
     )

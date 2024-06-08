@@ -5,11 +5,17 @@ import { CollectionType } from "../utils/enums";
 
 function Album() {
   const { id: albumId } = useParams();
-  const [album, isLoading] = useAlbum(albumId || '')
-  
-  console.log(album)
+  const [album, isLoading] = useAlbum(albumId || "");
 
-  return <CollectionsTemplate type={CollectionType.Album} collection={album} />;
+  console.log(album);
+
+  return (
+    <CollectionsTemplate
+      type={CollectionType.Album}
+      collection={album}
+      isDataLoading={isLoading}
+    />
+  );
 }
 
 export default Album;

@@ -26,9 +26,9 @@ function useAlbumTracks(id: string) {
     requestTracks();
   }, [id, token]);
 
-  const cachedAlbum = useMemo(() => tracks, [tracks]);
+  const cachedTracks = useMemo(() => tracks, [tracks]);
 
-  return [cachedAlbum, isLoading] as const;
+  return [cachedTracks, isLoading] as const;
 }
 
 export default useAlbumTracks;

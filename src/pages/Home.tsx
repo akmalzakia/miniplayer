@@ -58,7 +58,7 @@ function Home() {
           >
             <Topbar />
             <OverlayScrollbarsComponent
-              className='gap-2 overlow-y p-4'
+              className='gap-2 overlow-y p-4 flex-1'
               options={{
                 scrollbars: { autoHide: "leave", theme: "os-theme-light" },
               }}

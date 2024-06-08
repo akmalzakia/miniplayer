@@ -1,27 +1,72 @@
 import { FiPause, FiPlay } from "react-icons/fi";
 import Button from "../component/Button";
 import utils from "../utils/util";
-import { useEffect } from "react";
-import useAlbumTracks from "../hooks/useAlbumTracks";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import TrackList from "./templates/Collections/components/TrackList";
 import { CollectionType } from "../utils/enums";
 import usePlayerContext from "../hooks/usePlayerContext";
+import { spotifyAPI } from "../api/spotifyAxios";
+import { TokenContext } from "../context/tokenContext";
+import TrackListSkeleton from "../component/Skeleton/TrackListSkeleton";
 
 interface Props {
   album: SpotifyApi.AlbumObjectSimplified;
 }
 
 function AlbumListItem({ album }: Props) {
-  const [tracks, isTracksLoading] = useAlbumTracks(album.id);
+  const [tracks, setTracks] = useState<
+    SpotifyApi.TrackObjectSimplified[] | null
+  >(null);
+  const [isTracksLoading, setIsTrackLoading] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const token = useContext(TokenContext);
   const { playerDispatcher, currentContext } = usePlayerContext();
+  const loaderRef = useRef(null);
 
   const isTrackOnCollection =
-    tracks && tracks.some((i) => i.uri === currentContext?.current_track?.uri);
+    currentContext && currentContext.context.uri === album.uri;
 
   const isPlayedInAnotherDevice = !!currentContext?.device;
 
+  const fetchTracks = useCallback(async () => {
+    setIsTrackLoading(true);
+    try {
+      const res = await spotifyAPI.getAlbumTracks(album.id, token);
+      setTracks(res.items);
+      setIsTrackLoading(false);
+      setIsLoaded(true);
+    } catch (error) {
+      console.log(error);
+      setIsTrackLoading(true);
+    }
+  }, [album, token]);
+
+  useEffect(() => {
+    let observerRefValue = null;
+    const observer = new IntersectionObserver((entries) => {
+      const target = entries[0];
+      if (target.isIntersecting && !isLoaded) {
+        fetchTracks();
+      }
+    });
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+      observerRefValue = loaderRef.current;
+    }
+
+    return () => {
+      if (observerRefValue) {
+        observer.unobserve(observerRefValue);
+      }
+    };
+  }, [fetchTracks, isLoaded]);
+
   return (
-    <div className='my-10'>
+    <div
+      className='my-10'
+      ref={loaderRef}
+    >
       <div className='flex gap-5 mb-5'>
         <div className='w-32'>
           <img
@@ -72,14 +117,16 @@ function AlbumListItem({ album }: Props) {
           </Button>
         </div>
       </div>
-      {tracks && (
-        <TrackList
-          type={CollectionType.Album}
-          tracks={tracks}
-          collectionUri={album.uri}
-          currentTrackUri={currentContext?.current_track?.uri || ""}
-          isPlaying={!currentContext?.paused}
-        />
+      {isTracksLoading ? (
+        <TrackListSkeleton type={CollectionType.Album} />
+      ) : (
+        tracks && (
+          <TrackList
+            type={CollectionType.Album}
+            tracks={tracks}
+            collectionUri={album.uri}
+          />
+        )
       )}
     </div>
   );

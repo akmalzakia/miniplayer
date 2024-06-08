@@ -5,39 +5,30 @@ import { CollectionType } from "../../../../utils/enums";
 import usePlayerContext from "../../../../hooks/usePlayerContext";
 import utils from "../../../../utils/util";
 import { isPlaylistTrack } from "../../../../utils/matchers";
+import Image from "../../../../component/Image";
 
 interface Props {
   type: CollectionType;
-  collectionUri: string
-  tracks:
-    | SpotifyApi.PlaylistTrackObject[]
-    | SpotifyApi.TrackObjectSimplified[];
-  currentTrackUri: string;
-  isPlaying: boolean;
+  collectionUri: string;
+  tracks: SpotifyApi.PlaylistTrackObject[] | SpotifyApi.TrackObjectSimplified[];
 }
 
-function TrackList({
-  type,
-  tracks,
-  collectionUri,
-  currentTrackUri,
-  isPlaying,
-}: Props) {
+function TrackList({ type, tracks, collectionUri }: Props) {
   const { playerDispatcher, isActive, currentContext } = usePlayerContext();
   const [currentHover, setCurrentHover] = useState("");
 
-  const isSameContext = collectionUri === currentContext?.context.uri
+  const isSameContext = collectionUri === currentContext?.context.uri;
 
   const isTrackPlayed = (trackId?: string) =>
-    isActive && currentTrackUri === trackId && isSameContext
+    isActive && currentContext?.current_track?.uri === trackId && isSameContext;
 
   function play(trackUri?: string) {
     if (!trackUri) return;
-    playerDispatcher.playCollectionTrack(collectionUri, trackUri)
+    playerDispatcher.playCollectionTrack(collectionUri, trackUri);
   }
 
   function pause() {
-   playerDispatcher.pause()
+    playerDispatcher.pause();
   }
 
   function formatDateAdded(datetime?: string) {
@@ -102,7 +93,7 @@ function TrackList({
                   }`}
                 >
                   {isTrackPlayed(trackItem?.uri) ? (
-                    isPlaying ? (
+                    !currentContext?.paused ? (
                       <FiPause
                         className='m-auto'
                         onClick={pause}
@@ -125,8 +116,10 @@ function TrackList({
                 <td className='flex items-center py-2 gap-2'>
                   {isPlaylistTrack(item) && (
                     <div className='w-10 min-w-10'>
-                      <img
+                      <Image
                         className='max-w-full max-h-full rounded-md'
+                        width={item.track?.album.images[0].width}
+                        height={item.track?.album.images[0].height}
                         src={item.track?.album.images[0].url}
                       />
                     </div>

@@ -12,6 +12,8 @@ import useArtistAlbums from "../hooks/Artist/useArtistAlbums";
 import useRelatedArtists from "../hooks/Artist/useRelatedArtists";
 import usePlayerContext from "../hooks/usePlayerContext";
 import usePlayerStateFetcher from "../hooks/usePlayerStateFetcher";
+import Image from "../component/Image";
+import LoadingDots from "../component/LoadingDots";
 
 function Artist() {
   const { id: artistId } = useParams();
@@ -37,20 +39,30 @@ function Artist() {
 
   usePlayerStateFetcher(artist);
 
+  const isDataLoading =
+    isLoading && isTrackLoading && isAlbumsLoading && isRelatedArtistLoading;
+
+  if (isDataLoading) {
+    return (
+      <div className='w-full h-full flex'>
+        <LoadingDots className='h-[15px] w-full m-auto' />
+      </div>
+    );
+  }
+
   return (
     <div className='px-2'>
       <div className='py-2 flex w-full gap-4'>
         <div className='w-40 shrink-0'>
-          <img
+          <Image
             className='rounded-full shadow-md max-w-full max-h-full'
             height={artist?.images[0].height}
             width={artist?.images[0].width}
             src={artist?.images[0].url}
-          ></img>
+          ></Image>
         </div>
         <div className='flex flex-col justify-between gap-4 w-[calc(100%-10.5rem)] flex-grow-0'>
-          <div></div>
-          <div className='font-bold'>
+          <div className='font-bold flex-1'>
             <Textfit
               mode='single'
               min={36}
@@ -59,9 +71,11 @@ function Artist() {
               {artist?.name}
             </Textfit>
           </div>
-          <div className='font-normal'>
-            {utils.formatFollowers(artist?.followers.total || 0)} monthly
-            listeners
+          <div className='font-normal h-6'>
+            <>
+              {utils.formatFollowers(artist?.followers.total || 0)} monthly
+              listeners
+            </>
           </div>
         </div>
       </div>

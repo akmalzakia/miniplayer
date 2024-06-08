@@ -12,6 +12,7 @@ function Playlist() {
     <CollectionsTemplate
       type={CollectionType.Playlist}
       collection={playlist}
+      isDataLoading={isLoading}
     />
   );
 }
