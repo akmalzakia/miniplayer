@@ -11,7 +11,8 @@ export default {
         'spotify-black': '#191414',
         'spotify-card': '#211E1F',
         'spotify-hover': '#2C292A',
-        'spotify-gray': '#9CA3AF'
+        'spotify-gray': '#9CA3AF',
+        'spotify-tooltip': '#282828'
       },
       gridTemplateColumns: {
         'auto-fill-100': 'repeat(auto-fill, minmax(100px, 1fr))',

@@ -5,16 +5,16 @@ import { createPortal } from "react-dom";
 interface Props extends React.PropsWithChildren {
   position: TooltipPosition;
   element: HTMLElement;
+  className?: string;
 }
 
-function Tooltip({ position, children, element }: Props) {
+function Tooltip({ position, children, element, className }: Props) {
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
-  const rect = element.getBoundingClientRect();
+  const rect = element?.getBoundingClientRect();
   const tooltipRef = useRef<HTMLDivElement>(null);
   const root = document.getElementById("root");
   const margin = 5; //px
-  console.log(rect);
 
   let tooltipStyle: {
     top?: number;
@@ -70,7 +70,7 @@ function Tooltip({ position, children, element }: Props) {
     createPortal(
       <div
         ref={tooltipRef}
-        className={`absolute bg-gray-700 text-xs p-1 rounded-md shadow-lg text-nowrap z-10`}
+        className={`fixed bg-spotify-tooltip text-xs p-1.5 rounded-md shadow-lg text-nowrap z-10 ${className}`}
         style={tooltipStyle}
       >
         {children}

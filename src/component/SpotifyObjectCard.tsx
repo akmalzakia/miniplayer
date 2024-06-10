@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { SpotifyObjectType } from "../utils/enums";
 import utils from "../utils/util";
-import React from "react";
+import React, { forwardRef } from "react";
 import { isAlbum, isPlaylist } from "../utils/matchers";
 
-interface Props extends React.PropsWithChildren {
+interface Props extends React.ComponentPropsWithRef<"div"> {
   type: SpotifyObjectType;
   data:
     | SpotifyApi.PlaylistObjectFull
@@ -13,16 +13,15 @@ interface Props extends React.PropsWithChildren {
     | SpotifyApi.AlbumObjectSimplified;
   imageOnly?: boolean;
   rounded?: boolean;
-  className?: string;
 }
 
-function SpotifyObjectCard({
-  type,
-  data,
-  imageOnly,
-  rounded,
-  className,
-}: Props) {
+const SpotifyObjectCard = forwardRef<
+  HTMLDivElement,
+  Props & React.PropsWithChildren
+>(function SpotifyObjectCard(
+  { type, data, imageOnly, rounded, className, ...rest },
+  ref
+) {
   const navigate = useNavigate();
 
   return (
@@ -33,6 +32,8 @@ function SpotifyObjectCard({
       onClick={() => {
         navigate(`/${type}/${data.id}`);
       }}
+      ref={ref}
+      {...rest}
     >
       <img
         className={`max-w-full max-h-full aspect-square object-cover ${
@@ -64,6 +65,6 @@ function SpotifyObjectCard({
       )}
     </div>
   );
-}
+});
 
 export default SpotifyObjectCard;

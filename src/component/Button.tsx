@@ -27,6 +27,7 @@ function Button({
         <Tooltip
           position={tooltipPosition}
           element={buttonRef.current}
+          className="text-xs text-nowrap"
         >
           {tooltipContent}
         </Tooltip>
