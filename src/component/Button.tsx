@@ -1,6 +1,5 @@
-import { useRef, useState } from "react";
-import Tooltip from "./Tooltip";
 import { TooltipPosition } from "../utils/enums";
+import Tooltip from "./Tooltip";
 
 interface Props extends React.PropsWithChildren {
   onClick?(): void;
@@ -16,35 +15,30 @@ function Button({
   tooltipContent,
   tooltipPosition = TooltipPosition.Bottom,
 }: Props) {
-  const [isHover, setIsHover] = useState(false);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-
-  const isTooltipShowing = tooltipContent && isHover && buttonRef.current;
-
   return (
     <>
-      {isTooltipShowing && (
-        <Tooltip
-          position={tooltipPosition}
-          element={buttonRef.current}
-          className="text-xs text-nowrap"
-        >
-          {tooltipContent}
-        </Tooltip>
-      )}
-      <button
-        ref={buttonRef}
-        className={`text-white p-2 rounded-full shadow-lg no-underline bg-spotify-green ${className}`}
-        onClick={onClick}
-        onMouseEnter={() => {
-          setIsHover(true);
-        }}
-        onMouseLeave={() => {
-          setIsHover(false);
-        }}
+      <Tooltip<HTMLButtonElement>
+        position={tooltipPosition}
+        tooltipClass='text-xs text-nowrap'
+        tooltipElement={tooltipContent}
+        tooltipEnabled={!!tooltipContent}
       >
-        {children}
-      </button>
+        {({ ref, setHover }) => (
+          <button
+            ref={ref}
+            className={`text-white p-2 rounded-full shadow-lg no-underline bg-spotify-green ${className}`}
+            onClick={onClick}
+            onMouseEnter={() => {
+              setHover(true);
+            }}
+            onMouseLeave={() => {
+              setHover(false);
+            }}
+          >
+            {children}
+          </button>
+        )}
+      </Tooltip>
     </>
   );
 }

@@ -1,13 +1,13 @@
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
-import { Fragment, useContext, useEffect, useRef, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import SpotifyObjectCardSkeleton from "./SpotifyObjectCardSkeleton";
-import Tooltip from "./Tooltip";
 import SpotifyObjectCard from "./SpotifyObjectCard";
 import { SpotifyObjectType, TooltipPosition } from "../utils/enums";
 import { spotifyAPI } from "../api/spotifyAxios";
 import { TokenContext } from "../context/tokenContext";
 import utils from "../utils/util";
 import "overlayscrollbars/overlayscrollbars.css";
+import Tooltip from "./Tooltip";
 
 function SidebarPlaylistLibrary() {
   const [playlists, setPlaylists] = useState<
@@ -15,17 +15,6 @@ function SidebarPlaylistLibrary() {
   >(null);
   const [isLoading, setIsLoading] = useState(true);
   const token = useContext(TokenContext);
-  const playlistRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-
-  const [currentHover, setCurrentHover] = useState("");
-  const isHover = (id: string) => id === currentHover;
-
-  function getPlaylistRef() {
-    if (!playlistRefs.current) {
-      playlistRefs.current = new Map();
-    }
-    return playlistRefs.current;
-  }
 
   useEffect(() => {
     async function requestPlaylists() {
@@ -66,15 +55,11 @@ function SidebarPlaylistLibrary() {
             />
           ))
         : playlists?.map((playlist) => {
-            const el = getPlaylistRef().get(playlist.id);
-            console.log(el);
             return (
               <Fragment key={playlist.id}>
-                {el && isHover(playlist.id) && (
-                  <Tooltip
-                    position={TooltipPosition.Right}
-                    element={el}
-                  >
+                <Tooltip<HTMLDivElement>
+                  position={TooltipPosition.Right}
+                  tooltipElement={
                     <div className='flex flex-col font-sans text-sm'>
                       <div className='font-bold'>{playlist.name}</div>
                       <div className='flex gap-1 text-spotify-gray'>
@@ -83,24 +68,20 @@ function SidebarPlaylistLibrary() {
                         <div>{playlist.owner.display_name}</div>
                       </div>
                     </div>
-                  </Tooltip>
-                )}
-                <SpotifyObjectCard
-                  type={SpotifyObjectType.Playlist}
-                  className={"min-w-14 min-h-14 p-1"}
-                  data={playlist}
-                  imageOnly={true}
-                  ref={(node) => {
-                    const mapRef = getPlaylistRef();
-                    if (node) {
-                      mapRef.set(playlist.id, node);
-                    } else {
-                      mapRef.delete(playlist.id);
-                    }
-                  }}
-                  onMouseEnter={() => setCurrentHover(playlist.id)}
-                  onMouseLeave={() => setCurrentHover("")}
-                ></SpotifyObjectCard>
+                  }
+                >
+                  {({ ref, setHover }) => (
+                    <SpotifyObjectCard
+                      type={SpotifyObjectType.Playlist}
+                      className={"min-w-14 min-h-14 p-1"}
+                      data={playlist}
+                      imageOnly={true}
+                      ref={ref}
+                      onMouseEnter={() => setHover(true)}
+                      onMouseLeave={() => setHover(false)}
+                    ></SpotifyObjectCard>
+                  )}
+                </Tooltip>
               </Fragment>
             );
           })}

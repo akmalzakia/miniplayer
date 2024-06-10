@@ -1,82 +1,43 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import TooltipComponent from "./TooltipComponent";
 import { TooltipPosition } from "../utils/enums";
-import { createPortal } from "react-dom";
 
-interface Props extends React.PropsWithChildren {
-  position: TooltipPosition;
-  element: HTMLElement;
-  className?: string;
+interface ChildrenProps<T> {
+  ref: React.RefObject<T>;
+  setHover: (hover: boolean) => void;
 }
 
-function Tooltip({ position, children, element, className }: Props) {
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
-  const rect = element?.getBoundingClientRect();
-  const tooltipRef = useRef<HTMLDivElement>(null);
-  const root = document.getElementById("root");
-  const margin = 5; //px
+interface Props<T> {
+  position: TooltipPosition;
+  children: (props: ChildrenProps<T>) => React.ReactNode;
+  tooltipElement?: React.ReactNode;
+  tooltipClass?: string;
+  tooltipEnabled?: boolean;
+}
 
-  let tooltipStyle: {
-    top?: number;
-    left?: number;
-    right?: number;
-    bottom?: number;
-  };
-
-  useLayoutEffect(() => {
-    if (!tooltipRef.current) return;
-
-    const tooltipRect = tooltipRef.current.getBoundingClientRect();
-    const w = tooltipRect.width;
-    const h = tooltipRect.height;
-
-    setWidth(w);
-    setHeight(h);
-  }, []);
-
-  switch (position) {
-    case TooltipPosition.Bottom:
-      tooltipStyle = {
-        top: rect.top + rect.height + margin,
-        left: rect.left + rect.width / 2 - width / 2,
-      };
-      break;
-    case TooltipPosition.Right:
-      tooltipStyle = {
-        top: rect.top + rect.height / 2 - height / 2,
-        left: rect.left + rect.width + margin,
-      };
-      break;
-    case TooltipPosition.Top:
-      tooltipStyle = {
-        top: rect.top - height - margin,
-        left: rect.left + rect.width / 2 - width / 2,
-      };
-      break;
-    case TooltipPosition.Left:
-      tooltipStyle = {
-        top: rect.top + rect.height / 2 - height / 2,
-        left: rect.left - width - margin,
-      };
-      break;
-    default: {
-      const _exh: never = position;
-      return _exh;
-    }
-  }
+function Tooltip<T extends HTMLElement>({
+  children,
+  position,
+  tooltipElement,
+  tooltipClass,
+  tooltipEnabled = true,
+}: Props<T>) {
+  const [isHover, setIsHover] = useState(false);
+  const ref = useRef<T>(null);
 
   return (
-    root &&
-    createPortal(
-      <div
-        ref={tooltipRef}
-        className={`fixed bg-spotify-tooltip text-xs p-1.5 rounded-md shadow-lg text-nowrap z-10 ${className}`}
-        style={tooltipStyle}
-      >
-        {children}
-      </div>,
-      root
-    )
+    <>
+      {tooltipEnabled && ref.current && isHover && (
+        <TooltipComponent
+          position={position}
+          element={ref.current}
+          className={tooltipClass}
+        >
+          {tooltipElement}
+        </TooltipComponent>
+      )}
+      {children({ ref: ref, setHover: setIsHover })}
+    </>
   );
 }
 
