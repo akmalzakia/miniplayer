@@ -16,6 +16,7 @@ interface Props extends React.ComponentPropsWithRef<"div"> {
   rounded?: boolean;
   imageResolution: CollectionImageResolution;
   imagePriority?: "high" | "low" | "auto";
+  lazy?: boolean
 }
 
 const SpotifyObjectCard = forwardRef<
@@ -30,6 +31,7 @@ const SpotifyObjectCard = forwardRef<
     className,
     imagePriority,
     imageResolution,
+    lazy,
     ...rest
   },
   ref
@@ -54,6 +56,7 @@ const SpotifyObjectCard = forwardRef<
         images={data.images}
         priority={imagePriority}
         resolution={imageResolution}
+        lazy={lazy}
       ></SpotifyImage>
       {!imageOnly && (
         <>

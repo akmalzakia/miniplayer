@@ -51,6 +51,7 @@ function SidebarPlaylistLibrary() {
                       onMouseLeave={() => setHover(false)}
                       imagePriority="low"
                       imageResolution={CollectionImageResolution.Low}
+                      lazy
                     ></SpotifyObjectCard>
                   )}
                 </Tooltip>

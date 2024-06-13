@@ -24,6 +24,7 @@ function SingleDisplay({
   isLoading,
   detailLink,
   imagePriority,
+  lazy
 }: Props) {
   const [columnSize, columnRef] = useSingleColumnDisplay(180);
   const isShowAllNeeded = data.length > columnSize && detailLink;
@@ -64,6 +65,7 @@ function SingleDisplay({
                   rounded={type === SpotifyObjectType.Artist}
                   imageResolution={CollectionImageResolution.Medium}
                   imagePriority={imagePriority}
+                  lazy={lazy}
                 />
               );
             })}

@@ -14,7 +14,8 @@ function SpotifyImage({
   className,
   images,
   priority,
-  resolution
+  resolution,
+  lazy,
 }: Props) {
   const [width, setWidth] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,6 +74,7 @@ function SpotifyImage({
       onLoad={() => setIsLoading(false)}
       ref={imageRef}
       fetchPriority={priority}
+      loading={lazy ? "lazy" : "eager"}
     ></Image>
   );
 }
