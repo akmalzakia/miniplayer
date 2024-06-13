@@ -45,18 +45,13 @@ export function PlayerProvider({ children }: PropsWithChildren) {
     null
   );
 
-  const { user, isLoading } = useUserContext();
+  const { user } = useUserContext();
   const token = useContext(TokenContext);
 
   const defaultVolume = 0.5;
 
   useEffect(() => {
-    console.log("playerContext:", currentContext);
-  }, [currentContext]);
-
-  useEffect(() => {
     function onSDKReady() {
-      console.log("currentPlayer", playerInstance);
       if (playerInstance) return;
       console.log("trying to create new player");
       const newPlayer = new window.Spotify.Player({
@@ -91,8 +86,6 @@ export function PlayerProvider({ children }: PropsWithChildren) {
           current_track: state.track_window.current_track,
         };
         setCurrentContext(data);
-
-        console.log("xd", data);
 
         if (!state.playback_id && state.playback_quality === "UNKNOWN") {
           newPlayer.disconnect();
@@ -187,8 +180,6 @@ export function PlayerProvider({ children }: PropsWithChildren) {
           position_ms: progress_ms,
         };
 
-        console.log(data);
-
         await spotifyAPI.playPlayer(token, data).then(() => {
           if (currentContext) {
             setCurrentContext({ ...currentContext, paused: false });
@@ -270,7 +261,6 @@ export function PlayerProvider({ children }: PropsWithChildren) {
   const playTrackOnly = useCallback(
     async (trackUri: string) => {
       const isCurrentTrack = trackUri === currentContext?.current_track?.uri;
-      console.log(currentContext);
 
       if (player.instance && isActive && isCurrentTrack) {
         player.instance.resume();

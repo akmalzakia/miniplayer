@@ -16,7 +16,6 @@ function usePlaylist(id: string) {
         const data = await spotifyAPI.getPlaylistWithId(id, token);
         setPlaylist(data);
         setIsLoading(false);
-        console.log(data);
       } catch (err) {
         console.log("error fetching playlist id: ", id);
         setIsLoading(true);

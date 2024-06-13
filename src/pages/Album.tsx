@@ -7,8 +7,6 @@ function Album() {
   const { id: albumId } = useParams();
   const [album, isLoading] = useAlbum(albumId || "");
 
-  console.log(album);
-
   return (
     <CollectionsTemplate
       type={CollectionType.Album}

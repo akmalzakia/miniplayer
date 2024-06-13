@@ -18,14 +18,6 @@ function useArtistAlbums(artistId: string, limit: number) {
   const [albumConfig, setAlbumConfig] = useState<AlbumConfig | null>(null);
   const token = useContext(TokenContext);
 
-  useEffect(() => {
-    console.log("albums now", albums);
-  }, [albums]);
-
-  useEffect(() => {
-    console.log("next now", albumConfig?.nextUrl);
-  }, [albumConfig]);
-
   const requestAlbums = useCallback(
     async (params: ArtistAlbumParams) => {
       setIsLoading(true);
@@ -41,7 +33,6 @@ function useArtistAlbums(artistId: string, limit: number) {
           nextUrl: res.next,
         };
         setAlbumConfig(config);
-        console.log(res);
         setIsLoading(false);
       } catch (error) {
         console.log(error);

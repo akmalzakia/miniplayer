@@ -36,12 +36,13 @@ function Featured() {
   }, [featured, token]);
 
   return (
-    <div className="bg-spotify-card h-full w-full px-2">
+    <div className='bg-spotify-card h-full w-full px-2'>
       <SingleDisplay
         title='Featured'
         data={featured}
         type={SpotifyObjectType.Playlist}
         isLoading={isLoading}
+        imagePriority='high'
       />
     </div>
   );

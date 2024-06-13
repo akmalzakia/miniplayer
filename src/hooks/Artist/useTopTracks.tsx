@@ -17,7 +17,6 @@ function useTopTracks(artistId?: string) {
       try {
         const res = await spotifyAPI.getArtistTopTracks(artistId, token);
         setTopTracks(res);
-        console.log(res);
         setIsLoading(false);
       } catch (error) {
         console.log(error);

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import useSingleColumnDisplay from "../hooks/useSingleColumnDisplay";
-import { SpotifyObjectType } from "../utils/enums";
+import { CollectionImageResolution, SpotifyObjectType } from "../utils/enums";
 import SpotifyObjectCard from "./SpotifyObjectCard";
 import SpotifyObjectCardSkeleton from "./SpotifyObjectCardSkeleton";
 
@@ -13,9 +13,18 @@ interface Props {
     | SpotifyApi.PlaylistObjectSimplified[];
   isLoading?: boolean;
   detailLink?: string;
+  imagePriority?: "high" | "low" | "auto";
+  lazy?: boolean;
 }
 
-function SingleDisplay({ title, type, data, isLoading, detailLink }: Props) {
+function SingleDisplay({
+  title,
+  type,
+  data,
+  isLoading,
+  detailLink,
+  imagePriority,
+}: Props) {
   const [columnSize, columnRef] = useSingleColumnDisplay(180);
   const isShowAllNeeded = data.length > columnSize && detailLink;
   return (
@@ -53,6 +62,8 @@ function SingleDisplay({ title, type, data, isLoading, detailLink }: Props) {
                   type={type}
                   data={item}
                   rounded={type === SpotifyObjectType.Artist}
+                  imageResolution={CollectionImageResolution.Medium}
+                  imagePriority={imagePriority}
                 />
               );
             })}

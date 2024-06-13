@@ -8,7 +8,6 @@ function Login() {
 
     const codeVerifier = utils.generateRandomString(64);
     localStorage.setItem("code_verifier", codeVerifier);
-    console.log(codeVerifier);
     const hashed = await utils.sha256(codeVerifier);
     const codeChallenge = utils.base64encode(hashed);
 

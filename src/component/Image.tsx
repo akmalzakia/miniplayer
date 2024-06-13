@@ -1,20 +1,26 @@
-import React, { useState } from "react";
+import React, { forwardRef, useState } from "react";
 import ImageSkeleton from "./Skeleton/ImageSkeleton";
 
-function Image(props: React.ImgHTMLAttributes<HTMLImageElement>) {
-  const [isLoading, setIsLoading] = useState(true);
-  return (
-    <>
-      <ImageSkeleton
-        className={`${isLoading ? "block" : "hidden"} ${props.className}`}
-      />
-      <img
-        className={`${props.className} ${isLoading ? "hidden" : "block"}`}
-        src={props.src}
-        onLoad={() => setIsLoading(false)}
-      ></img>
-    </>
-  );
-}
+const Image = forwardRef<HTMLImageElement, React.ComponentPropsWithRef<"img">>(
+  function Image({ className, onLoad, ...rest }, ref) {
+    const [isLoading, setIsLoading] = useState(true);
+    return (
+      <>
+        <ImageSkeleton
+          className={`${isLoading ? "block" : "hidden"} ${className}`}
+        />
+        <img
+          className={`${className} ${isLoading ? "hidden" : "block"}`}
+          onLoad={(ev) => {
+            setIsLoading(false);
+            onLoad?.(ev);
+          }}
+          ref={ref}
+          {...rest}
+        ></img>
+      </>
+    );
+  }
+);
 
 export default Image;

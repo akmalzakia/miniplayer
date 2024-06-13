@@ -5,15 +5,15 @@ import { Textfit } from "react-textfit";
 import { FiPause, FiPlay } from "react-icons/fi";
 import Button from "../component/Button";
 import { useState } from "react";
-import { SpotifyObjectType } from "../utils/enums";
+import { CollectionImageResolution, SpotifyObjectType } from "../utils/enums";
 import SingleDisplay from "../component/SingleDisplay";
 import useTopTracks from "../hooks/Artist/useTopTracks";
 import useArtistAlbums from "../hooks/Artist/useArtistAlbums";
 import useRelatedArtists from "../hooks/Artist/useRelatedArtists";
 import usePlayerContext from "../hooks/usePlayerContext";
 import usePlayerStateFetcher from "../hooks/usePlayerStateFetcher";
-import Image from "../component/Image";
 import LoadingDots from "../component/LoadingDots";
+import SpotifyImage from "../component/SpotifyImage";
 
 function Artist() {
   const { id: artistId } = useParams();
@@ -54,12 +54,11 @@ function Artist() {
     <div className='px-2'>
       <div className='py-2 flex w-full gap-4'>
         <div className='w-40 shrink-0'>
-          <Image
+          <SpotifyImage
             className='rounded-full shadow-md max-w-full max-h-full'
-            height={artist?.images[0].height}
-            width={artist?.images[0].width}
-            src={artist?.images[0].url}
-          ></Image>
+            images={artist?.images}
+            resolution={CollectionImageResolution.Medium}
+          ></SpotifyImage>
         </div>
         <div className='flex flex-col justify-between gap-4 w-[calc(100%-10.5rem)] flex-grow-0'>
           <div className='font-bold flex-1'>
@@ -158,10 +157,11 @@ function Artist() {
                     )}
                   </div>
                   <div className='w-10 min-w-10'>
-                    <img
+                    <SpotifyImage
                       className='max-w-full max-h-full rounded-md'
-                      src={track.album.images[0].url}
-                    ></img>
+                      images={track.album.images}
+                      resolution={CollectionImageResolution.Low}
+                    ></SpotifyImage>
                   </div>
 
                   <div className='flex flex-col justify-center'>

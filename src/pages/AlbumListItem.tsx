@@ -3,11 +3,12 @@ import Button from "../component/Button";
 import utils from "../utils/util";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import TrackList from "./templates/Collections/components/TrackList";
-import { CollectionType } from "../utils/enums";
+import { CollectionImageResolution, CollectionType } from "../utils/enums";
 import usePlayerContext from "../hooks/usePlayerContext";
 import { spotifyAPI } from "../api/spotifyAxios";
 import { TokenContext } from "../context/tokenContext";
 import TrackListSkeleton from "../component/Skeleton/TrackListSkeleton";
+import SpotifyImage from "../component/SpotifyImage";
 
 interface Props {
   album: SpotifyApi.AlbumObjectSimplified;
@@ -18,7 +19,6 @@ function AlbumListItem({ album }: Props) {
     SpotifyApi.TrackObjectSimplified[] | null
   >(null);
   const [isTracksLoading, setIsTrackLoading] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
   const token = useContext(TokenContext);
   const { playerDispatcher, currentContext } = usePlayerContext();
   const loaderRef = useRef(null);
@@ -34,7 +34,6 @@ function AlbumListItem({ album }: Props) {
       const res = await spotifyAPI.getAlbumTracks(album.id, token);
       setTracks(res.items);
       setIsTrackLoading(false);
-      setIsLoaded(true);
     } catch (error) {
       console.log(error);
       setIsTrackLoading(true);
@@ -43,10 +42,11 @@ function AlbumListItem({ album }: Props) {
 
   useEffect(() => {
     let observerRefValue = null;
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver((entries, observer) => {
       const target = entries[0];
-      if (target.isIntersecting && !isLoaded) {
+      if (target.isIntersecting) {
         fetchTracks();
+        observer.unobserve(target.target);
       }
     });
 
@@ -60,7 +60,7 @@ function AlbumListItem({ album }: Props) {
         observer.unobserve(observerRefValue);
       }
     };
-  }, [fetchTracks, isLoaded]);
+  }, [fetchTracks]);
 
   return (
     <div
@@ -69,10 +69,11 @@ function AlbumListItem({ album }: Props) {
     >
       <div className='flex gap-5 mb-5'>
         <div className='w-32'>
-          <img
+          <SpotifyImage
             className='max-w-full max-h-full rounded-md shadow-md'
-            src={album.images[0].url}
-          ></img>
+            images={album.images}
+            resolution={CollectionImageResolution.Medium}
+          ></SpotifyImage>
         </div>
         <div className='flex-1 flex flex-col justify-between'>
           <div>
@@ -102,7 +103,6 @@ function AlbumListItem({ album }: Props) {
                   isTrackOnCollection ?? false
                 );
               }
-              console.log(isPlayedInAnotherDevice);
             }}
           >
             {!currentContext?.paused && isTrackOnCollection ? (

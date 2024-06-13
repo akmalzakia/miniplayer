@@ -33,3 +33,9 @@ export enum TooltipPosition {
   Left,
   Right
 }
+
+export enum CollectionImageResolution {
+  High = 0,
+  Medium = 1,
+  Low = 2
+}

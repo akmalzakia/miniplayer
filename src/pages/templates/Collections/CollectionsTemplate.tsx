@@ -1,7 +1,10 @@
 import Button from "../../../component/Button";
 import { FiPause, FiPlay } from "react-icons/fi";
 import TrackList from "./components/TrackList";
-import { CollectionType } from "../../../utils/enums";
+import {
+  CollectionImageResolution,
+  CollectionType,
+} from "../../../utils/enums";
 import CollectionOwnerImage from "./components/CollectionOwnerImage";
 import { Textfit } from "react-textfit";
 import usePlayerContext from "../../../hooks/usePlayerContext";
@@ -9,6 +12,7 @@ import utils from "../../../utils/util";
 import { isPlaylist, isPlaylistTrack } from "../../../utils/matchers";
 import usePlayerStateFetcher from "../../../hooks/usePlayerStateFetcher";
 import LoadingDots from "../../../component/LoadingDots";
+import SpotifyImage from "../../../component/SpotifyImage";
 
 interface Props {
   type: CollectionType;
@@ -73,14 +77,15 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
   return (
     collection && (
       <>
-        <div className='w-full flex gap-2'>
+        <div className='w-full flex gap-6'>
           <div className='w-[30%] min-w-36 max-w-72'>
-            <img
+            <SpotifyImage
               className='max-w-full max-h-full rounded-md shadow-md'
-              src={collection.images[0].url}
-            ></img>
+              images={collection.images}
+              resolution={CollectionImageResolution.Medium}
+            ></SpotifyImage>
           </div>
-          <div className='flex flex-col justify-end gap-2 w-[70%] min-w-[calc(100%-18rem)] max-w-[calc(100%-9rem)]'>
+          <div className='flex flex-col justify-end gap-2 w-[70%] min-w-[calc(100%-19.5rem)] max-w-[calc(100%-10.5rem)]'>
             {isPlaylist(collection) && (
               <div className=''>
                 {collection.public ? "Public" : "Private"} Playlist
@@ -101,7 +106,7 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
               {isPlaylist(collection) && collection.description}
             </div>
             <div className='flex text-spotify-gray items-center gap-1'>
-              {
+              <div className='w-6 h-6'>
                 <CollectionOwnerImage
                   type={type}
                   ownerId={
@@ -110,7 +115,7 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
                       : collection.artists[0].id
                   }
                 />
-              }
+              </div>
               <div className='font-bold text-white'>
                 {isPlaylist(collection)
                   ? collection.owner.display_name
@@ -152,7 +157,6 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
                   isTrackOnCollection ?? false
                 );
               }
-              console.log(isPlayedInAnotherDevice);
             }}
           >
             {!currentContext?.paused && isTrackOnCollection ? (

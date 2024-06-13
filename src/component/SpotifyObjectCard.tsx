@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import { SpotifyObjectType } from "../utils/enums";
+import { CollectionImageResolution, SpotifyObjectType } from "../utils/enums";
 import utils from "../utils/util";
 import React, { forwardRef } from "react";
 import { isAlbum, isPlaylist } from "../utils/matchers";
+import SpotifyImage from "./SpotifyImage";
 
 interface Props extends React.ComponentPropsWithRef<"div"> {
   type: SpotifyObjectType;
@@ -13,13 +14,24 @@ interface Props extends React.ComponentPropsWithRef<"div"> {
     | SpotifyApi.AlbumObjectSimplified;
   imageOnly?: boolean;
   rounded?: boolean;
+  imageResolution: CollectionImageResolution;
+  imagePriority?: "high" | "low" | "auto";
 }
 
 const SpotifyObjectCard = forwardRef<
   HTMLDivElement,
   Props & React.PropsWithChildren
 >(function SpotifyObjectCard(
-  { type, data, imageOnly, rounded, className, ...rest },
+  {
+    type,
+    data,
+    imageOnly,
+    rounded,
+    className,
+    imagePriority,
+    imageResolution,
+    ...rest
+  },
   ref
 ) {
   const navigate = useNavigate();
@@ -35,12 +47,14 @@ const SpotifyObjectCard = forwardRef<
       ref={ref}
       {...rest}
     >
-      <img
+      <SpotifyImage
         className={`max-w-full max-h-full aspect-square object-cover ${
           rounded ? "rounded-full" : "rounded-md"
         }`}
-        src={data.images[0].url}
-      ></img>
+        images={data.images}
+        priority={imagePriority}
+        resolution={imageResolution}
+      ></SpotifyImage>
       {!imageOnly && (
         <>
           <div className='text-base text-nowrap overflow-hidden text-ellipsis font-sans'>

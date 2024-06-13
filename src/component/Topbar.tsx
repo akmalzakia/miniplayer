@@ -3,7 +3,8 @@ import Button from "./Button";
 import useUserContext from "../hooks/useUserContext";
 import ImageSkeleton from "./Skeleton/ImageSkeleton";
 import { HiChevronLeft, HiOutlineBell, HiOutlineUsers } from "react-icons/hi2";
-import Image from "./Image";
+import SpotifyImage from "./SpotifyImage";
+import { CollectionImageResolution } from "../utils/enums";
 
 function Topbar() {
   const { user, isLoading } = useUserContext();
@@ -32,12 +33,12 @@ function Topbar() {
           {isLoading ? (
             <ImageSkeleton className='rounded-full' />
           ) : (
-            <Image
+            <SpotifyImage
               className='rounded-full'
-              src={user?.images?.[0].url}
-              width={user?.images?.[0].width}
-              height={user?.images?.[0].height}
-            ></Image>
+              images={user?.images}
+              priority="low"
+              resolution={CollectionImageResolution.Low}
+            ></SpotifyImage>
           )}
         </Button>
       </div>

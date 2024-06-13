@@ -2,9 +2,8 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { Fragment } from "react";
 import SpotifyObjectCardSkeleton from "./SpotifyObjectCardSkeleton";
 import SpotifyObjectCard from "./SpotifyObjectCard";
-import { SpotifyObjectType, TooltipPosition } from "../utils/enums";
+import { CollectionImageResolution, SpotifyObjectType, TooltipPosition } from "../utils/enums";
 import utils from "../utils/util";
-import "overlayscrollbars/overlayscrollbars.css";
 import Tooltip from "./Tooltip";
 import useUserPlaylists from "../hooks/useUserPlaylists";
 
@@ -50,6 +49,8 @@ function SidebarPlaylistLibrary() {
                       ref={ref}
                       onMouseEnter={() => setHover(true)}
                       onMouseLeave={() => setHover(false)}
+                      imagePriority="low"
+                      imageResolution={CollectionImageResolution.Low}
                     ></SpotifyObjectCard>
                   )}
                 </Tooltip>

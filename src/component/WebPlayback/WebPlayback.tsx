@@ -12,10 +12,12 @@ import VolumeBar from "./components/VolumeBar";
 import { Link } from "react-router-dom";
 import usePlayerContext from "../../hooks/usePlayerContext";
 import useUserContext from "../../hooks/useUserContext";
+import SpotifyImage from "../SpotifyImage";
+import { CollectionImageResolution } from "../../utils/enums";
 
 function WebPlayback() {
   const { player, isActive } = usePlayerContext();
-  const { user, isLoading } = useUserContext();
+  const { user } = useUserContext();
   const [isPaused, setPaused] = useState(false);
   const [track, setTrack] = useState<Spotify.Track | null>(null);
   const [position, setPosition] = useState(0);
@@ -32,7 +34,6 @@ function WebPlayback() {
       setTrack(currentTrack);
       setPaused(state.paused);
       setPosition(state.position);
-      console.log(state);
     }
 
     if (player.instance) {
@@ -62,10 +63,14 @@ function WebPlayback() {
           isActive ? (
             <>
               <div className='flex gap-3 w-1/4'>
-                <img
-                  src={track?.album.images[0].url}
-                  className='w-14 h-14 rounded-sm'
-                ></img>
+                <div className='w-14 h-14'>
+                  <SpotifyImage
+                    images={track?.album.images}
+                    className='rounded-sm'
+                    priority="low"
+                    resolution={CollectionImageResolution.Low}
+                  ></SpotifyImage>
+                </div>
                 <div className='flex flex-col justify-center'>
                   <span className='text-sm font-bold'>{track?.name}</span>
                   <span className='text-sm font-light text-spotify-gray'>

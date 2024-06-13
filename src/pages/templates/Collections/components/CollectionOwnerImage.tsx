@@ -1,7 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { TokenContext } from "../../../../context/tokenContext";
 import { spotifyAPI } from "../../../../api/spotifyAxios";
-import { CollectionType } from "../../../../utils/enums";
+import {
+  CollectionImageResolution,
+  CollectionType,
+} from "../../../../utils/enums";
+import SpotifyImage from "../../../../component/SpotifyImage";
 
 interface Props {
   type: CollectionType;
@@ -9,13 +13,13 @@ interface Props {
 }
 
 function CollectionOwnerImage({ type, ownerId }: Props) {
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrls, setImageUrls] = useState<SpotifyApi.ImageObject[]>();
   const token = useContext(TokenContext);
   useEffect(() => {
     async function fetchOwnerImageUrl() {
       try {
         const res = await spotifyAPI.getUserById(ownerId, token);
-        setImageUrl((res.images && res.images[0].url) || "");
+        setImageUrls(res.images);
       } catch (error) {
         console.log(error);
       }
@@ -24,7 +28,7 @@ function CollectionOwnerImage({ type, ownerId }: Props) {
     async function fetchArtistImageUrl() {
       try {
         const res = await spotifyAPI.getArtistById(ownerId, token);
-        setImageUrl((res.images && res.images[0].url) || "");
+        setImageUrls(res.images);
       } catch (error) {
         console.log(error);
       }
@@ -39,12 +43,13 @@ function CollectionOwnerImage({ type, ownerId }: Props) {
     }
   }, [token, ownerId, type]);
 
-  if (imageUrl) {
+  if (imageUrls) {
     return (
-      <img
-        src={imageUrl}
-        className='w-6 h-6 rounded-full'
-      ></img>
+      <SpotifyImage
+        images={imageUrls}
+        resolution={CollectionImageResolution.Low}
+        className='rounded-full'
+      ></SpotifyImage>
     );
   } else {
     return <></>;

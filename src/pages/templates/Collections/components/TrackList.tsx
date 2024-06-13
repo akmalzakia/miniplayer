@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { FiPause, FiPlay } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { CollectionType } from "../../../../utils/enums";
+import {
+  CollectionImageResolution,
+  CollectionType,
+} from "../../../../utils/enums";
 import usePlayerContext from "../../../../hooks/usePlayerContext";
 import utils from "../../../../utils/util";
 import { isPlaylistTrack } from "../../../../utils/matchers";
-import Image from "../../../../component/Image";
+import SpotifyImage from "../../../../component/SpotifyImage";
 
 interface Props {
   type: CollectionType;
@@ -116,11 +119,10 @@ function TrackList({ type, tracks, collectionUri }: Props) {
                 <td className='flex items-center py-2 gap-2'>
                   {isPlaylistTrack(item) && (
                     <div className='w-10 min-w-10'>
-                      <Image
+                      <SpotifyImage
+                        resolution={CollectionImageResolution.Low}
                         className='max-w-full max-h-full rounded-md'
-                        width={item.track?.album.images[0].width}
-                        height={item.track?.album.images[0].height}
-                        src={item.track?.album.images[0].url}
+                        images={item.track?.album.images}
                       />
                     </div>
                   )}

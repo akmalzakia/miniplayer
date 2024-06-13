@@ -5,6 +5,7 @@ import {
   OverlayScrollbarsComponent,
   OverlayScrollbarsComponentRef,
 } from "overlayscrollbars-react";
+import "overlayscrollbars/overlayscrollbars.css";
 import Topbar from "../component/Topbar";
 import { PlayerProvider } from "../context/playerContext";
 import { useEffect, useRef, useState } from "react";
@@ -22,8 +23,6 @@ function Home() {
 
     function scrollToTop() {
       const { viewport } = scrollRef.current?.osInstance()?.elements() || {}
-
-      console.log(viewport)
 
       if (viewport) {
         window.scrollTo({top: 0, behavior: "smooth"})
