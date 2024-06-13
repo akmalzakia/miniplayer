@@ -60,7 +60,7 @@ function Artist() {
             resolution={CollectionImageResolution.Medium}
           ></SpotifyImage>
         </div>
-        <div className='flex flex-col justify-between gap-4 w-[calc(100%-10.5rem)] flex-grow-0'>
+        <div className='flex flex-col justify-between gap-4 w-[calc(100%-10.5rem)] flex-grow-0 h-[175px]'>
           <div className='font-bold flex-1'>
             <Textfit
               mode='single'
@@ -109,13 +109,13 @@ function Artist() {
       </div>
       <div className='py-4'>
         <div className='font-bold text-xl'>Popular</div>
-        <div className='py-2'>
+        <div className='py-1 h-72'>
           {topTracks
             ?.slice(0, isExpanded ? topTracks.length : topTracks.length / 2)
             .map((track, idx) => (
               <div
                 key={track.id}
-                className={`flex justify-between p-2 gap-2 hover:bg-spotify-hover text-sm text-spotify-gray rounded-md ${
+                className={`flex justify-between p-2 gap-2 hover:bg-spotify-hover text-sm text-spotify-gray rounded-md h-14 ${
                   isTrackPlayed(track.uri) ? "border border-spotify-green" : ""
                 }`}
                 onMouseEnter={() => {
@@ -161,6 +161,7 @@ function Artist() {
                       className='max-w-full max-h-full rounded-md'
                       images={track.album.images}
                       resolution={CollectionImageResolution.Low}
+                      lazy
                     ></SpotifyImage>
                   </div>
 
@@ -190,23 +191,21 @@ function Artist() {
           {isExpanded ? "See less" : "See more"}
         </button>
       </div>
-      {albums && (
-        <SingleDisplay
-          title='Albums'
-          data={albums}
-          type={SpotifyObjectType.Album}
-          isLoading={isAlbumsLoading}
-          detailLink='discography/all'
-        />
-      )}
-      {relatedArtists && (
-        <SingleDisplay
-          title='Related Artists'
-          data={relatedArtists}
-          type={SpotifyObjectType.Artist}
-          isLoading={isRelatedArtistLoading}
-        />
-      )}
+      <SingleDisplay
+        title='Albums'
+        data={albums}
+        type={SpotifyObjectType.Album}
+        isLoading={isAlbumsLoading}
+        detailLink='discography/all'
+        lazy
+      />
+      <SingleDisplay
+        title='Related Artists'
+        data={relatedArtists}
+        type={SpotifyObjectType.Artist}
+        isLoading={isRelatedArtistLoading}
+        lazy
+      />
     </div>
   );
 }

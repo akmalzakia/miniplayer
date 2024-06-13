@@ -10,7 +10,8 @@ interface Props {
   data:
     | SpotifyApi.AlbumObjectSimplified[]
     | SpotifyApi.ArtistObjectFull[]
-    | SpotifyApi.PlaylistObjectSimplified[];
+    | SpotifyApi.PlaylistObjectSimplified[]
+    | null;
   isLoading?: boolean;
   detailLink?: string;
   imagePriority?: "high" | "low" | "auto";
@@ -24,10 +25,11 @@ function SingleDisplay({
   isLoading,
   detailLink,
   imagePriority,
-  lazy
+  lazy,
 }: Props) {
   const [columnSize, columnRef] = useSingleColumnDisplay(180);
-  const isShowAllNeeded = data.length > columnSize && detailLink;
+  const isShowAllNeeded =
+    detailLink && data?.length && data.length > columnSize;
   return (
     <div className='py-2'>
       <div className='flex justify-between'>

@@ -52,7 +52,6 @@ const Image = forwardRef<HTMLImageElement, React.ComponentPropsWithRef<"img">>(
             <img
               className={`${className} ${isLoading ? "hidden" : "block"}`}
               onLoad={(ev) => {
-                console.log("loading")
                 setIsLoading(false);
                 onLoad?.(ev);
               }}

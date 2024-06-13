@@ -123,6 +123,7 @@ function TrackList({ type, tracks, collectionUri }: Props) {
                         resolution={CollectionImageResolution.Low}
                         className='max-w-full max-h-full rounded-md'
                         images={item.track?.album.images}
+                        lazy
                       />
                     </div>
                   )}

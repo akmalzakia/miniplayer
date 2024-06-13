@@ -17,7 +17,6 @@ function useRelatedArtists(artistId?: string) {
       try {
         const res = await spotifyAPI.getRelatedArtists(artistId, token);
         setRelatedArtists(res);
-        console.log(res);
         setIsLoading(false);
       } catch (error) {
         console.log(error);
