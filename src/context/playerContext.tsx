@@ -123,6 +123,12 @@ export function PlayerProvider({ children }: PropsWithChildren) {
     if (user?.product === "premium") {
       window.onSpotifyWebPlaybackSDKReady = onSDKReady;
     }
+
+    return () => {
+      if (playerInstance) {
+        playerInstance.disconnect();
+      }
+    }
     // removed cleanup function, need to check if triggered twice
   }, [playerInstance, user]);
 
