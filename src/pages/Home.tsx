@@ -49,7 +49,7 @@ function Home() {
 
   return (
     <PlayerProvider>
-      <div className='w-full flex flex-col bg-spotify-black h-full min-w-[800px] min-h-[600px]'>
+      <div className='w-full flex flex-col bg-spotify-black h-full min-w-[800px] min-h-[600px] font-sans'>
         <div className='flex w-full h-full py-2 gap-2 overflow-hidden p-1'>
           <Sidebar></Sidebar>
           <div

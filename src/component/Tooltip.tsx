@@ -1,9 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import TooltipComponent from "./TooltipComponent";
 import { TooltipPosition } from "../utils/enums";
 
 interface ChildrenProps<T> {
-  ref: React.RefObject<T>;
+  ref?: React.RefObject<T>;
   setHover: (hover: boolean) => void;
 }
 
@@ -13,6 +13,7 @@ interface Props<T> {
   tooltipElement?: React.ReactNode;
   tooltipClass?: string;
   tooltipEnabled?: boolean;
+  innerRef?: React.Ref<T | null>;
 }
 
 function Tooltip<T extends HTMLElement>({
@@ -21,22 +22,31 @@ function Tooltip<T extends HTMLElement>({
   tooltipElement,
   tooltipClass,
   tooltipEnabled = true,
+  innerRef,
 }: Props<T>) {
   const [isHover, setIsHover] = useState(false);
-  const ref = useRef<T>(null);
+  const tooltipRef = useRef<T>(null);
+
+  useImperativeHandle(innerRef, () => tooltipRef.current);
+
+  useEffect(() => {
+    tooltipRef.current?.addEventListener("click", () => {
+      setIsHover((hover) => !hover);
+    });
+  }, []);
 
   return (
     <>
-      {tooltipEnabled && ref.current && isHover && (
+      {tooltipEnabled && tooltipRef.current && isHover && (
         <TooltipComponent
           position={position}
-          element={ref.current}
+          element={tooltipRef.current}
           className={tooltipClass}
         >
           {tooltipElement}
         </TooltipComponent>
       )}
-      {children({ ref: ref, setHover: setIsHover })}
+      {children({ ref: tooltipRef, setHover: setIsHover })}
     </>
   );
 }

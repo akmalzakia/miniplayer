@@ -60,7 +60,7 @@ const SpotifyObjectCard = forwardRef<
       ></SpotifyImage>
       {!imageOnly && (
         <>
-          <div className='text-base text-nowrap overflow-hidden text-ellipsis font-sans'>
+          <div className='text-base text-nowrap overflow-hidden text-ellipsis'>
             {data.name}
           </div>
           {isPlaylist(data) ? (

@@ -75,7 +75,7 @@ function TooltipComponent<T extends HTMLElement>({
     createPortal(
       <div
         ref={tooltipRef}
-        className={`fixed bg-spotify-tooltip text-xs p-1.5 rounded-md shadow-lg text-nowrap z-10 ${className}`}
+        className={`fixed bg-spotify-tooltip text-xs p-1.5 rounded-md shadow-lg text-nowrap z-10 ${className} font-sans`}
         style={tooltipStyle}
       >
         {children}

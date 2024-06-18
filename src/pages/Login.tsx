@@ -24,13 +24,13 @@ function Login() {
   }
 
   return (
-    <div className='App'>
-      <header className='App-header'>
+    <div className='w-full h-full'>
+      <header className='w-full h-full flex'>
         <button
-          className='btn-spotify'
+          className='bg-spotify-green py-3 px-5 rounded-full m-auto'
           onClick={handleLogin}
         >
-          Login with Spotify
+          Login with <img src='/assets/Spotify_Logo_CMYK_White.png' className="inline w-20 ml-2"></img>
         </button>
       </header>
     </div>

@@ -30,7 +30,7 @@ function SidebarPlaylistLibrary() {
                 <Tooltip<HTMLDivElement>
                   position={TooltipPosition.Right}
                   tooltipElement={
-                    <div className='flex flex-col font-sans text-sm'>
+                    <div className='flex flex-col text-sm'>
                       <div className='font-bold'>{playlist.name}</div>
                       <div className='flex gap-1 text-spotify-gray'>
                         <div>{utils.upperFirstLetter(playlist.type)}</div>
