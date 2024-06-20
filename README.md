@@ -1,6 +1,6 @@
 # Known Bugs / Unimplemented Features
 
-## Play Playlist when Webplayer and Spotify inactive (no active devices)
+## [SOLVED] Play Playlist when Webplayer and Spotify inactive (no active devices)
 
 Returned a 404 Response
 

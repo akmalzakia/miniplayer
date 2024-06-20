@@ -13,6 +13,8 @@ import { isPlaylist, isPlaylistTrack } from "../../../utils/matchers";
 import usePlayerStateFetcher from "../../../hooks/usePlayerStateFetcher";
 import LoadingDots from "../../../component/LoadingDots";
 import SpotifyImage from "../../../component/SpotifyImage";
+import PlayWarningModal from "../../../component/PlayWarningModal";
+import useModalContext from "../../../hooks/useModalContext";
 
 interface Props {
   type: CollectionType;
@@ -22,6 +24,7 @@ interface Props {
 
 function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
   const { playerDispatcher, currentContext } = usePlayerContext();
+  const { openModal } = useModalContext();
 
   const isTrackOnCollection =
     currentContext && currentContext.context.uri === collection?.uri;
@@ -145,7 +148,11 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
           <Button
             className='p-3'
             onClick={() => {
-              if (!currentContext?.paused && isTrackOnCollection) {
+              if (!currentContext) {
+                openModal(<PlayWarningModal />);
+                return;
+              }
+              if (!currentContext.paused && isTrackOnCollection) {
                 if (isPlayedInAnotherDevice) {
                   playerDispatcher.transferPlayback();
                 } else {

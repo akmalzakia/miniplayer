@@ -9,6 +9,8 @@ import { spotifyAPI } from "../api/spotifyAxios";
 import { TokenContext } from "../context/tokenContext";
 import TrackListSkeleton from "../component/Skeleton/TrackListSkeleton";
 import SpotifyImage from "../component/SpotifyImage";
+import PlayWarningModal from "../component/PlayWarningModal";
+import useModalContext from "../hooks/useModalContext";
 
 interface Props {
   album: SpotifyApi.AlbumObjectSimplified;
@@ -21,6 +23,7 @@ function AlbumListItem({ album }: Props) {
   const [isTracksLoading, setIsTrackLoading] = useState(true);
   const token = useContext(TokenContext);
   const { playerDispatcher, currentContext } = usePlayerContext();
+  const { openModal } = useModalContext();
   const loaderRef = useRef(null);
 
   const isTrackOnCollection =
@@ -91,6 +94,10 @@ function AlbumListItem({ album }: Props) {
           <Button
             className='p-2 mt-2 self-start'
             onClick={() => {
+              if (!currentContext) {
+                openModal(<PlayWarningModal />);
+                return;
+              }
               if (!currentContext?.paused && isTrackOnCollection) {
                 if (isPlayedInAnotherDevice) {
                   playerDispatcher.transferPlayback();

@@ -10,6 +10,7 @@ import Topbar from "../component/Topbar";
 import { PlayerProvider } from "../context/playerContext";
 import { useEffect, useRef, useState } from "react";
 import useUserContext from "../hooks/useUserContext";
+import { ModalProvider } from "../context/modalContext";
 
 function Home() {
   const [isLoaded, setLoaded] = useState(false);
@@ -22,16 +23,16 @@ function Home() {
     console.log("location changes");
 
     function scrollToTop() {
-      const { viewport } = scrollRef.current?.osInstance()?.elements() || {}
+      const { viewport } = scrollRef.current?.osInstance()?.elements() || {};
 
       if (viewport) {
-        window.scrollTo({top: 0, behavior: "smooth"})
-        viewport.scrollTo({top: 0, behavior: "smooth"})
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        viewport.scrollTo({ top: 0, behavior: "smooth" });
       }
     }
     if (!scrollRef.current) return;
-    
-    scrollToTop()
+
+    scrollToTop();
   }, [location]);
 
   useEffect(() => {
@@ -49,31 +50,33 @@ function Home() {
 
   return (
     <PlayerProvider>
-      <div className='w-full flex flex-col bg-spotify-black h-full min-w-[800px] min-h-[600px] font-sans'>
-        <div className='flex w-full h-full py-2 gap-2 overflow-hidden p-1'>
-          <Sidebar></Sidebar>
-          <div
-            className={`flex flex-col h-full rounded-md w-[calc(100%-6rem)] bg-spotify-card`}
-          >
-            <Topbar />
-            <OverlayScrollbarsComponent
-              className='gap-2 overlow-y p-4 flex-1'
-              options={{
-                scrollbars: { autoHide: "leave", theme: "os-theme-light" },
-              }}
-              ref={scrollRef}
+      <ModalProvider>
+        <div className='w-full flex flex-col bg-spotify-black h-full min-w-[800px] min-h-[600px] font-sans'>
+          <div className='flex w-full h-full py-2 gap-2 overflow-hidden p-1'>
+            <Sidebar></Sidebar>
+            <div
+              className={`flex flex-col h-full rounded-md w-[calc(100%-6rem)] bg-spotify-card`}
             >
-              <Outlet></Outlet>
-            </OverlayScrollbarsComponent>
-          </div>
-          {/* <div className='w-1/3'>
+              <Topbar />
+              <OverlayScrollbarsComponent
+                className='gap-2 overlow-y p-4 flex-1'
+                options={{
+                  scrollbars: { autoHide: "leave", theme: "os-theme-light" },
+                }}
+                ref={scrollRef}
+              >
+                <Outlet></Outlet>
+              </OverlayScrollbarsComponent>
+            </div>
+            {/* <div className='w-1/3'>
             <div className='flex w-full h-full rounded-md bg-gray-800 px-2 py-4'>
               d
             </div>
           </div> */}
+          </div>
+          <WebPlayback></WebPlayback>
         </div>
-        <WebPlayback></WebPlayback>
-      </div>
+      </ModalProvider>
     </PlayerProvider>
   );
 }

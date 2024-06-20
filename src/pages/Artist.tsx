@@ -14,6 +14,8 @@ import usePlayerContext from "../hooks/usePlayerContext";
 import usePlayerStateFetcher from "../hooks/usePlayerStateFetcher";
 import LoadingDots from "../component/LoadingDots";
 import SpotifyImage from "../component/SpotifyImage";
+import PlayWarningModal from "../component/PlayWarningModal";
+import useModalContext from "../hooks/useModalContext";
 
 function Artist() {
   const { id: artistId } = useParams();
@@ -24,6 +26,7 @@ function Artist() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { playerDispatcher, currentContext, isActive } = usePlayerContext();
+  const { openModal } = useModalContext();
   const [currentHover, setCurrentHover] = useState("");
 
   const isTrackOnTopTracks =
@@ -82,6 +85,11 @@ function Artist() {
         <Button
           className='p-3'
           onClick={() => {
+            if (!currentContext) {
+              openModal(<PlayWarningModal />);
+              return;
+            }
+
             if (!currentContext?.paused && isTrackOnTopTracks) {
               if (isPlayedInAnotherDevice) {
                 playerDispatcher.transferPlayback();
