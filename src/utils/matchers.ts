@@ -10,9 +10,11 @@ function isPlaylist(
     | SpotifyApi.PlaylistObjectFull
     | SpotifyApi.PlaylistObjectSimplified
     | SpotifyApi.ArtistObjectFull
+    | SpotifyApi.ArtistObjectSimplified
+    | SpotifyApi.AlbumObjectFull
     | SpotifyApi.AlbumObjectSimplified
-): data is SpotifyApi.PlaylistObjectFull {
-  return (data as SpotifyApi.PlaylistObjectFull).type === "playlist";
+): data is SpotifyApi.PlaylistObjectFull | SpotifyApi.PlaylistObjectSimplified {
+  return (data as SpotifyApi.PlaylistObjectSimplified).type === "playlist";
 }
 
 function isAlbum(
@@ -20,15 +22,34 @@ function isAlbum(
     | SpotifyApi.PlaylistObjectFull
     | SpotifyApi.PlaylistObjectSimplified
     | SpotifyApi.ArtistObjectFull
+    | SpotifyApi.ArtistObjectSimplified
+    | SpotifyApi.AlbumObjectFull
     | SpotifyApi.AlbumObjectSimplified
-): data is SpotifyApi.AlbumObjectSimplified {
+): data is SpotifyApi.AlbumObjectFull | SpotifyApi.AlbumObjectSimplified {
   return (data as SpotifyApi.AlbumObjectSimplified).type === "album";
 }
 
+function isArtist(
+  data:
+    | SpotifyApi.PlaylistObjectFull
+    | SpotifyApi.PlaylistObjectSimplified
+    | SpotifyApi.ArtistObjectFull
+    | SpotifyApi.ArtistObjectSimplified
+    | SpotifyApi.AlbumObjectFull
+    | SpotifyApi.AlbumObjectSimplified
+): data is SpotifyApi.ArtistObjectFull | SpotifyApi.ArtistObjectSimplified {
+  return (data as SpotifyApi.ArtistObjectSimplified).type === "artist";
+}
+
+function isFullTrack(track: SpotifyApi.TrackObjectFull | SpotifyApi.TrackObjectSimplified): track is SpotifyApi.TrackObjectFull {
+  return !!(track as SpotifyApi.TrackObjectFull).album
+}
 
 
 export {
   isPlaylist,
   isPlaylistTrack,
-  isAlbum
+  isAlbum,
+  isArtist,
+  isFullTrack
 }
