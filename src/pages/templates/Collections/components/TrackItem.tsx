@@ -6,6 +6,8 @@ import { CollectionImageResolution } from "../../../../utils/enums";
 import { isPlaylistTrack } from "../../../../utils/matchers";
 import { Link } from "react-router-dom";
 import utils from "../../../../utils/util";
+import useModalContext from "../../../../hooks/useModalContext";
+import PlayWarningModal from "../../../../component/PlayWarningModal";
 
 interface Props {
   item: SpotifyApi.TrackObjectSimplified | SpotifyApi.PlaylistTrackObject;
@@ -15,6 +17,7 @@ interface Props {
 
 function TrackItem({ item, idx, collectionUri }: Props) {
   const [isHover, setIsHover] = useState(false);
+  const { openModal } = useModalContext();
   const { playerDispatcher, currentContext, isActive } = usePlayerContext();
   const track = isPlaylistTrack(item) ? item.track : item;
   const isSameContext = collectionUri === currentContext?.context.uri;
@@ -25,6 +28,12 @@ function TrackItem({ item, idx, collectionUri }: Props) {
     isSameContext;
   function play(trackUri?: string) {
     if (!trackUri) return;
+
+    if (!currentContext) {
+      openModal(<PlayWarningModal />);
+      return;
+    }
+
     playerDispatcher.playCollectionTrack(collectionUri, trackUri);
   }
 

@@ -3,7 +3,6 @@ import useArtist from "../hooks/useArtist";
 import utils from "../utils/util";
 import { Textfit } from "react-textfit";
 import { FiPause, FiPlay } from "react-icons/fi";
-import Button from "../component/Button";
 import { useState } from "react";
 import { CollectionImageResolution, SpotifyObjectType } from "../utils/enums";
 import SingleDisplay from "../component/SingleDisplay";
@@ -14,8 +13,9 @@ import usePlayerContext from "../hooks/usePlayerContext";
 import usePlayerStateFetcher from "../hooks/usePlayerStateFetcher";
 import LoadingDots from "../component/LoadingDots";
 import SpotifyImage from "../component/SpotifyImage";
-import PlayWarningModal from "../component/PlayWarningModal";
+import MajorPlayButton from "../component/MajorPlayButton";
 import useModalContext from "../hooks/useModalContext";
+import PlayWarningModal from "../component/PlayWarningModal";
 
 function Artist() {
   const { id: artistId } = useParams();
@@ -24,26 +24,27 @@ function Artist() {
   const [albums, isAlbumsLoading] = useArtistAlbums(artistId || "", 10);
   const [relatedArtists, isRelatedArtistLoading] = useRelatedArtists(artistId);
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const { playerDispatcher, currentContext, isActive } = usePlayerContext();
-  const { openModal } = useModalContext();
   const [currentHover, setCurrentHover] = useState("");
 
-  const isTrackOnTopTracks =
-    topTracks &&
-    topTracks?.some((i) => {
-      return i.uri === currentContext?.current_track?.uri;
-    });
+  const { openModal } = useModalContext();
+  const { playerDispatcher, currentContext, isActive } = usePlayerContext();
 
   const isTrackPlayed = (trackId?: string) =>
     isActive && currentContext?.current_track?.uri === trackId;
-
-  const isPlayedInAnotherDevice = !isActive && !currentContext?.paused;
 
   usePlayerStateFetcher(artist);
 
   const isDataLoading =
     isLoading && isTrackLoading && isAlbumsLoading && isRelatedArtistLoading;
+
+  function play(track: SpotifyApi.TrackObjectFull) {
+    if (!currentContext) {
+      openModal(<PlayWarningModal />);
+      return;
+    }
+
+    playerDispatcher.playTrackOnly(track.uri);
+  }
 
   if (isDataLoading) {
     return (
@@ -82,38 +83,7 @@ function Artist() {
         </div>
       </div>
       <div className='py-2 flex gap-2'>
-        <Button
-          className='p-3'
-          onClick={() => {
-            if (!currentContext) {
-              openModal(<PlayWarningModal />);
-              return;
-            }
-
-            if (!currentContext?.paused && isTrackOnTopTracks) {
-              if (isPlayedInAnotherDevice) {
-                playerDispatcher.transferPlayback();
-              } else {
-                playerDispatcher.pause();
-              }
-            } else {
-              playerDispatcher.playArtist(
-                artist?.uri || "",
-                isTrackOnTopTracks ?? false
-              );
-            }
-          }}
-        >
-          {!currentContext?.paused && isTrackOnTopTracks ? (
-            isPlayedInAnotherDevice ? (
-              <>Playing on {currentContext?.device?.name}</>
-            ) : (
-              <FiPause className='text-xl' />
-            )
-          ) : (
-            <FiPlay className='text-xl' />
-          )}
-        </Button>
+        {artist && <MajorPlayButton collection={artist} />}
       </div>
       <div className='py-4'>
         <div className='font-bold text-xl'>Popular</div>
@@ -148,17 +118,13 @@ function Artist() {
                       ) : (
                         <FiPlay
                           className='my-1'
-                          onClick={() =>
-                            playerDispatcher.playTrackOnly(track.uri)
-                          }
+                          onClick={() => play(track)}
                         />
                       )
                     ) : currentHover === track?.id ? (
                       <FiPlay
                         className='my-1'
-                        onClick={() =>
-                          playerDispatcher.playTrackOnly(track.uri)
-                        }
+                        onClick={() => play(track)}
                       />
                     ) : (
                       idx + 1

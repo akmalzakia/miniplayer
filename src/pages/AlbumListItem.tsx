@@ -1,16 +1,12 @@
-import { FiPause, FiPlay } from "react-icons/fi";
-import Button from "../component/Button";
 import utils from "../utils/util";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import TrackList from "./templates/Collections/components/TrackList";
 import { CollectionImageResolution, CollectionType } from "../utils/enums";
-import usePlayerContext from "../hooks/usePlayerContext";
 import { spotifyAPI } from "../api/spotifyAxios";
 import { TokenContext } from "../context/tokenContext";
 import TrackListSkeleton from "../component/Skeleton/TrackListSkeleton";
 import SpotifyImage from "../component/SpotifyImage";
-import PlayWarningModal from "../component/PlayWarningModal";
-import useModalContext from "../hooks/useModalContext";
+import MajorPlayButton from "../component/MajorPlayButton";
 
 interface Props {
   album: SpotifyApi.AlbumObjectSimplified;
@@ -22,14 +18,7 @@ function AlbumListItem({ album }: Props) {
   >(null);
   const [isTracksLoading, setIsTrackLoading] = useState(true);
   const token = useContext(TokenContext);
-  const { playerDispatcher, currentContext } = usePlayerContext();
-  const { openModal } = useModalContext();
   const loaderRef = useRef(null);
-
-  const isTrackOnCollection =
-    currentContext && currentContext.context.uri === album.uri;
-
-  const isPlayedInAnotherDevice = !!currentContext?.device;
 
   const fetchTracks = useCallback(async () => {
     setIsTrackLoading(true);
@@ -91,37 +80,9 @@ function AlbumListItem({ album }: Props) {
               <div>{album.total_tracks} songs</div>
             </div>
           </div>
-          <Button
-            className='p-2 mt-2 self-start'
-            onClick={() => {
-              if (!currentContext) {
-                openModal(<PlayWarningModal />);
-                return;
-              }
-              if (!currentContext?.paused && isTrackOnCollection) {
-                if (isPlayedInAnotherDevice) {
-                  playerDispatcher.transferPlayback();
-                } else {
-                  playerDispatcher.pause();
-                }
-              } else {
-                playerDispatcher.playCollection(
-                  album,
-                  isTrackOnCollection ?? false
-                );
-              }
-            }}
-          >
-            {!currentContext?.paused && isTrackOnCollection ? (
-              isPlayedInAnotherDevice ? (
-                <>Playing on {currentContext?.device?.name}</>
-              ) : (
-                <FiPause className='text-xl'></FiPause>
-              )
-            ) : (
-              <FiPlay className='text-xl'></FiPlay>
-            )}
-          </Button>
+          <div>
+            <MajorPlayButton collection={album} />
+          </div>
         </div>
       </div>
       {isTracksLoading ? (

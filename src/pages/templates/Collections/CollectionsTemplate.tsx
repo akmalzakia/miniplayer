@@ -1,5 +1,3 @@
-import Button from "../../../component/Button";
-import { FiPause, FiPlay } from "react-icons/fi";
 import TrackList from "./components/TrackList";
 import {
   CollectionImageResolution,
@@ -7,14 +5,12 @@ import {
 } from "../../../utils/enums";
 import CollectionOwnerImage from "./components/CollectionOwnerImage";
 import { Textfit } from "react-textfit";
-import usePlayerContext from "../../../hooks/usePlayerContext";
 import utils from "../../../utils/util";
 import { isPlaylist, isPlaylistTrack } from "../../../utils/matchers";
 import usePlayerStateFetcher from "../../../hooks/usePlayerStateFetcher";
 import LoadingDots from "../../../component/LoadingDots";
 import SpotifyImage from "../../../component/SpotifyImage";
-import PlayWarningModal from "../../../component/PlayWarningModal";
-import useModalContext from "../../../hooks/useModalContext";
+import MajorPlayButton from "../../../component/MajorPlayButton";
 
 interface Props {
   type: CollectionType;
@@ -23,14 +19,6 @@ interface Props {
 }
 
 function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
-  const { playerDispatcher, currentContext } = usePlayerContext();
-  const { openModal } = useModalContext();
-
-  const isTrackOnCollection =
-    currentContext && currentContext.context.uri === collection?.uri;
-
-  const isPlayedInAnotherDevice = !!currentContext?.device;
-
   function calculateDuration(
     tracks:
       | SpotifyApi.PlaylistTrackObject[]
@@ -145,37 +133,7 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
           </div>
         </div>
         <div className='flex mt-4'>
-          <Button
-            className='p-3'
-            onClick={() => {
-              if (!currentContext) {
-                openModal(<PlayWarningModal />);
-                return;
-              }
-              if (!currentContext.paused && isTrackOnCollection) {
-                if (isPlayedInAnotherDevice) {
-                  playerDispatcher.transferPlayback();
-                } else {
-                  playerDispatcher.pause();
-                }
-              } else {
-                playerDispatcher.playCollection(
-                  collection,
-                  isTrackOnCollection ?? false
-                );
-              }
-            }}
-          >
-            {!currentContext?.paused && isTrackOnCollection ? (
-              isPlayedInAnotherDevice ? (
-                <>Playing on {currentContext?.device?.name}</>
-              ) : (
-                <FiPause className='text-xl'></FiPause>
-              )
-            ) : (
-              <FiPlay className='text-xl'></FiPlay>
-            )}
-          </Button>
+          <MajorPlayButton collection={collection} />
         </div>
         <TrackList
           type={type}
