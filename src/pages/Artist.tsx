@@ -87,7 +87,7 @@ function Artist() {
       </div>
       <div className='py-4'>
         <div className='font-bold text-xl'>Popular</div>
-        <div className='py-1 h-72'>
+        <div className={`py-1 ${!isExpanded && "h-72"}`}>
           {topTracks
             ?.slice(0, isExpanded ? topTracks.length : topTracks.length / 2)
             .map((track, idx) => (
