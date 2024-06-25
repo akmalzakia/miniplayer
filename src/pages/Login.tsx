@@ -1,4 +1,5 @@
 import utils from "../utils/util";
+import spotifyImg from "../assets/Spotify_Logo_CMYK_White.png";
 
 function Login() {
   async function handleLogin() {
@@ -30,7 +31,11 @@ function Login() {
           className='bg-spotify-green py-3 px-5 rounded-full m-auto'
           onClick={handleLogin}
         >
-          Login with <img src='/assets/Spotify_Logo_CMYK_White.png' className="inline w-20 ml-2"></img>
+          Login with{" "}
+          <img
+            src={spotifyImg}
+            className='inline w-20 ml-2'
+          ></img>
         </button>
       </header>
     </div>
