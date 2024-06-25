@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import useArtistAlbums from "../hooks/Artist/useArtistAlbums";
-import { PaginatedRequestMode } from "../utils/enums";
+import useArtistAlbums from "../../hooks/Artist/useArtistAlbums";
+import { PaginatedRequestMode } from "../../utils/enums";
 import { useCallback, useEffect, useRef, useState } from "react";
 import AlbumListItem from "./AlbumListItem";
 

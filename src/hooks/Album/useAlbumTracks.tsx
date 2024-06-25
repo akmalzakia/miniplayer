@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { TokenContext } from "../context/tokenContext";
-import { spotifyAPI } from "../api/spotifyAxios";
+import { TokenContext } from "../../context/tokenContext";
+import { spotifyAPI } from "../../api/spotifyAxios";
 
 function useAlbumTracks(id: string) {
   const [tracks, setTracks] = useState<

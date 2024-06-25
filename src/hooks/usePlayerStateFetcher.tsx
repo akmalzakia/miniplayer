@@ -1,5 +1,5 @@
 import { useContext, useEffect } from "react";
-import usePlayerContext from "./usePlayerContext";
+import usePlayerContext from "./Context/usePlayerContext";
 import { DataContext } from "../utils/interfaces";
 import { spotifyAPI } from "../api/spotifyAxios";
 import { TokenContext } from "../context/tokenContext";

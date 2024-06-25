@@ -1,7 +1,7 @@
-import useModalContext from "../hooks/useModalContext";
-import usePlayerContext from "../hooks/usePlayerContext";
+import useModalContext from "../../hooks/Context/useModalContext";
+import usePlayerContext from "../../hooks/Context/usePlayerContext";
 import DefaultModal from "./DefaultModal";
-import useUserContext from "../hooks/useUserContext";
+import useUserContext from "../../hooks/Context/useUserContext";
 
 function PlayWarningModal() {
   const { openModal } = useModalContext();

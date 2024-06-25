@@ -1,16 +1,16 @@
-import WebPlayback from "../component/WebPlayback/WebPlayback";
-import Sidebar from "../component/Sidebar";
+import WebPlayback from "../../component/WebPlayback/WebPlayback";
+import Sidebar from "./components/Sidebar";
 import { Outlet, useLocation } from "react-router-dom";
 import {
   OverlayScrollbarsComponent,
   OverlayScrollbarsComponentRef,
 } from "overlayscrollbars-react";
 import "overlayscrollbars/overlayscrollbars.css";
-import Topbar from "../component/Topbar";
-import { PlayerProvider } from "../context/playerContext";
+import Topbar from "./components/Topbar";
+import { PlayerProvider } from "../../context/playerContext";
 import { useEffect, useRef, useState } from "react";
-import useUserContext from "../hooks/useUserContext";
-import { ModalProvider } from "../context/modalContext";
+import useUserContext from "../../hooks/Context/useUserContext";
+import { ModalProvider } from "../../context/modalContext";
 
 function Home() {
   const [isLoaded, setLoaded] = useState(false);

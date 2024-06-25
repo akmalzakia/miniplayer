@@ -1,12 +1,12 @@
-import utils from "../utils/util";
+import utils from "../../utils/util";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import TrackList from "./templates/Collections/components/TrackList";
-import { CollectionImageResolution, CollectionType } from "../utils/enums";
-import { spotifyAPI } from "../api/spotifyAxios";
-import { TokenContext } from "../context/tokenContext";
-import TrackListSkeleton from "../component/Skeleton/TrackListSkeleton";
-import SpotifyImage from "../component/SpotifyImage";
-import MajorPlayButton from "../component/MajorPlayButton";
+import TrackList from "../templates/Collections/components/TrackList";
+import { CollectionImageResolution, CollectionType } from "../../utils/enums";
+import { spotifyAPI } from "../../api/spotifyAxios";
+import { TokenContext } from "../../context/tokenContext";
+import TrackListSkeleton from "../../component/Skeleton/TrackListSkeleton";
+import SpotifyImage from "../../component/SpotifyImage";
+import MajorPlayButton from "../../component/Buttons/MajorPlayButton";
 
 interface Props {
   album: SpotifyApi.AlbumObjectSimplified;

@@ -1,13 +1,13 @@
 import { useState } from "react";
-import usePlayerContext from "../../../../hooks/usePlayerContext";
+import usePlayerContext from "../../../../hooks/Context/usePlayerContext";
 import { FiPause, FiPlay } from "react-icons/fi";
 import SpotifyImage from "../../../../component/SpotifyImage";
 import { CollectionImageResolution } from "../../../../utils/enums";
 import { isPlaylistTrack } from "../../../../utils/matchers";
 import { Link } from "react-router-dom";
 import utils from "../../../../utils/util";
-import useModalContext from "../../../../hooks/useModalContext";
-import PlayWarningModal from "../../../../component/PlayWarningModal";
+import useModalContext from "../../../../hooks/Context/useModalContext";
+import PlayWarningModal from "../../../../component/Modals/PlayWarningModal";
 
 interface Props {
   item: SpotifyApi.TrackObjectSimplified | SpotifyApi.PlaylistTrackObject;

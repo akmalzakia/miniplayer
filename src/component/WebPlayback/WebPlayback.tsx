@@ -7,11 +7,11 @@ import {
   FiPlusCircle,
 } from "react-icons/fi";
 import ProgressBar from "./components/ProgressBar";
-import Button from "../Button";
+import Button from "../Buttons/Button";
 import VolumeBar from "./components/VolumeBar";
 import { Link } from "react-router-dom";
-import usePlayerContext from "../../hooks/usePlayerContext";
-import useUserContext from "../../hooks/useUserContext";
+import usePlayerContext from "../../hooks/Context/usePlayerContext";
+import useUserContext from "../../hooks/Context/useUserContext";
 import SpotifyImage from "../SpotifyImage";
 import { CollectionImageResolution } from "../../utils/enums";
 

@@ -1,6 +1,6 @@
 import { useEffect, useImperativeHandle, useRef, useState } from "react";
 import TooltipComponent from "./TooltipComponent";
-import { TooltipPosition } from "../utils/enums";
+import { TooltipPosition } from "../../utils/enums";
 
 interface ChildrenProps<T> {
   ref?: React.RefObject<T>;

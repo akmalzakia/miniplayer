@@ -1,5 +1,5 @@
-import DivSkeleton from "./Skeleton/DivSkeleton";
-import ImageSkeleton from "./Skeleton/ImageSkeleton";
+import DivSkeleton from "./DivSkeleton";
+import ImageSkeleton from "./ImageSkeleton";
 
 interface Props {
   imageOnly?: boolean;

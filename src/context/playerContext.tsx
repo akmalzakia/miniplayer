@@ -10,7 +10,7 @@ import {
 import { spotifyAPI } from "../api/spotifyAxios";
 import { TokenContext } from "./tokenContext";
 import { DataContext } from "../utils/interfaces";
-import useUserContext from "../hooks/useUserContext";
+import useUserContext from "../hooks/Context/useUserContext";
 
 interface PlayerContextType {
   player: {

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import useArtist from "../hooks/useArtist";
+import useArtist from "../hooks/Artist/useArtist";
 import utils from "../utils/util";
 import { Textfit } from "react-textfit";
 import { FiPause, FiPlay } from "react-icons/fi";
@@ -9,13 +9,13 @@ import SingleDisplay from "../component/SingleDisplay";
 import useTopTracks from "../hooks/Artist/useTopTracks";
 import useArtistAlbums from "../hooks/Artist/useArtistAlbums";
 import useRelatedArtists from "../hooks/Artist/useRelatedArtists";
-import usePlayerContext from "../hooks/usePlayerContext";
+import usePlayerContext from "../hooks/Context/usePlayerContext";
 import usePlayerStateFetcher from "../hooks/usePlayerStateFetcher";
 import LoadingDots from "../component/LoadingDots";
 import SpotifyImage from "../component/SpotifyImage";
-import MajorPlayButton from "../component/MajorPlayButton";
-import useModalContext from "../hooks/useModalContext";
-import PlayWarningModal from "../component/PlayWarningModal";
+import MajorPlayButton from "../component/Buttons/MajorPlayButton";
+import useModalContext from "../hooks/Context/useModalContext";
+import PlayWarningModal from "../component/Modals/PlayWarningModal";
 
 function Artist() {
   const { id: artistId } = useParams();

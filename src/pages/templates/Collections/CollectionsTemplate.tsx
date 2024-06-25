@@ -10,7 +10,7 @@ import { isPlaylist, isPlaylistTrack } from "../../../utils/matchers";
 import usePlayerStateFetcher from "../../../hooks/usePlayerStateFetcher";
 import LoadingDots from "../../../component/LoadingDots";
 import SpotifyImage from "../../../component/SpotifyImage";
-import MajorPlayButton from "../../../component/MajorPlayButton";
+import MajorPlayButton from "../../../component/Buttons/MajorPlayButton";
 
 interface Props {
   type: CollectionType;

@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import useUserContext from "../hooks/useUserContext";
+import useUserContext from "../hooks/Context/useUserContext";
 import { CollectionImageResolution } from "../utils/enums";
-import Button from "./Button";
+import Button from "./Buttons/Button";
 import ImageSkeleton from "./Skeleton/ImageSkeleton";
 import SpotifyImage from "./SpotifyImage";
 import { createPortal } from "react-dom";

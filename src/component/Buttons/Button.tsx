@@ -1,6 +1,6 @@
 import { useImperativeHandle, useRef } from "react";
-import { TooltipPosition } from "../utils/enums";
-import Tooltip from "./Tooltip";
+import { TooltipPosition } from "../../utils/enums";
+import Tooltip from "../Tooltips/Tooltip";
 
 interface Props extends React.PropsWithChildren {
   onClick?(ev: React.MouseEvent<HTMLButtonElement, MouseEvent>): void;

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import Button from "./Button";
-import useModalContext from "../hooks/useModalContext";
+import Button from "../Buttons/Button";
+import useModalContext from "../../hooks/Context/useModalContext";
 
 interface ModalProps {
   title: string;

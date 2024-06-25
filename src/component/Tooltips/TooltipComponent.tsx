@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { TooltipPosition } from "../utils/enums";
+import { TooltipPosition } from "../../utils/enums";
 import { createPortal } from "react-dom";
 
 interface Props<T> extends React.PropsWithChildren {

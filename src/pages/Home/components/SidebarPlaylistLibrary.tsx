@@ -1,11 +1,11 @@
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { Fragment } from "react";
-import SpotifyObjectCardSkeleton from "./SpotifyObjectCardSkeleton";
-import SpotifyObjectCard from "./SpotifyObjectCard";
-import { CollectionImageResolution, SpotifyObjectType, TooltipPosition } from "../utils/enums";
-import utils from "../utils/util";
-import Tooltip from "./Tooltip";
-import useUserPlaylists from "../hooks/useUserPlaylists";
+import SpotifyObjectCardSkeleton from "../../../component/Skeleton/SpotifyObjectCardSkeleton";
+import SpotifyObjectCard from "../../../component/SpotifyObjectCard";
+import { CollectionImageResolution, SpotifyObjectType, TooltipPosition } from "../../../utils/enums";
+import utils from "../../../utils/util";
+import Tooltip from "../../../component/Tooltips/Tooltip";
+import useUserPlaylists from "../../../hooks/useUserPlaylists";
 
 function SidebarPlaylistLibrary() {
   const [playlists, isLoading] = useUserPlaylists();

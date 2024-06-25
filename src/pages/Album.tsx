@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import useAlbum from "../hooks/useAlbum";
+import useAlbum from "../hooks/Album/useAlbum";
 import CollectionsTemplate from "./templates/Collections/CollectionsTemplate";
 import { CollectionType } from "../utils/enums";
 

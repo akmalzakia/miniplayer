@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
-import { TokenContext } from "../context/tokenContext";
-import { spotifyAPI } from "../api/spotifyAxios";
+import { TokenContext } from "../../context/tokenContext";
+import { spotifyAPI } from "../../api/spotifyAxios";
 
 function useArtist(id: string) {
   const [artist, setArtist] = useState<SpotifyApi.ArtistObjectFull | null>(
@@ -11,7 +11,7 @@ function useArtist(id: string) {
 
   useEffect(() => {
     async function requestArtist() {
-      console.log("requesting album with id :", id);
+      console.log("requesting artist with id :", id);
       setIsLoading(true);
       try {
         const res = await spotifyAPI.getArtistById(id, token);

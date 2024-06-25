@@ -1,9 +1,9 @@
 import { FiPause, FiPlay } from "react-icons/fi";
-import useModalContext from "../hooks/useModalContext";
-import usePlayerContext from "../hooks/usePlayerContext";
+import useModalContext from "../../hooks/Context/useModalContext";
+import usePlayerContext from "../../hooks/Context/usePlayerContext";
 import Button from "./Button";
-import { isArtist } from "../utils/matchers";
-import PlayWarningModal from "./PlayWarningModal";
+import { isArtist } from "../../utils/matchers";
+import PlayWarningModal from "../Modals/PlayWarningModal";
 
 interface Props {
   collection:

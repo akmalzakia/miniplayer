@@ -1,15 +1,15 @@
 import { createBrowserRouter } from "react-router-dom";
-import Home from "./Home";
-import Featured from "./Featured";
-import Login from "./Login";
-import ProtectedRoute from "./ProtectedRoute";
-import requestToken from "../router/loaders/homeLoader";
-import Playlist from "./Playlist";
+import Home from "../pages/Home/Home";
+import Featured from "../pages/Featured";
+import Login from "../pages/Login";
+import ProtectedRoute from "../pages/ProtectedRoute";
+import requestToken from "./loaders/homeLoader";
+import Playlist from "../pages/Playlist";
 import { TokenProvider } from "../context/tokenContext";
 import { UserProvider } from "../context/userContext";
-import Album from "./Album";
-import Artist from "./Artist";
-import AlbumList from "./AlbumList";
+import Album from "../pages/Album";
+import Artist from "../pages/Artist";
+import AlbumList from "../pages/AlbumList/AlbumList";
 
 const router = createBrowserRouter([
   {

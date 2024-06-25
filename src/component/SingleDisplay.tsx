@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import useSingleColumnDisplay from "../hooks/useSingleColumnDisplay";
 import { CollectionImageResolution, SpotifyObjectType } from "../utils/enums";
 import SpotifyObjectCard from "./SpotifyObjectCard";
-import SpotifyObjectCardSkeleton from "./SpotifyObjectCardSkeleton";
+import SpotifyObjectCardSkeleton from "./Skeleton/SpotifyObjectCardSkeleton";
 
 interface Props {
   title: string;
