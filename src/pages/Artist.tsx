@@ -39,7 +39,11 @@ function Artist() {
 
   function play(track: SpotifyApi.TrackObjectFull) {
     if (!currentContext) {
-      openModal(<PlayWarningModal />);
+      openModal(
+        <PlayWarningModal
+          transferPlayback={playerDispatcher.transferPlayback}
+        />
+      );
       return;
     }
 

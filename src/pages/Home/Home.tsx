@@ -20,8 +20,6 @@ function Home() {
   const scrollRef = useRef<OverlayScrollbarsComponentRef>(null);
 
   useEffect(() => {
-    console.log("location changes");
-
     function scrollToTop() {
       const { viewport } = scrollRef.current?.osInstance()?.elements() || {};
 
@@ -49,8 +47,8 @@ function Home() {
   }, [isLoaded, user, isLoading]);
 
   return (
-    <PlayerProvider>
-      <ModalProvider>
+    <ModalProvider>
+      <PlayerProvider>
         <div className='w-full flex flex-col bg-spotify-black h-full min-w-[800px] min-h-[600px] font-sans'>
           <div className='flex w-full h-full py-2 gap-2 overflow-hidden p-1'>
             <Sidebar></Sidebar>
@@ -76,8 +74,8 @@ function Home() {
           </div>
           <WebPlayback></WebPlayback>
         </div>
-      </ModalProvider>
-    </PlayerProvider>
+      </PlayerProvider>
+    </ModalProvider>
   );
 }
 

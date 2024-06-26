@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import {
   FiChevronLeft,
   FiChevronRight,
@@ -79,21 +79,22 @@ function WebPlayback() {
                   >
                     {track?.name}
                   </Link>
-                  <div className="text-sm font-light text-spotify-gray">
+                  <div className='text-sm font-light text-spotify-gray'>
                     {track?.artists.map((artist, idx) => {
                       const artistId = utils.getIdFromUri(artist.uri);
-                      const separator = track.artists.length > idx + 1 && <>, </>;
+                      const separator = track.artists.length > idx + 1 && (
+                        <>, </>
+                      );
                       return (
-                        <>
+                        <Fragment key={artistId}>
                           <Link
-                            key={artistId}
                             className='hover:underline'
                             to={`/artist/${artistId}`}
                           >
                             {artist.name}
                           </Link>
                           {separator}
-                        </>
+                        </Fragment>
                       );
                     })}
                   </div>

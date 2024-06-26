@@ -30,7 +30,11 @@ function TrackItem({ item, idx, collectionUri }: Props) {
     if (!trackUri) return;
 
     if (!currentContext) {
-      openModal(<PlayWarningModal />);
+      openModal(
+        <PlayWarningModal
+          transferPlayback={playerDispatcher.transferPlayback}
+        />
+      );
       return;
     }
 

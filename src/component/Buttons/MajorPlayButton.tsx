@@ -1,9 +1,9 @@
 import { FiPause, FiPlay } from "react-icons/fi";
-import useModalContext from "../../hooks/Context/useModalContext";
 import usePlayerContext from "../../hooks/Context/usePlayerContext";
 import Button from "./Button";
 import { isArtist } from "../../utils/matchers";
 import PlayWarningModal from "../Modals/PlayWarningModal";
+import useModalContext from "../../hooks/Context/useModalContext";
 
 interface Props {
   collection:
@@ -14,10 +14,10 @@ interface Props {
 }
 
 function MajorPlayButton({ collection }: Props) {
-  const { openModal } = useModalContext();
   const { currentContext } = usePlayerContext();
   const { playerDispatcher } = usePlayerContext();
 
+  const { openModal } = useModalContext();
   const isPlayedInAnotherDevice = !!currentContext?.device;
   const isTrackOnCollection =
     !!currentContext?.context.uri &&
@@ -25,12 +25,16 @@ function MajorPlayButton({ collection }: Props) {
   return (
     <Button
       className='p-3'
-      onClick={() => {
+      onClick={async () => {
         if (!currentContext) {
-          openModal(<PlayWarningModal />);
+          openModal(
+            <PlayWarningModal
+              transferPlayback={playerDispatcher.transferPlayback}
+            />
+          );
           return;
         }
-        console.log(currentContext);
+
         if (!currentContext?.paused && isTrackOnCollection) {
           if (isPlayedInAnotherDevice) {
             playerDispatcher.transferPlayback();

@@ -11,6 +11,9 @@ import { spotifyAPI } from "../api/spotifyAxios";
 import { TokenContext } from "./tokenContext";
 import { DataContext } from "../utils/interfaces";
 import useUserContext from "../hooks/Context/useUserContext";
+import { isAxiosError } from "axios";
+import PlayWarningModal from "../component/Modals/PlayWarningModal";
+import useModalContext from "../hooks/Context/useModalContext";
 
 interface PlayerContextType {
   player: {
@@ -18,15 +21,18 @@ interface PlayerContextType {
     instance: Spotify.Player | null;
   };
   playerDispatcher: {
-    pause(): void;
-    transferPlayback(): void;
+    pause(): Promise<void>;
+    transferPlayback(): Promise<void>;
     playCollection(
-      collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull | SpotifyApi.AlbumObjectSimplified,
+      collection:
+        | SpotifyApi.AlbumObjectFull
+        | SpotifyApi.PlaylistObjectFull
+        | SpotifyApi.AlbumObjectSimplified,
       isTrackOnCollection: boolean
-    ): void;
-    playCollectionTrack(collectionUri: string, trackUri: string): void;
-    playArtist(artistUri: string, isTrackOnTopTracks: boolean): void;
-    playTrackOnly(trackUri: string): void;
+    ): Promise<void>;
+    playCollectionTrack(collectionUri: string, trackUri: string): Promise<void>;
+    playArtist(artistUri: string, isTrackOnTopTracks: boolean): Promise<void>;
+    playTrackOnly(trackUri: string): Promise<void>;
   };
   currentContext: DataContext | null;
   setSpotifyContext(context: DataContext | null): void;
@@ -46,6 +52,7 @@ export function PlayerProvider({ children }: PropsWithChildren) {
   );
 
   const { user } = useUserContext();
+  const { openModal } = useModalContext();
   const token = useContext(TokenContext);
 
   const defaultVolume = 0.5;
@@ -126,9 +133,10 @@ export function PlayerProvider({ children }: PropsWithChildren) {
 
     return () => {
       if (playerInstance) {
+        console.log("disconnecting");
         playerInstance.disconnect();
       }
-    }
+    };
     // removed cleanup function, need to check if triggered twice
   }, [playerInstance, user]);
 
@@ -170,27 +178,38 @@ export function PlayerProvider({ children }: PropsWithChildren) {
 
   const playCollection = useCallback(
     async (
-      collection: SpotifyApi.AlbumObjectFull | SpotifyApi.PlaylistObjectFull | SpotifyApi.AlbumObjectSimplified,
+      collection:
+        | SpotifyApi.AlbumObjectFull
+        | SpotifyApi.PlaylistObjectFull
+        | SpotifyApi.AlbumObjectSimplified,
       isTrackOnCollection: boolean
     ) => {
       if (player.instance && isActive && isTrackOnCollection) {
         player.instance.resume();
-      } else if (isTrackOnCollection) {
-        const { progress_ms, item } = await spotifyAPI.getPlayerState(token);
+        return;
+      }
 
-        const data = {
-          context_uri: collection.uri,
-          offset: {
-            uri: item?.uri,
-          },
-          position_ms: progress_ms,
-        };
+      const state = await spotifyAPI.getPlayerState(token);
 
-        await spotifyAPI.playPlayer(token, data).then(() => {
-          if (currentContext) {
-            setCurrentContext({ ...currentContext, paused: false });
+      if (isTrackOnCollection && state) {
+        try {
+          const { progress_ms, item } = state;
+          const data = {
+            context_uri: collection.uri,
+            offset: {
+              uri: item?.uri,
+            },
+            position_ms: progress_ms,
+          };
+
+          await spotifyAPI.playPlayer(token, data).then(() => {
+            setCurrentContext((ctx) => (ctx ? { ...ctx, paused: false } : ctx));
+          });
+        } catch (error) {
+          if (isAxiosError(error) && error.response?.status === 404) {
+            openModal(<PlayWarningModal transferPlayback={transferPlayback} />);
           }
-        });
+        }
       } else {
         try {
           const data = {
@@ -201,16 +220,16 @@ export function PlayerProvider({ children }: PropsWithChildren) {
             position_ms: 0,
           };
           await spotifyAPI.playPlayer(token, data).then(() => {
-            if (currentContext) {
-              setCurrentContext({ ...currentContext, paused: false });
-            }
+            setCurrentContext((ctx) => (ctx ? { ...ctx, paused: false } : ctx));
           });
-        } catch (err) {
-          console.log(err);
+        } catch (error) {
+          if (isAxiosError(error) && error.response?.status === 404) {
+            openModal(<PlayWarningModal transferPlayback={transferPlayback} />);
+          }
         }
       }
     },
-    [currentContext, isActive, player, token]
+    [isActive, player, token, openModal, transferPlayback]
   );
 
   const playCollectionTrack = useCallback(
@@ -233,12 +252,14 @@ export function PlayerProvider({ children }: PropsWithChildren) {
               setCurrentContext({ ...currentContext, paused: false });
             }
           });
-        } catch (err) {
-          console.log(err);
+        } catch (error) {
+          if (isAxiosError(error) && error.response?.status === 404) {
+            openModal(<PlayWarningModal transferPlayback={transferPlayback} />);
+          }
         }
       }
     },
-    [currentContext, isActive, player, token]
+    [currentContext, isActive, player, token, openModal, transferPlayback]
   );
 
   const playArtist = useCallback(
@@ -252,16 +273,16 @@ export function PlayerProvider({ children }: PropsWithChildren) {
             position_ms: 0,
           };
           await spotifyAPI.playPlayer(token, data).then(() => {
-            if (currentContext) {
-              setCurrentContext({ ...currentContext, paused: false });
-            }
+            setCurrentContext((ctx) => (ctx ? { ...ctx, paused: false } : ctx));
           });
-        } catch (err) {
-          console.log(err);
+        } catch (error) {
+          if (isAxiosError(error) && error.response?.status === 404) {
+            openModal(<PlayWarningModal transferPlayback={transferPlayback} />);
+          }
         }
       }
     },
-    [currentContext, isActive, player, token]
+    [isActive, player, token, openModal, transferPlayback]
   );
 
   const playTrackOnly = useCallback(
@@ -282,12 +303,14 @@ export function PlayerProvider({ children }: PropsWithChildren) {
               setCurrentContext({ ...currentContext, paused: false });
             }
           });
-        } catch (err) {
-          console.log(err);
+        } catch (error) {
+          if (isAxiosError(error) && error.response?.status === 404) {
+            openModal(<PlayWarningModal transferPlayback={transferPlayback} />);
+          }
         }
       }
     },
-    [currentContext, isActive, player, token]
+    [currentContext, isActive, player, token, openModal, transferPlayback]
   );
 
   const setSpotifyContext = useCallback((context: DataContext) => {

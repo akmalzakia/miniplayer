@@ -1,11 +1,13 @@
 import useModalContext from "../../hooks/Context/useModalContext";
-import usePlayerContext from "../../hooks/Context/usePlayerContext";
 import DefaultModal from "./DefaultModal";
 import useUserContext from "../../hooks/Context/useUserContext";
 
-function PlayWarningModal() {
+interface Props {
+  transferPlayback: () => Promise<void>;
+}
+
+function PlayWarningModal({ transferPlayback }: Props) {
   const { openModal } = useModalContext();
-  const { playerDispatcher } = usePlayerContext();
   const { user } = useUserContext();
 
   return (
@@ -13,9 +15,9 @@ function PlayWarningModal() {
       title='Warning!'
       description='No spotify instance found!'
       confirmText='Transfer Playback'
-      onConfirm={() => {
+      onConfirm={async () => {
         if (user?.product === "premium") {
-          playerDispatcher.transferPlayback();
+          await transferPlayback();
         } else {
           openModal(
             <DefaultModal
