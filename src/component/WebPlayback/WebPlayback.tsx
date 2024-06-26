@@ -17,7 +17,7 @@ import { CollectionImageResolution } from "../../utils/enums";
 import utils from "../../utils/util";
 
 function WebPlayback() {
-  const { player, isActive } = usePlayerContext();
+  const { player, playerDispatcher, isActive } = usePlayerContext();
   const { user } = useUserContext();
   const [isPaused, setPaused] = useState(false);
   const [track, setTrack] = useState<Spotify.Track | null>(null);
@@ -154,8 +154,14 @@ function WebPlayback() {
             <>
               <div className='flex justify-center w-full'>
                 <b>
-                  Instances not active. Transfer your playback using your
-                  Spotify app
+                  Instance not active.{" "}
+                  <span
+                    className='text-spotify-green underline cursor-pointer'
+                    onClick={playerDispatcher.transferPlayback}
+                  >
+                    Click here to transfer your playback
+                  </span>{" "}
+                  or manually transfer using your Spotify client!
                 </b>
               </div>
             </>
