@@ -14,6 +14,7 @@ import usePlayerContext from "../../hooks/Context/usePlayerContext";
 import useUserContext from "../../hooks/Context/useUserContext";
 import SpotifyImage from "../SpotifyImage";
 import { CollectionImageResolution } from "../../utils/enums";
+import utils from "../../utils/util";
 
 function WebPlayback() {
   const { player, isActive } = usePlayerContext();
@@ -67,15 +68,35 @@ function WebPlayback() {
                   <SpotifyImage
                     images={track?.album.images}
                     className='rounded-sm'
-                    priority="low"
+                    priority='low'
                     resolution={CollectionImageResolution.Low}
                   ></SpotifyImage>
                 </div>
                 <div className='flex flex-col justify-center'>
-                  <span className='text-sm font-bold'>{track?.name}</span>
-                  <span className='text-sm font-light text-spotify-gray'>
-                    {track?.artists[0].name}
-                  </span>
+                  <Link
+                    className='text-sm font-bold hover:underline'
+                    to={`/album/${utils.getIdFromUri(track?.album.uri)}`}
+                  >
+                    {track?.name}
+                  </Link>
+                  <div className="text-sm font-light text-spotify-gray">
+                    {track?.artists.map((artist, idx) => {
+                      const artistId = utils.getIdFromUri(artist.uri);
+                      const separator = track.artists.length > idx + 1 && <>, </>;
+                      return (
+                        <>
+                          <Link
+                            key={artistId}
+                            className='hover:underline'
+                            to={`/artist/${artistId}`}
+                          >
+                            {artist.name}
+                          </Link>
+                          {separator}
+                        </>
+                      );
+                    })}
+                  </div>
                 </div>
                 <div className='my-auto'>
                   <FiPlusCircle></FiPlusCircle>
