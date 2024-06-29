@@ -1,26 +1,31 @@
 import { useCallback } from "react";
 
-function useDynamicTopbar<T extends HTMLElement>(topbarContentEl: T | null) {
+function useDynamicTopbar<T extends HTMLElement>(
+  topbarContentRef: React.RefObject<T>
+) {
   const topbarContentTriggerRef = useCallback(
-    (node: HTMLDivElement) => {
+    (
+      node: HTMLDivElement,
+      onTriggerVisible?: () => void,
+      onTriggerInvisible?: () => void
+    ) => {
       if (!node) return;
       const observer = new IntersectionObserver(
         (entries) => {
           const [entry] = entries;
           if (entry.isIntersecting) {
-            topbarContentEl?.classList.add("invisible");
+            topbarContentRef.current?.classList.add("invisible");
+            onTriggerVisible?.();
           } else {
-            topbarContentEl?.classList.remove("invisible");
+            topbarContentRef.current?.classList.remove("invisible");
+            onTriggerInvisible?.();
           }
-        },
-        {
-          threshold: 0.5,
         }
       );
 
       observer.observe(node);
     },
-    [topbarContentEl]
+    [topbarContentRef]
   );
 
   return topbarContentTriggerRef;

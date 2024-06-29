@@ -33,9 +33,7 @@ function Artist() {
 
   const contentRef = useRef<HTMLDivElement>(null);
   const portal = document.getElementById("topbar-content-wrapper");
-  const topbarContentTriggerRef = useDynamicTopbar<HTMLElement>(
-    contentRef.current
-  );
+  const topbarContentTriggerRef = useDynamicTopbar<HTMLElement>(contentRef);
 
   const isTrackPlayed = (trackId?: string) =>
     isActive && currentContext?.current_track?.uri === trackId;
@@ -83,37 +81,36 @@ function Artist() {
           portal
         )}
       <div className='px-2'>
-        <div className='py-2 flex w-full gap-4'>
-          <div className='w-40 shrink-0'>
-            <SpotifyImage
-              className='rounded-full shadow-md max-w-full max-h-full'
-              images={artist?.images}
-              resolution={CollectionImageResolution.Medium}
-            ></SpotifyImage>
-          </div>
-          <div className='flex flex-col justify-between gap-4 w-[calc(100%-10.5rem)] flex-grow-0 h-[175px]'>
-            <div className='font-bold flex-1'>
-              <Textfit
-                mode='single'
-                min={36}
-                max={90}
-              >
-                {artist?.name}
-              </Textfit>
+        <div ref={topbarContentTriggerRef}>
+          <div className='py-2 flex w-full gap-4'>
+            <div className='w-40 shrink-0'>
+              <SpotifyImage
+                className='rounded-full shadow-md max-w-full max-h-full'
+                images={artist?.images}
+                resolution={CollectionImageResolution.Medium}
+              ></SpotifyImage>
             </div>
-            <div className='font-normal h-6'>
-              <>
-                {utils.formatFollowers(artist?.followers.total || 0)} monthly
-                listeners
-              </>
+            <div className='flex flex-col justify-between gap-4 w-[calc(100%-10.5rem)] flex-grow-0 h-[175px]'>
+              <div className='font-bold flex-1'>
+                <Textfit
+                  mode='single'
+                  min={36}
+                  max={90}
+                >
+                  {artist?.name}
+                </Textfit>
+              </div>
+              <div className='font-normal h-6'>
+                <>
+                  {utils.formatFollowers(artist?.followers.total || 0)} monthly
+                  listeners
+                </>
+              </div>
             </div>
           </div>
-        </div>
-        <div
-          ref={topbarContentTriggerRef}
-          className='py-2 flex gap-2'
-        >
-          {artist && <MajorPlayButton playableObjects={artist} />}
+          <div className='py-2 flex gap-2'>
+            {artist && <MajorPlayButton playableObjects={artist} />}
+          </div>
         </div>
         <div className='py-4'>
           <div className='font-bold text-xl'>Popular</div>
