@@ -11,6 +11,9 @@ import usePlayerStateFetcher from "../../../hooks/usePlayerStateFetcher";
 import LoadingDots from "../../../component/LoadingDots";
 import SpotifyImage from "../../../component/SpotifyImage";
 import MajorPlayButton from "../../../component/Buttons/MajorPlayButton";
+import { useRef } from "react";
+import { createPortal } from "react-dom";
+import useDynamicTopbar from "../../../hooks/useDynamicTopbar";
 
 interface Props {
   type: CollectionType;
@@ -19,6 +22,13 @@ interface Props {
 }
 
 function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const portal = document.getElementById("topbar-content-wrapper");
+
+  const topbarContentTriggerRef = useDynamicTopbar<HTMLElement>(
+    contentRef.current
+  );
+
   function calculateDuration(
     tracks:
       | SpotifyApi.PlaylistTrackObject[]
@@ -68,6 +78,19 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
   return (
     collection && (
       <>
+        {portal &&
+          createPortal(
+            <div
+              ref={contentRef}
+              className={`flex invisible gap-4`}
+            >
+              <div>
+                <MajorPlayButton playableObjects={collection}></MajorPlayButton>
+              </div>
+              <b className='text-xl my-auto'>{collection.name}</b>
+            </div>,
+            portal
+          )}
         <div className='w-full flex gap-6'>
           <div className='w-[30%] min-w-36 max-w-72'>
             <SpotifyImage
@@ -132,8 +155,11 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
             </div>
           </div>
         </div>
-        <div className='flex mt-4'>
-          <MajorPlayButton collection={collection} />
+        <div
+          ref={topbarContentTriggerRef}
+          className='flex mt-4'
+        >
+          <MajorPlayButton playableObjects={collection} />
         </div>
         <TrackList
           type={type}

@@ -81,7 +81,7 @@ function AlbumListItem({ album }: Props) {
             </div>
           </div>
           <div>
-            <MajorPlayButton collection={album} />
+            <MajorPlayButton playableObjects={album} />
           </div>
         </div>
       </div>

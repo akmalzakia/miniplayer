@@ -6,14 +6,14 @@ import PlayWarningModal from "../Modals/PlayWarningModal";
 import useModalContext from "../../hooks/Context/useModalContext";
 
 interface Props {
-  collection:
+  playableObjects:
     | SpotifyApi.PlaylistObjectFull
     | SpotifyApi.ArtistObjectFull
     | SpotifyApi.AlbumObjectSimplified
     | SpotifyApi.AlbumObjectFull;
 }
 
-function MajorPlayButton({ collection }: Props) {
+function MajorPlayButton({ playableObjects }: Props) {
   const { currentContext } = usePlayerContext();
   const { playerDispatcher } = usePlayerContext();
 
@@ -21,7 +21,7 @@ function MajorPlayButton({ collection }: Props) {
   const isPlayedInAnotherDevice = !!currentContext?.device;
   const isTrackOnCollection =
     !!currentContext?.context.uri &&
-    currentContext.context.uri === collection.uri;
+    currentContext.context.uri === playableObjects.uri;
   return (
     <Button
       className='p-3'
@@ -42,14 +42,14 @@ function MajorPlayButton({ collection }: Props) {
             playerDispatcher.pause();
           }
         } else {
-          if (isArtist(collection)) {
+          if (isArtist(playableObjects)) {
             playerDispatcher.playArtist(
-              collection.uri || "",
+              playableObjects.uri || "",
               isTrackOnCollection
             );
           } else {
             playerDispatcher.playCollection(
-              collection,
+              playableObjects,
               isTrackOnCollection ?? false
             );
           }
