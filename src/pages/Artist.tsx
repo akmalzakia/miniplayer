@@ -3,7 +3,7 @@ import useArtist from "../hooks/Artist/useArtist";
 import utils from "../utils/util";
 import { Textfit } from "react-textfit";
 import { FiPause, FiPlay } from "react-icons/fi";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { CollectionImageResolution, SpotifyObjectType } from "../utils/enums";
 import SingleDisplay from "../component/SingleDisplay";
 import useTopTracks from "../hooks/Artist/useTopTracks";
@@ -16,11 +16,13 @@ import SpotifyImage from "../component/SpotifyImage";
 import MajorPlayButton from "../component/Buttons/MajorPlayButton";
 import useModalContext from "../hooks/Context/useModalContext";
 import PlayWarningModal from "../component/Modals/PlayWarningModal";
-import useDynamicTopbar from "../hooks/useDynamicTopbar";
+import useElementIntersection from "../hooks/useElementIntersection";
 import { createPortal } from "react-dom";
+import { ScrollbarContext } from "../context/scrollbarContext";
 
 function Artist() {
   const { id: artistId } = useParams();
+  const scrollbar = useContext(ScrollbarContext);
   const [artist, isLoading] = useArtist(artistId || "");
   const [topTracks, isTrackLoading] = useTopTracks(artistId);
   const [albums, isAlbumsLoading] = useArtistAlbums(artistId || "", 10);
@@ -33,7 +35,7 @@ function Artist() {
 
   const contentRef = useRef<HTMLDivElement>(null);
   const portal = document.getElementById("topbar-content-wrapper");
-  const topbarContentTriggerRef = useDynamicTopbar<HTMLElement>(contentRef);
+  const { observeElementVisibility } = useElementIntersection();
 
   const isTrackPlayed = (trackId?: string) =>
     isActive && currentContext?.current_track?.uri === trackId;
@@ -81,7 +83,25 @@ function Artist() {
           portal
         )}
       <div className='px-2'>
-        <div ref={topbarContentTriggerRef}>
+        <div
+          ref={(node) => {
+            if (node) {
+              observeElementVisibility(
+                node,
+                () => {
+                  contentRef.current?.classList.add("invisible");
+                },
+                () => {
+                  contentRef.current?.classList.remove("invisible");
+                },
+                {
+                  root: scrollbar?.osInstance()?.elements().viewport,
+                  threshold: 0.05,
+                }
+              );
+            }
+          }}
+        >
           <div className='py-2 flex w-full gap-4'>
             <div className='w-40 shrink-0'>
               <SpotifyImage

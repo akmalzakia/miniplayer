@@ -8,6 +8,7 @@ import TrackListSkeleton from "../../component/Skeleton/TrackListSkeleton";
 import SpotifyImage from "../../component/SpotifyImage";
 import MajorPlayButton from "../../component/Buttons/MajorPlayButton";
 import { ScrollbarContext } from "../../context/scrollbarContext";
+import useElementIntersection from "../../hooks/useElementIntersection";
 
 interface Props {
   album: SpotifyApi.AlbumObjectSimplified;
@@ -37,26 +38,7 @@ function AlbumListItem({ album, onHeaderAbove, onTrackAbove }: Props) {
     }
   }, [album, token]);
 
-  function observeElementIntersectTop(
-    node: HTMLDivElement,
-    callback: () => void
-  ) {
-    function handleIntersect(entries: IntersectionObserverEntry[]) {
-      const target = entries[0];
-
-      if (!target.isIntersecting) return;
-
-      callback();
-    }
-
-    const observer = new IntersectionObserver(handleIntersect, {
-      root: scrollbar?.osInstance()?.elements().viewport,
-      rootMargin: "-1% 0% -99% 0%",
-      threshold: 0,
-    });
-
-    observer.observe(node);
-  }
+  const { observeElementIntersectTop } = useElementIntersection();
 
   useEffect(() => {
     let observerRefValue = null;
@@ -89,7 +71,11 @@ function AlbumListItem({ album, onHeaderAbove, onTrackAbove }: Props) {
         className='flex gap-5 mb-5'
         ref={(node) => {
           if (node) {
-            observeElementIntersectTop(node, onHeaderAbove);
+            observeElementIntersectTop(
+              node,
+              onHeaderAbove,
+              scrollbar?.osInstance()?.elements().viewport
+            );
           }
         }}
       >
@@ -121,7 +107,11 @@ function AlbumListItem({ album, onHeaderAbove, onTrackAbove }: Props) {
       <div
         ref={(node) => {
           if (node) {
-            observeElementIntersectTop(node, onTrackAbove);
+            observeElementIntersectTop(
+              node,
+              onTrackAbove,
+              scrollbar?.osInstance()?.elements().viewport
+            );
           }
         }}
       >

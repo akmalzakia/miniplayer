@@ -11,9 +11,10 @@ import usePlayerStateFetcher from "../../../hooks/usePlayerStateFetcher";
 import LoadingDots from "../../../component/LoadingDots";
 import SpotifyImage from "../../../component/SpotifyImage";
 import MajorPlayButton from "../../../component/Buttons/MajorPlayButton";
-import { useRef } from "react";
+import { useContext, useRef } from "react";
 import { createPortal } from "react-dom";
-import useDynamicTopbar from "../../../hooks/useDynamicTopbar";
+import useElementIntersection from "../../../hooks/useElementIntersection";
+import { ScrollbarContext } from "../../../context/scrollbarContext";
 
 interface Props {
   type: CollectionType;
@@ -23,11 +24,10 @@ interface Props {
 
 function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const scrollbar = useContext(ScrollbarContext);
   const portal = document.getElementById("topbar-content-wrapper");
 
-  const topbarContentTriggerRef = useDynamicTopbar<HTMLElement>(
-    contentRef
-  );
+  const { observeElementVisibility } = useElementIntersection();
 
   function calculateDuration(
     tracks:
@@ -91,7 +91,25 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
             </div>,
             portal
           )}
-        <div ref={topbarContentTriggerRef}>
+        <div
+          ref={(node) => {
+            if (node) {
+              observeElementVisibility(
+                node,
+                () => {
+                  contentRef.current?.classList.add("invisible");
+                },
+                () => {
+                  contentRef.current?.classList.remove("invisible");
+                },
+                {
+                  root: scrollbar?.osInstance()?.elements().viewport,
+                  threshold: 0.05,
+                }
+              );
+            }
+          }}
+        >
           <div className='w-full flex gap-6'>
             <div className='w-[30%] min-w-36 max-w-72'>
               <SpotifyImage
