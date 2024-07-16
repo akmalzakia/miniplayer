@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import usePlayerContext from "../../../../hooks/Context/usePlayerContext";
 import { FiPause, FiPlay } from "react-icons/fi";
 import SpotifyImage from "../../../../component/SpotifyImage";
@@ -121,11 +121,11 @@ function TrackItem({ item, idx, collectionUri }: Props) {
           <div className={`${isPlayed ? "text-spotify-green" : "text-white"}`}>
             {track?.name}
           </div>
-          <div className='flex gap-1'>
+          <div className='inline gap-1'>
             {track?.artists.map((artist, idx) => {
               const separator = track.artists.length > idx + 1 && <>, </>;
               return (
-                <div key={artist.id}>
+                <Fragment key={artist.id}>
                   <Link
                     className='hover:underline'
                     to={`/artist/${artist.id}`}
@@ -133,7 +133,7 @@ function TrackItem({ item, idx, collectionUri }: Props) {
                     {artist.name}
                   </Link>
                   {separator}
-                </div>
+                </Fragment>
               );
             })}
           </div>
