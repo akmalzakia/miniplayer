@@ -7,12 +7,17 @@ import { TokenContext } from "../../context/tokenContext";
 import TrackListSkeleton from "../../component/Skeleton/TrackListSkeleton";
 import SpotifyImage from "../../component/SpotifyImage";
 import MajorPlayButton from "../../component/Buttons/MajorPlayButton";
+import { ScrollbarContext } from "../../context/scrollbarContext";
 
 interface Props {
   album: SpotifyApi.AlbumObjectSimplified;
+  onHeaderAbove: () => void;
+  onTrackAbove: () => void;
 }
 
-function AlbumListItem({ album }: Props) {
+function AlbumListItem({ album, onHeaderAbove, onTrackAbove }: Props) {
+  const scrollbar = useContext(ScrollbarContext);
+
   const [tracks, setTracks] = useState<
     SpotifyApi.TrackObjectSimplified[] | null
   >(null);
@@ -31,6 +36,27 @@ function AlbumListItem({ album }: Props) {
       setIsTrackLoading(true);
     }
   }, [album, token]);
+
+  function observeElementIntersectTop(
+    node: HTMLDivElement,
+    callback: () => void
+  ) {
+    function handleIntersect(entries: IntersectionObserverEntry[]) {
+      const target = entries[0];
+
+      if (!target.isIntersecting) return;
+
+      callback();
+    }
+
+    const observer = new IntersectionObserver(handleIntersect, {
+      root: scrollbar?.osInstance()?.elements().viewport,
+      rootMargin: "-1% 0% -99% 0%",
+      threshold: 0,
+    });
+
+    observer.observe(node);
+  }
 
   useEffect(() => {
     let observerRefValue = null;
@@ -59,7 +85,14 @@ function AlbumListItem({ album }: Props) {
       className='my-10'
       ref={loaderRef}
     >
-      <div className='flex gap-5 mb-5'>
+      <div
+        className='flex gap-5 mb-5'
+        ref={(node) => {
+          if (node) {
+            observeElementIntersectTop(node, onHeaderAbove);
+          }
+        }}
+      >
         <div className='w-32'>
           <SpotifyImage
             className='max-w-full max-h-full rounded-md shadow-md'
@@ -85,17 +118,25 @@ function AlbumListItem({ album }: Props) {
           </div>
         </div>
       </div>
-      {isTracksLoading ? (
-        <TrackListSkeleton type={CollectionType.Album} />
-      ) : (
-        tracks && (
-          <TrackList
-            type={CollectionType.Album}
-            tracks={tracks}
-            collectionUri={album.uri}
-          />
-        )
-      )}
+      <div
+        ref={(node) => {
+          if (node) {
+            observeElementIntersectTop(node, onTrackAbove);
+          }
+        }}
+      >
+        {isTracksLoading ? (
+          <TrackListSkeleton type={CollectionType.Album} />
+        ) : (
+          tracks && (
+            <TrackList
+              type={CollectionType.Album}
+              tracks={tracks}
+              collectionUri={album.uri}
+            />
+          )
+        )}
+      </div>
     </div>
   );
 }

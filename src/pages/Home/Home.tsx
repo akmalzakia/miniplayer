@@ -11,6 +11,7 @@ import { PlayerProvider } from "../../context/playerContext";
 import { useEffect, useRef, useState } from "react";
 import useUserContext from "../../hooks/Context/useUserContext";
 import { ModalProvider } from "../../context/modalContext";
+import { ScrollbarContext } from "../../context/scrollbarContext";
 
 function Home() {
   const [isLoaded, setLoaded] = useState(false);
@@ -63,7 +64,9 @@ function Home() {
                 }}
                 ref={scrollRef}
               >
-                <Outlet></Outlet>
+                <ScrollbarContext.Provider value={scrollRef.current}>
+                  <Outlet></Outlet>
+                </ScrollbarContext.Provider>
               </OverlayScrollbarsComponent>
             </div>
             {/* <div className='w-1/3'>
