@@ -10,6 +10,7 @@ import { UserProvider } from "../context/userContext";
 import Album from "../pages/Album";
 import Artist from "../pages/Artist/Artist";
 import AlbumList from "../pages/AlbumList/AlbumList";
+import Search from "../pages/Search/Search";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,14 @@ const router = createBrowserRouter([
       {
         path: "/artist/:id/discography/all",
         element: <AlbumList />,
+      },
+      {
+        path: "/search",
+        element: <Search />,
+      },
+      {
+        path: "/search/:query",
+        element: <Search />,
       },
     ],
   },

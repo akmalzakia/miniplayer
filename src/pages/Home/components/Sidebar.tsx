@@ -20,7 +20,14 @@ function Sidebar() {
             )
           }
         </NavLink>
-        {/* <AiOutlineSearch className='text-xl'></AiOutlineSearch> */}
+        <NavLink
+          to='/search'
+          className='text-2xl'
+        >
+          {({ isActive }) => (
+            <AiOutlineSearch className={isActive ? "text-spotify-green" : ""} />
+          )}
+        </NavLink>
       </div>
       <SidebarPlaylistLibrary />
     </div>

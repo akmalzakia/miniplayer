@@ -19,7 +19,7 @@ import useElementIntersection from "../../hooks/useElementIntersection";
 import { createPortal } from "react-dom";
 import { ScrollbarContext } from "../../context/scrollbarContext";
 import { TopbarContentContext } from "../../context/topbarContext";
-import ArtistTopTracks from "./components/ArtistTopTracks";
+import SimplifiedTrackList from "./components/SimplifiedTrackList";
 
 function Artist() {
   const { id: artistId } = useParams();
@@ -115,10 +115,12 @@ function Artist() {
         <div className='py-4'>
           <div className='font-bold text-xl'>Popular</div>
           {topTracks && (
-            <ArtistTopTracks
+            <SimplifiedTrackList
               tracks={topTracks}
               expandable={{ enabled: true, preview: 5 }}
-            ></ArtistTopTracks>
+              isNumbered={true}
+              showArtist={false}
+            ></SimplifiedTrackList>
           )}
         </div>
         <SingleDisplay

@@ -20,3 +20,10 @@ export interface ArtistAlbumParams {
   limit: number;
   offset: number;
 }
+
+export interface SearchParams {
+  query: string;
+  type: ("album" | "artist" | "playlist" | "track")[];
+  limit?: number;
+  offset?: number;
+}

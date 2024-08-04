@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import utils from "../../../utils/util";
 import SpotifyImage from "../../../component/SpotifyImage";
 import usePlayerContext from "../../../hooks/Context/usePlayerContext";
@@ -6,13 +6,22 @@ import { FiPause, FiPlay } from "react-icons/fi";
 import PlayWarningModal from "../../../component/Modals/PlayWarningModal";
 import useModalContext from "../../../hooks/Context/useModalContext";
 import { CollectionImageResolution } from "../../../utils/enums";
+import { FaPlay } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 
 interface ArtistTopTracksProps {
   tracks: SpotifyApi.TrackObjectFull[];
   expandable: { enabled: boolean; preview?: number };
+  isNumbered: boolean;
+  showArtist: boolean;
 }
 
-function ArtistTopTracks({ tracks, expandable }: ArtistTopTracksProps) {
+function SimplifiedTrackList({
+  tracks,
+  expandable,
+  isNumbered,
+  showArtist,
+}: ArtistTopTracksProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentHover, setCurrentHover] = useState("");
 
@@ -58,39 +67,63 @@ function ArtistTopTracks({ tracks, expandable }: ArtistTopTracksProps) {
               }}
             >
               <div className='flex gap-2'>
-                <div
-                  className={`p-2 w-8 ${
-                    isTrackPlayed(track.uri) ? "text-spotify-green" : ""
-                  }`}
-                >
-                  {isTrackPlayed(track?.uri) ? (
-                    !currentContext?.paused ? (
-                      <FiPause
-                        className='my-1'
-                        onClick={playerDispatcher.pause}
-                      />
-                    ) : (
+                {isNumbered && (
+                  <div
+                    className={`p-2 w-8 ${
+                      isTrackPlayed(track.uri) ? "text-spotify-green" : ""
+                    }`}
+                  >
+                    {isTrackPlayed(track.uri) ? (
+                      !currentContext?.paused ? (
+                        <FiPause
+                          className='my-1'
+                          onClick={playerDispatcher.pause}
+                        />
+                      ) : (
+                        <FiPlay
+                          className='my-1'
+                          onClick={() => play(track)}
+                        />
+                      )
+                    ) : currentHover === track.id ? (
                       <FiPlay
                         className='my-1'
                         onClick={() => play(track)}
                       />
-                    )
-                  ) : currentHover === track?.id ? (
-                    <FiPlay
-                      className='my-1'
-                      onClick={() => play(track)}
-                    />
-                  ) : (
-                    idx + 1
-                  )}
-                </div>
-                <div className='w-10 min-w-10'>
+                    ) : (
+                      idx + 1
+                    )}
+                  </div>
+                )}
+                <div className='w-10 min-w-10 relative'>
                   <SpotifyImage
                     className='max-w-full max-h-full rounded-md'
                     images={track.album.images}
                     resolution={CollectionImageResolution.Low}
                     lazy
                   ></SpotifyImage>
+                  {!isNumbered && currentHover === track.id && (
+                    <div className='absolute bg-spotify-hover inset-0 bg-opacity-50'>
+                      {isTrackPlayed(track.uri) ? (
+                        !currentContext?.paused ? (
+                          <FiPause
+                            className='text-white absolute inset-0 m-auto'
+                            onClick={playerDispatcher.pause}
+                          />
+                        ) : (
+                          <FaPlay
+                            className='text-white absolute inset-0 m-auto'
+                            onClick={() => play(track)}
+                          />
+                        )
+                      ) : (
+                        <FaPlay
+                          className='text-white absolute inset-0 m-auto'
+                          onClick={() => play(track)}
+                        />
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div className='flex flex-col justify-center'>
@@ -103,7 +136,26 @@ function ArtistTopTracks({ tracks, expandable }: ArtistTopTracksProps) {
                   >
                     {track.name}
                   </div>
-                  {track.explicit && <div>Explicit</div>}
+                  {showArtist && (
+                    <div className='inline gap-1'>
+                      {track?.artists.map((artist, idx) => {
+                        const separator = track.artists.length > idx + 1 && (
+                          <>, </>
+                        );
+                        return (
+                          <Fragment key={artist.id}>
+                            <Link
+                              className='hover:underline'
+                              to={`/artist/${artist.id}`}
+                            >
+                              {artist.name}
+                            </Link>
+                            {separator}
+                          </Fragment>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className='self-center'>
@@ -124,4 +176,4 @@ function ArtistTopTracks({ tracks, expandable }: ArtistTopTracksProps) {
   );
 }
 
-export default ArtistTopTracks;
+export default SimplifiedTrackList;

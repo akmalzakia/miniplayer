@@ -1,4 +1,4 @@
-import { ArtistAlbumParams } from "../utils/interfaces";
+import { ArtistAlbumParams, SearchParams } from "../utils/interfaces";
 import { PlaybackStateAPI } from "./base";
 import { spotifyAxios } from "./spotifyAxios";
 
@@ -126,6 +126,23 @@ async function getPlayerState(token: string) {
 }
 //#endregion
 
+//#region Search
+async function search(params: SearchParams, token: string) {
+  const res = await spotifyAxios(token).get<
+    Omit<SpotifyApi.SearchResponse, "shows" | "episodes">
+  >(`/search`, {
+    params: {
+      q: params.query,
+      type: params.type.join(","),
+      limit: params.limit,
+      offset: params.offset,
+    },
+  });
+
+  return res.data;
+}
+//#endregion
+
 const get = {
   getCurrentUser,
   getUserById,
@@ -139,6 +156,7 @@ const get = {
   getArtistAlbums,
   getRelatedArtists,
   getPlayerState,
+  search,
 };
 
 export { get };
