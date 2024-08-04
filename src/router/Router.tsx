@@ -8,7 +8,7 @@ import Playlist from "../pages/Playlist";
 import { TokenProvider } from "../context/tokenContext";
 import { UserProvider } from "../context/userContext";
 import Album from "../pages/Album";
-import Artist from "../pages/Artist";
+import Artist from "../pages/Artist/Artist";
 import AlbumList from "../pages/AlbumList/AlbumList";
 
 const router = createBrowserRouter([
