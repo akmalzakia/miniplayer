@@ -6,7 +6,7 @@ function Sidebar() {
   return (
     <div className='w-24 h-full flex flex-col justify-between pr-2'>
       <div
-        className={`flex flex-col gap-6 items-center rounded-md px-2 py-6 shadow-md bg-spotify-card`}
+        className={`flex flex-col gap-6 items-center rounded-md px-2 py-6 shadow-md`}
       >
         <NavLink
           to='/'
@@ -14,7 +14,7 @@ function Sidebar() {
         >
           {({ isActive }) =>
             isActive ? (
-              <AiFillHome></AiFillHome>
+              <AiFillHome className="text-spotify-green"></AiFillHome>
             ) : (
               <AiOutlineHome></AiOutlineHome>
             )

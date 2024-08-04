@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import useUserContext from "../../hooks/Context/useUserContext";
 import { ModalProvider } from "../../context/modalContext";
 import { ScrollbarContext } from "../../context/scrollbarContext";
+import { TopbarContentContext } from "../../context/topbarContext";
 
 function Home() {
   const [isLoaded, setLoaded] = useState(false);
@@ -19,6 +20,7 @@ function Home() {
   const { user, isLoading } = useUserContext();
   const location = useLocation();
   const scrollRef = useRef<OverlayScrollbarsComponentRef>(null);
+  const topbarContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function scrollToTop() {
@@ -54,9 +56,13 @@ function Home() {
           <div className='flex w-full h-full py-2 gap-2 overflow-hidden p-1'>
             <Sidebar></Sidebar>
             <div
-              className={`flex flex-col h-full rounded-md w-[calc(100%-6rem)] bg-spotify-card`}
+              className={`flex flex-col h-full rounded-md w-[calc(100%-6rem)] ${
+                location.pathname.split("/").at(-1) === "search"
+                  ? "bg-spotify-black"
+                  : "bg-gradient-to-b from-spotify-card to-spotify-black"
+              }`}
             >
-              <Topbar />
+              <Topbar ref={topbarContentRef} />
               <OverlayScrollbarsComponent
                 className='gap-2 overlow-y p-4 flex-1'
                 options={{
@@ -65,7 +71,11 @@ function Home() {
                 ref={scrollRef}
               >
                 <ScrollbarContext.Provider value={scrollRef.current}>
-                  <Outlet></Outlet>
+                  <TopbarContentContext.Provider
+                    value={topbarContentRef.current}
+                  >
+                    <Outlet></Outlet>
+                  </TopbarContentContext.Provider>
                 </ScrollbarContext.Provider>
               </OverlayScrollbarsComponent>
             </div>

@@ -1,13 +1,14 @@
 import { useParams } from "react-router-dom";
 import useArtistAlbums from "../../hooks/Artist/useArtistAlbums";
 import { PaginatedRequestMode } from "../../utils/enums";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import AlbumListItem from "./AlbumListItem";
 import MajorPlayButton from "../../component/Buttons/MajorPlayButton";
 import { createPortal } from "react-dom";
+import { TopbarContentContext } from "../../context/topbarContext";
 
 function AlbumList() {
-  const portal = document.getElementById("topbar-content-wrapper");
+  const portal = useContext(TopbarContentContext);
   const { id: artistId } = useParams();
   const [albums, isAlbumsLoading, requestPaginated] = useArtistAlbums(
     artistId || "",

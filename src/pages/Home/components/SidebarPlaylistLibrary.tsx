@@ -12,7 +12,7 @@ function SidebarPlaylistLibrary() {
 
   return (
     <OverlayScrollbarsComponent
-      className='gap-2 overlow-y h-3/4 p-2 bg-spotify-card rounded-md shadow-md'
+      className='gap-2 overlow-y h-3/4 p-2 rounded-md shadow-md'
       options={{
         scrollbars: { autoHide: "leave", theme: "os-theme-light" },
       }}

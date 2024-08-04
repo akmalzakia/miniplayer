@@ -15,6 +15,7 @@ import { useContext, useRef } from "react";
 import { createPortal } from "react-dom";
 import useElementIntersection from "../../../hooks/useElementIntersection";
 import { ScrollbarContext } from "../../../context/scrollbarContext";
+import { TopbarContentContext } from "../../../context/topbarContext";
 
 interface Props {
   type: CollectionType;
@@ -25,7 +26,7 @@ interface Props {
 function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollbar = useContext(ScrollbarContext);
-  const portal = document.getElementById("topbar-content-wrapper");
+  const portal = useContext(TopbarContentContext);
 
   const { observeElementVisibility } = useElementIntersection();
 

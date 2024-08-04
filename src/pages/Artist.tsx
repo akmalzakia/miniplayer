@@ -19,6 +19,7 @@ import PlayWarningModal from "../component/Modals/PlayWarningModal";
 import useElementIntersection from "../hooks/useElementIntersection";
 import { createPortal } from "react-dom";
 import { ScrollbarContext } from "../context/scrollbarContext";
+import { TopbarContentContext } from "../context/topbarContext";
 
 function Artist() {
   const { id: artistId } = useParams();
@@ -34,7 +35,7 @@ function Artist() {
   const { playerDispatcher, currentContext, isActive } = usePlayerContext();
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const portal = document.getElementById("topbar-content-wrapper");
+  const portal = useContext(TopbarContentContext);
   const { observeElementVisibility } = useElementIntersection();
 
   const isTrackPlayed = (trackId?: string) =>

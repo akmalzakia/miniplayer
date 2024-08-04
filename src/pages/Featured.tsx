@@ -36,7 +36,7 @@ function Featured() {
   }, [featured, token]);
 
   return (
-    <div className='bg-spotify-card h-full w-full px-2'>
+    <div className=' h-full w-full px-2'>
       <SingleDisplay
         title='Featured'
         data={featured}
