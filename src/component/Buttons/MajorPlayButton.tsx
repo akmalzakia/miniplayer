@@ -20,8 +20,9 @@ function MajorPlayButton({ playableObjects }: Props) {
   const { openModal } = useModalContext();
   const isPlayedInAnotherDevice = !!currentContext?.device;
   const isTrackOnCollection =
-    !!currentContext?.context.uri &&
+    !!currentContext?.context?.uri &&
     currentContext.context.uri === playableObjects.uri;
+    
   return (
     <Button
       className='p-3'

@@ -20,7 +20,7 @@ function TrackItem({ item, idx, collectionUri }: Props) {
   const { openModal } = useModalContext();
   const { playerDispatcher, currentContext, isActive } = usePlayerContext();
   const track = isPlaylistTrack(item) ? item.track : item;
-  const isSameContext = collectionUri === currentContext?.context.uri;
+  const isSameContext = collectionUri === currentContext?.context?.uri;
 
   const isPlayed =
     isActive &&
