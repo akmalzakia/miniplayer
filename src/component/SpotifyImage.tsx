@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import Image from "./Image";
 import { CollectionImageResolution } from "../utils/enums";
+import imgUnavailable from "../assets/bar-img-unavailable.png";
 
 interface Props {
   className: string;
@@ -59,6 +60,8 @@ function SpotifyImage({
       image = images[0];
     }
 
+    if (!image) return null;
+
     image.width = width;
     image.height = width;
 
@@ -68,7 +71,7 @@ function SpotifyImage({
   return (
     <Image
       className={className}
-      src={getImageBySpecifiedResolution()?.url}
+      src={getImageBySpecifiedResolution()?.url ?? imgUnavailable}
       height={getImageBySpecifiedResolution()?.height || undefined}
       width={getImageBySpecifiedResolution()?.width || undefined}
       onLoad={() => setIsLoading(false)}
