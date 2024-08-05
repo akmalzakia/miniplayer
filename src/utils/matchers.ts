@@ -41,15 +41,10 @@ function isArtist(
   return (data as SpotifyApi.ArtistObjectSimplified).type === "artist";
 }
 
-function isFullTrack(track: SpotifyApi.TrackObjectFull | SpotifyApi.TrackObjectSimplified): track is SpotifyApi.TrackObjectFull {
-  return !!(track as SpotifyApi.TrackObjectFull).album
+function isFullTrack(
+  track: SpotifyApi.TrackObjectFull | SpotifyApi.TrackObjectSimplified
+): track is SpotifyApi.TrackObjectFull {
+  return !!(track as SpotifyApi.TrackObjectFull).album;
 }
 
-
-export {
-  isPlaylist,
-  isPlaylistTrack,
-  isAlbum,
-  isArtist,
-  isFullTrack
-}
+export { isPlaylist, isPlaylistTrack, isAlbum, isArtist, isFullTrack };

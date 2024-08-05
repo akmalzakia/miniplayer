@@ -57,7 +57,7 @@ function Home() {
             <Sidebar></Sidebar>
             <div
               className={`flex flex-col h-full rounded-md w-[calc(100%-6rem)] ${
-                location.pathname.split("/").at(-1) === "search"
+                location.pathname.includes("search")
                   ? "bg-spotify-black"
                   : "bg-gradient-to-b from-spotify-card to-spotify-black"
               }`}

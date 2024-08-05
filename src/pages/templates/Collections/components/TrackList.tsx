@@ -3,12 +3,13 @@ import { isPlaylistTrack } from "../../../../utils/matchers";
 import TrackItem from "./TrackItem";
 
 interface Props {
-  type: CollectionType;
-  collectionUri: string;
+  type?: CollectionType;
+  collectionUri?: string;
   tracks: SpotifyApi.PlaylistTrackObject[] | SpotifyApi.TrackObjectSimplified[];
+  matchContext?: boolean;
 }
 
-function TrackList({ type, tracks, collectionUri }: Props) {
+function TrackList({ type, tracks, collectionUri, matchContext }: Props) {
   return (
     <div className='px-4'>
       <table className='table-fixed w-full text-sm text-spotify-gray'>
@@ -16,10 +17,12 @@ function TrackList({ type, tracks, collectionUri }: Props) {
           <tr className='text-left'>
             <th className='text-right pr-3 font-normal w-8'>#</th>
             <th className='font-normal'>Title</th>
-            {type === CollectionType.Playlist && (
+            {type !== CollectionType.Album && (
               <>
                 <th className='font-normal w-1/3'>Album</th>
-                <th className='py-1 pr-2 font-normal w-32'>Date Added</th>
+                {type === CollectionType.Playlist && (
+                  <th className='py-1 pr-2 font-normal w-32'>Date Added</th>
+                )}
               </>
             )}
             <th className='font-normal w-20'>Duration</th>
@@ -32,6 +35,7 @@ function TrackList({ type, tracks, collectionUri }: Props) {
               idx={idx}
               collectionUri={collectionUri}
               item={item}
+              matchContext={matchContext}
             />
           ))}
         </tbody>

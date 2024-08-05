@@ -9,7 +9,7 @@ interface InputProps {
   onInput?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-function Input({ className, onDebouncedInput, onInput }: InputProps) {
+function SearchInput({ className, onDebouncedInput, onInput }: InputProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -45,7 +45,7 @@ function Input({ className, onDebouncedInput, onInput }: InputProps) {
         (input: string, onDebouncedInput: (...args: any[]) => any) => {
           onDebouncedInput?.(input);
         },
-        1000
+        400
       ),
     []
   );
@@ -64,7 +64,7 @@ function Input({ className, onDebouncedInput, onInput }: InputProps) {
       <input
         ref={inputRef}
         type='text'
-        className={`h-full w-full bg-spotify-card rounded-full text-sm py-1 px-10 placeholder:text-[#6f6f6f]`}
+        className={`h-full w-full bg-[#2a2a2a] rounded-full text-sm py-1 px-10 placeholder:text-[#6f6f6f]`}
         placeholder='What do you want to play?'
         onChange={handleInput}
       ></input>
@@ -88,4 +88,4 @@ function Input({ className, onDebouncedInput, onInput }: InputProps) {
   );
 }
 
-export default Input;
+export default SearchInput;

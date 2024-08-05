@@ -1,104 +1,85 @@
 import { createPortal } from "react-dom";
-import Input from "./components/SearchInput";
-import { useCallback, useContext, useEffect, useState } from "react";
+import SearchInput from "./components/SearchInput";
+import { useContext } from "react";
 import { TopbarContentContext } from "../../context/topbarContext";
-import { spotifyAPI } from "../../api/spotifyAxios";
-import { TokenContext } from "../../context/tokenContext";
-import SimplifiedTrackList from "../Artist/components/SimplifiedTrackList";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import SingleDisplay from "../../component/SingleDisplay";
-import { SpotifyObjectType } from "../../utils/enums";
+import {
+  generatePath,
+  matchPath,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+import FilterTags from "./components/FilterTags";
+
+const baseUrl = "/search";
 
 function Search() {
   const portal = useContext(TopbarContentContext);
-  const token = useContext(TokenContext);
-  const { query } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchResult, setSearchResult] = useState<Omit<
-    SpotifyApi.SearchResponse,
-    "shows" | "episodes"
-  > | null>(null);
+  const { query } = useParams();
 
-  const fetchSearchQuery = useCallback(
-    async (query: string) => {
-      if (!query) return;
-      try {
-        const res = await spotifyAPI.search(
-          {
-            query,
-            type: ["album", "artist", "playlist", "track"],
-            limit: 10,
-          },
-          token
-        );
-        setSearchResult(res);
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    [token]
-  );
-
-  useEffect(() => {
-    if (!query) return;
-
-    fetchSearchQuery(query);
-  }, [query, fetchSearchQuery]);
+  const routes = [
+    "/search/:q",
+    "/search/:q/songs",
+    "/search/:q/albums",
+    "/search/:q/playlists",
+    "/search/:q/artists",
+  ];
 
   return (
     <>
       {portal &&
         createPortal(
-          <Input
+          <SearchInput
             className='w-80 h-12'
             onDebouncedInput={(query) => {
-              navigate(`/search/${query}`, {
-                replace: location.pathname === "/search",
+              // try to use regex + string.replace next time...
+              let path = "";
+              if (!query) {
+                path = baseUrl;
+              } else {
+                let pattern = routes.find((p) =>
+                  matchPath(p, location.pathname)
+                );
+                if (!pattern) pattern = routes[0];
+                path = generatePath(pattern, { q: query });
+              }
+              navigate(`${path}`, {
+                replace: location.pathname === baseUrl,
               });
             }}
           />,
           portal
         )}
-      {searchResult && (
-        <div className='px-2 mt-10'>
-          {searchResult.tracks && (
-            <>
-              <div className='text-2xl font-bold mb-2'>Songs</div>
-              <SimplifiedTrackList
-                tracks={searchResult.tracks.items}
-                expandable={{ enabled: false, preview: 4 }}
-                isNumbered={false}
-                showArtist={true}
-              />
-            </>
-          )}
-          {searchResult.artists && (
-            <SingleDisplay
-              title='Artists'
-              data={searchResult.artists.items}
-              type={SpotifyObjectType.Artist}
-              lazy
-            />
-          )}
-          {searchResult.albums && (
-            <SingleDisplay
-              title='Albums'
-              data={searchResult.albums.items}
-              type={SpotifyObjectType.Album}
-              lazy
-            />
-          )}
-          {searchResult.playlists && (
-            <SingleDisplay
-              title='Playlists'
-              data={searchResult.playlists.items}
-              type={SpotifyObjectType.Playlist}
-              lazy
-            />
-          )}
+      {query && (
+        <div className='px-4 py-2 flex gap-3 sticky top-0 bg-spotify-black z-10'>
+          <FilterTags
+            type='All'
+            link={`/search/${query}`}
+          />
+          <FilterTags
+            type='Songs'
+            link={`/search/${query}/songs`}
+          />
+          {/* <FilterTags
+            type='Artists'
+            link={`/search/${query}/artists`}
+          />
+          <FilterTags
+            type='Playlists'
+            link={`/search/${query}/playlists`}
+          />
+          <FilterTags
+            type='Albums'
+            link={`/search/${query}/albums`}
+          /> */}
         </div>
       )}
+      <div className='mt-5 px-4'>
+        <Outlet />
+      </div>
     </>
   );
 }

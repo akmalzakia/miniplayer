@@ -1,9 +1,9 @@
-import { Fragment, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import usePlayerContext from "../../../../hooks/Context/usePlayerContext";
 import { FiPause, FiPlay } from "react-icons/fi";
 import SpotifyImage from "../../../../component/SpotifyImage";
 import { CollectionImageResolution } from "../../../../utils/enums";
-import { isPlaylistTrack } from "../../../../utils/matchers";
+import { isFullTrack, isPlaylistTrack } from "../../../../utils/matchers";
 import { Link } from "react-router-dom";
 import utils from "../../../../utils/util";
 import useModalContext from "../../../../hooks/Context/useModalContext";
@@ -12,15 +12,24 @@ import PlayWarningModal from "../../../../component/Modals/PlayWarningModal";
 interface Props {
   item: SpotifyApi.TrackObjectSimplified | SpotifyApi.PlaylistTrackObject;
   idx: number;
-  collectionUri: string;
+  collectionUri?: string;
+  matchContext?: boolean;
 }
 
-function TrackItem({ item, idx, collectionUri }: Props) {
+function TrackItem({ item, idx, collectionUri, matchContext }: Props) {
   const [isHover, setIsHover] = useState(false);
   const { openModal } = useModalContext();
   const { playerDispatcher, currentContext, isActive } = usePlayerContext();
   const track = isPlaylistTrack(item) ? item.track : item;
-  const isSameContext = collectionUri === currentContext?.context?.uri;
+  const isSameContext = matchContext
+    ? collectionUri === currentContext?.context?.uri
+    : true; // forcefully match the context for case when the context are unavailable e.g artist page / search
+
+  const trackItem = useMemo(() => {
+    if (isPlaylistTrack(item)) {
+      return item.track;
+    } else return item;
+  }, [item]);
 
   const isPlayed =
     isActive &&
@@ -38,7 +47,11 @@ function TrackItem({ item, idx, collectionUri }: Props) {
       return;
     }
 
-    playerDispatcher.playCollectionTrack(collectionUri, trackUri);
+    if (collectionUri) {
+      playerDispatcher.playCollectionTrack(collectionUri, trackUri);
+    } else {
+      playerDispatcher.playTrackOnly(trackUri);
+    }
   }
 
   function pause() {
@@ -69,7 +82,7 @@ function TrackItem({ item, idx, collectionUri }: Props) {
 
   return (
     <tr
-      key={track?.id}
+      key={trackItem?.id}
       className={`hover:bg-spotify-hover ${
         isPlayed ? "border border-spotify-green" : ""
       }`}
@@ -94,36 +107,36 @@ function TrackItem({ item, idx, collectionUri }: Props) {
           ) : (
             <FiPlay
               className='m-auto'
-              onClick={() => play(track?.uri)}
+              onClick={() => play(trackItem?.uri)}
             />
           )
         ) : isHover ? (
           <FiPlay
             className='m-auto'
-            onClick={() => play(track?.uri)}
+            onClick={() => play(trackItem?.uri)}
           />
         ) : (
           <div className='pr-3'>{idx + 1}</div>
         )}
       </td>
       <td className='flex items-center py-2 gap-2'>
-        {isPlaylistTrack(item) && (
+        {trackItem && isFullTrack(trackItem) && (
           <div className='w-10 min-w-10'>
             <SpotifyImage
               resolution={CollectionImageResolution.Low}
               className='max-w-full max-h-full rounded-md'
-              images={item?.track?.album.images}
+              images={trackItem.album.images}
               lazy
             />
           </div>
         )}
         <div>
           <div className={`${isPlayed ? "text-spotify-green" : "text-white"}`}>
-            {track?.name}
+            {trackItem?.name}
           </div>
           <div className='inline gap-1'>
-            {track?.artists.map((artist, idx) => {
-              const separator = track.artists.length > idx + 1 && <>, </>;
+            {trackItem?.artists.map((artist, idx) => {
+              const separator = trackItem.artists.length > idx + 1 && <>, </>;
               return (
                 <Fragment key={artist.id}>
                   <Link
@@ -139,21 +152,23 @@ function TrackItem({ item, idx, collectionUri }: Props) {
           </div>
         </div>
       </td>
-      {isPlaylistTrack(item) && (
+      {trackItem && isFullTrack(trackItem) && (
         <>
           <td className='text-ellipsis overflow-hidden text-nowrap'>
             <Link
-              to={`/album/${item.track?.album.id}`}
+              to={`/album/${trackItem.album.id}`}
               className='hover:underline'
             >
-              {item.track?.album.name}
+              {trackItem.album.name}
             </Link>
           </td>
-          <td className='pr-2'>{formatDateAdded(item.added_at)}</td>
+          {isPlaylistTrack(item) && (
+            <td className='pr-2'>{formatDateAdded(item.added_at)}</td>
+          )}
         </>
       )}
       <td className='rounded-r-md'>
-        {utils.formatTimeMinSecond(track?.duration_ms)}
+        {utils.formatTimeMinSecond(trackItem?.duration_ms)}
       </td>
     </tr>
   );
