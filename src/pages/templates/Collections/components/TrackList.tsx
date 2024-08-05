@@ -10,7 +10,7 @@ interface Props {
 
 function TrackList({ type, tracks, collectionUri }: Props) {
   return (
-    <div className='pr-4'>
+    <div className='px-4'>
       <table className='table-fixed w-full text-sm text-spotify-gray'>
         <thead className='border-b border-gray-500'>
           <tr className='text-left'>

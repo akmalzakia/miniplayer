@@ -36,7 +36,7 @@ function Featured() {
   }, [featured, token]);
 
   return (
-    <div className=' h-full w-full px-2'>
+    <div className=' h-full w-full px-6 py-4'>
       <SingleDisplay
         title='Featured'
         data={featured}

@@ -62,7 +62,7 @@ function Artist() {
           </div>,
           portal
         )}
-      <div className='px-2'>
+      <div className='px-6 py-4'>
         <div
           ref={(node) => {
             if (node) {

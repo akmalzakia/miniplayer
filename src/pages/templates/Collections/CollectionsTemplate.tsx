@@ -110,6 +110,7 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
               );
             }
           }}
+          className='p-4'
         >
           <div className='w-full flex gap-6'>
             <div className='w-[30%] min-w-36 max-w-72'>
