@@ -6,6 +6,8 @@ import { spotifyAPI } from "../../api/spotifyAxios";
 import { TokenContext } from "../../context/tokenContext";
 import SimplifiedTrackList from "../Artist/components/SimplifiedTrackList";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import SingleDisplay from "../../component/SingleDisplay";
+import { SpotifyObjectType } from "../../utils/enums";
 
 function Search() {
   const portal = useContext(TopbarContentContext);
@@ -62,7 +64,7 @@ function Search() {
         <div className='px-2 mt-10'>
           {searchResult.tracks && (
             <>
-              <div className="text-2xl font-bold mb-2">Songs</div>
+              <div className='text-2xl font-bold mb-2'>Songs</div>
               <SimplifiedTrackList
                 tracks={searchResult.tracks.items}
                 expandable={{ enabled: false, preview: 4 }}
@@ -70,6 +72,30 @@ function Search() {
                 showArtist={true}
               />
             </>
+          )}
+          {searchResult.artists && (
+            <SingleDisplay
+              title='Artists'
+              data={searchResult.artists.items}
+              type={SpotifyObjectType.Artist}
+              lazy
+            />
+          )}
+          {searchResult.albums && (
+            <SingleDisplay
+              title='Albums'
+              data={searchResult.albums.items}
+              type={SpotifyObjectType.Album}
+              lazy
+            />
+          )}
+          {searchResult.playlists && (
+            <SingleDisplay
+              title='Playlists'
+              data={searchResult.playlists.items}
+              type={SpotifyObjectType.Playlist}
+              lazy
+            />
           )}
         </div>
       )}
