@@ -13,6 +13,9 @@ import AlbumList from "../pages/AlbumList/AlbumList";
 import Search from "../pages/Search/Search";
 import SearchSummary from "../pages/Search/SearchSummary";
 import SearchSongs from "../pages/Search/SearchSongs";
+import SearchArtists from "../pages/Search/SearchArtists";
+import SearchAlbums from "../pages/Search/SearchAlbums";
+import SearchPlaylists from "../pages/Search/SearchPlaylists";
 
 const router = createBrowserRouter([
   {
@@ -59,6 +62,18 @@ const router = createBrowserRouter([
           {
             path: "/search/:query/songs",
             element: <SearchSongs />,
+          },
+          {
+            path: "/search/:query/artists",
+            element: <SearchArtists />,
+          },
+          {
+            path: "/search/:query/albums",
+            element: <SearchAlbums />,
+          },
+          {
+            path: "/search/:query/playlists",
+            element: <SearchPlaylists />,
           },
         ],
       },

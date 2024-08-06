@@ -63,7 +63,7 @@ function Search() {
             type='Songs'
             link={`/search/${query}/songs`}
           />
-          {/* <FilterTags
+          <FilterTags
             type='Artists'
             link={`/search/${query}/artists`}
           />
@@ -74,7 +74,7 @@ function Search() {
           <FilterTags
             type='Albums'
             link={`/search/${query}/albums`}
-          /> */}
+          />
         </div>
       )}
       <div className='mt-5 px-4'>
