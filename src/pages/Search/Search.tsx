@@ -36,6 +36,7 @@ function Search() {
             className='w-80 h-12'
             onDebouncedInput={(query) => {
               // try to use regex + string.replace next time...
+              const q = encodeURIComponent(query);
               let path = "";
               if (!query) {
                 path = baseUrl;
@@ -44,7 +45,7 @@ function Search() {
                   matchPath(p, location.pathname)
                 );
                 if (!pattern) pattern = routes[0];
-                path = generatePath(pattern, { q: query });
+                path = generatePath(pattern, { q });
               }
               navigate(`${path}`, {
                 replace: location.pathname === baseUrl,
