@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { TokenContext } from "../context/tokenContext";
 import { spotifyAPI } from "../api/spotifyAxios";
 import { SpotifyObjectType } from "../utils/enums";
-import SingleDisplay from "../component/SingleDisplay";
+import GridDisplay from "../component/GridDisplay";
 
 function Featured() {
   const [featured, setFeatured] = useState<
@@ -37,7 +37,7 @@ function Featured() {
 
   return (
     <div className=' h-full w-full px-6 py-4'>
-      <SingleDisplay
+      <GridDisplay
         title='Featured'
         data={featured}
         type={SpotifyObjectType.Playlist}

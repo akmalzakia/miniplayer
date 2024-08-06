@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { TokenContext } from "../../context/tokenContext";
 import { spotifyAPI } from "../../api/spotifyAxios";
-import SingleDisplay from "../../component/SingleDisplay";
+import GridDisplay from "../../component/GridDisplay";
 import { SpotifyObjectType } from "../../utils/enums";
 
 function SearchAlbums() {
@@ -41,7 +41,7 @@ function SearchAlbums() {
   return (
     <div>
       {albums && (
-        <SingleDisplay
+        <GridDisplay
           data={albums.items}
           type={SpotifyObjectType.Album}
           isMulti={true}

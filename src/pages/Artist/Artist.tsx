@@ -7,7 +7,7 @@ import {
   CollectionImageResolution,
   SpotifyObjectType,
 } from "../../utils/enums";
-import SingleDisplay from "../../component/SingleDisplay";
+import GridDisplay from "../../component/GridDisplay";
 import useTopTracks from "../../hooks/Artist/useTopTracks";
 import useArtistAlbums from "../../hooks/Artist/useArtistAlbums";
 import useRelatedArtists from "../../hooks/Artist/useRelatedArtists";
@@ -123,7 +123,7 @@ function Artist() {
             ></SimplifiedTrackList>
           )}
         </div>
-        <SingleDisplay
+        <GridDisplay
           title='Albums'
           data={albums}
           type={SpotifyObjectType.Album}
@@ -131,7 +131,7 @@ function Artist() {
           detailLink='discography/all'
           lazy
         />
-        <SingleDisplay
+        <GridDisplay
           title='Related Artists'
           data={relatedArtists}
           type={SpotifyObjectType.Artist}

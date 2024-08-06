@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { spotifyAPI } from "../../api/spotifyAxios";
 import { useParams } from "react-router-dom";
 import { TokenContext } from "../../context/tokenContext";
-import SingleDisplay from "../../component/SingleDisplay";
+import GridDisplay from "../../component/GridDisplay";
 import { SpotifyObjectType } from "../../utils/enums";
 import SimplifiedTrackList from "../Artist/components/SimplifiedTrackList";
 
@@ -52,7 +52,7 @@ function SearchSummary() {
           </>
         )}
         {searchResult.artists && (
-          <SingleDisplay
+          <GridDisplay
             title='Artists'
             data={searchResult.artists.items}
             type={SpotifyObjectType.Artist}
@@ -60,7 +60,7 @@ function SearchSummary() {
           />
         )}
         {searchResult.albums && (
-          <SingleDisplay
+          <GridDisplay
             title='Albums'
             data={searchResult.albums.items}
             type={SpotifyObjectType.Album}
@@ -68,7 +68,7 @@ function SearchSummary() {
           />
         )}
         {searchResult.playlists && (
-          <SingleDisplay
+          <GridDisplay
             title='Playlists'
             data={searchResult.playlists.items}
             type={SpotifyObjectType.Playlist}

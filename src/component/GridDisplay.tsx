@@ -19,7 +19,7 @@ interface Props {
   isMulti?: boolean;
 }
 
-function SingleDisplay({
+function GridDisplay({
   title,
   type,
   data,
@@ -83,4 +83,4 @@ function SingleDisplay({
   );
 }
 
-export default SingleDisplay;
+export default GridDisplay;
