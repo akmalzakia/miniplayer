@@ -1,53 +1,35 @@
-import { useContext, useEffect, useState } from "react";
+import { useRef } from "react";
 import { useParams } from "react-router-dom";
-import { TokenContext } from "../../context/tokenContext";
-import { spotifyAPI } from "../../api/spotifyAxios";
 import GridDisplay from "../../component/GridDisplay";
 import { SpotifyObjectType } from "../../utils/enums";
+import useInfiniteSearch from "../../hooks/useInfiniteSearch";
 
 function SearchPlaylists() {
   const { query } = useParams();
-  const token = useContext(TokenContext);
-  const [playlists, setPlaylists] =
-    useState<SpotifyApi.PagingObject<SpotifyApi.PlaylistObjectSimplified> | null>(
-      null
-    );
-
-  useEffect(() => {
-    async function fetchPlaylists(query: string) {
-      try {
-        const res = await spotifyAPI.search(
-          {
-            query,
-            type: ["playlist"],
-            limit: 30,
-          },
-          token
-        );
-
-        if (!res.playlists) return;
-
-        setPlaylists(res.playlists);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    if (!query) return;
-
-    fetchPlaylists(query);
-  }, [query, token]);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const playlists = useInfiniteSearch<SpotifyApi.PlaylistObjectSimplified>(
+    {
+      query: query ?? "",
+      type: "playlist",
+      limit: 30,
+    },
+    triggerRef.current ?? undefined
+  );
 
   return (
     <div>
       {playlists && (
         <GridDisplay
-          data={playlists.items}
+          data={playlists}
           type={SpotifyObjectType.Playlist}
           isMulti={true}
           lazy
         />
       )}
+      <div
+        className='w-px h-px'
+        ref={triggerRef}
+      ></div>
     </div>
   );
 }
