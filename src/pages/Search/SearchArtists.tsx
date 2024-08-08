@@ -1,51 +1,34 @@
-import { useContext, useEffect, useState } from "react";
+import { useRef } from "react";
 import { useParams } from "react-router-dom";
-import { TokenContext } from "../../context/tokenContext";
-import { spotifyAPI } from "../../api/spotifyAxios";
 import GridDisplay from "../../component/GridDisplay";
 import { SpotifyObjectType } from "../../utils/enums";
+import useInfiniteSearch from "../../hooks/useInfiniteSearch";
 
 function SearchArtists() {
   const { query } = useParams();
-  const token = useContext(TokenContext);
-  const [artists, setArtists] =
-    useState<SpotifyApi.PagingObject<SpotifyApi.ArtistObjectFull> | null>(null);
-
-  useEffect(() => {
-    async function fetchArtists(query: string) {
-      try {
-        const res = await spotifyAPI.search(
-          {
-            query,
-            type: ["artist"],
-            limit: 30,
-          },
-          token
-        );
-
-        if (!res.artists) return;
-
-        setArtists(res.artists);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    if (!query) return;
-
-    fetchArtists(query);
-  }, [query, token]);
-
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const artists = useInfiniteSearch<SpotifyApi.ArtistObjectFull>(
+    {
+      query: query ?? "",
+      type: "artist",
+      limit: 30,
+    },
+    triggerRef.current ?? undefined
+  );
   return (
     <div>
       {artists && (
         <GridDisplay
-          data={artists.items}
+          data={artists}
           type={SpotifyObjectType.Artist}
           isMulti={true}
           lazy
         />
       )}
+      <div
+        className='w-px h-px'
+        ref={triggerRef}
+      ></div>
     </div>
   );
 }
