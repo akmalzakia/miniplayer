@@ -1,6 +1,7 @@
 import { CollectionType } from "../../../../utils/enums";
 import { isPlaylistTrack } from "../../../../utils/matchers";
 import TrackItem from "./TrackItem";
+import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   type?: CollectionType;
@@ -31,7 +32,9 @@ function TrackList({ type, tracks, collectionUri, matchContext }: Props) {
         <tbody>
           {tracks.map((item, idx) => (
             <TrackItem
-              key={isPlaylistTrack(item) ? item.track?.id : item.id}
+              key={`${
+                isPlaylistTrack(item) ? item.track?.id : item.id
+              }-${uuidv4()}`}
               idx={idx}
               collectionUri={collectionUri}
               item={item}

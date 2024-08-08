@@ -1,44 +1,32 @@
 import { useParams } from "react-router-dom";
 import TrackList from "../templates/Collections/components/TrackList";
-import { useContext, useEffect, useState } from "react";
-import { TokenContext } from "../../context/tokenContext";
-import { spotifyAPI } from "../../api/spotifyAxios";
+import { useRef } from "react";
+import useInfiniteSearch from "../../hooks/useInfiniteSearch";
 
 function SearchSongs() {
   const { query } = useParams();
-  const token = useContext(TokenContext);
-  const [tracks, setTracks] =
-    useState<SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull> | null>(null);
-
-  useEffect(() => {
-    async function fetchSongs(query: string) {
-      const res = await spotifyAPI.search(
-        {
-          query,
-          type: ["track"],
-          limit: 20,
-        },
-        token
-      );
-
-      if (!res.tracks) return;
-
-      setTracks(res.tracks);
-    }
-
-    if (!query) return;
-
-    fetchSongs(query);
-  }, [query, token]);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const tracks = useInfiniteSearch<SpotifyApi.TrackObjectFull>(
+    {
+      query: query ?? "",
+      type: "track",
+      limit: 20,
+    },
+    triggerRef.current ?? undefined
+  );
 
   return (
     <div>
       {tracks && (
         <TrackList
-          tracks={tracks?.items}
+          tracks={tracks}
           matchContext={false}
         />
       )}
+      <div
+        className='w-px h-px'
+        ref={triggerRef}
+      ></div>
     </div>
   );
 }
