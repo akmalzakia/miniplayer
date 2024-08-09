@@ -10,7 +10,7 @@ const Topbar = forwardRef<HTMLDivElement, unknown>(function Topbar(
 ) {
   const navigate = useNavigate();
   return (
-    <div className='flex sticky top-0 items-center px-4 py-2 justify-between z-10 text-lg gap-4'>
+    <div className='flex sticky top-0 items-center px-4 py-2 justify-between z-10 text-lg gap-4 h-16'>
       <Button
         className='!bg-black w-10 h-10'
         onClick={() => {
