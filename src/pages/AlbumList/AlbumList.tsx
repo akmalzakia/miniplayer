@@ -1,57 +1,39 @@
 import { useParams } from "react-router-dom";
-import useArtistAlbums from "../../hooks/Artist/useArtistAlbums";
-import { PaginatedRequestMode } from "../../utils/enums";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { AlbumGroup } from "../../utils/enums";
+import { useCallback, useContext, useRef, useState } from "react";
 import AlbumListItem from "./AlbumListItem";
 import MajorPlayButton from "../../component/Buttons/MajorPlayButton";
 import { createPortal } from "react-dom";
 import { TopbarContentContext } from "../../context/topbarContext";
+import useInfinite from "../../hooks/useInfinite";
+import { spotifyAPI } from "../../api/spotifyAxios";
+import { TokenContext } from "../../context/tokenContext";
 
 function AlbumList() {
   const portal = useContext(TopbarContentContext);
   const { id: artistId } = useParams();
-  const [albums, isAlbumsLoading, requestPaginated] = useArtistAlbums(
-    artistId || "",
-    5
-  );
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const token = useContext(TokenContext);
   const [currentAlbum, setCurrentAlbum] =
     useState<SpotifyApi.AlbumObjectSimplified | null>(null);
-  const loaderRef = useRef(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const requestMoreData = useCallback(async () => {
-    if (isAlbumsLoading && isLoadingMore) return;
-    try {
-      setIsLoadingMore(true);
-      await requestPaginated(PaginatedRequestMode.Next);
-      setIsLoadingMore(false);
-    } catch (error) {
-      console.log(error);
-      setIsLoadingMore(true);
-    }
-  }, [isAlbumsLoading, isLoadingMore, requestPaginated]);
+  const fetchAlbums = useCallback(async () => {
+    return await spotifyAPI.getArtistAlbums(
+      artistId || "",
+      {
+        include_groups: [AlbumGroup.All],
+        limit: 5,
+        offset: 0,
+      },
+      token
+    );
+  }, [artistId, token]);
 
-  useEffect(() => {
-    let observerRefValue = null;
-    const observer = new IntersectionObserver((entries) => {
-      const target = entries[0];
-      if (target.isIntersecting) {
-        requestMoreData();
-      }
-    });
-
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
-      observerRefValue = loaderRef.current;
-    }
-
-    return () => {
-      if (observerRefValue) {
-        observer.unobserve(observerRefValue);
-      }
-    };
-  }, [requestMoreData]);
+  const albums = useInfinite<
+    SpotifyApi.AlbumObjectSimplified,
+    SpotifyApi.ArtistsAlbumsResponse
+  >(fetchAlbums, triggerRef.current || undefined);
 
   return (
     <>
@@ -83,7 +65,7 @@ function AlbumList() {
           }}
         />
       ))}
-      <div ref={loaderRef}></div>
+      <div ref={triggerRef}></div>
     </>
   );
 }

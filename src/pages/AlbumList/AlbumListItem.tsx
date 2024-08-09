@@ -68,7 +68,7 @@ function AlbumListItem({ album, onHeaderAbove, onTrackAbove }: Props) {
       ref={loaderRef}
     >
       <div
-        className='flex gap-5 mb-5'
+        className='flex gap-5 mb-5 mx-4'
         ref={(node) => {
           if (node) {
             observeElementIntersectTop(
