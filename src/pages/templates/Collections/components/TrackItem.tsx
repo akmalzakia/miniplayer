@@ -6,8 +6,6 @@ import { CollectionImageResolution } from "../../../../utils/enums";
 import { isFullTrack, isPlaylistTrack } from "../../../../utils/matchers";
 import { Link } from "react-router-dom";
 import utils from "../../../../utils/util";
-import useModalContext from "../../../../hooks/Context/useModalContext";
-import PlayWarningModal from "../../../../component/Modals/PlayWarningModal";
 
 interface Props {
   item: SpotifyApi.TrackObjectSimplified | SpotifyApi.PlaylistTrackObject;
@@ -18,7 +16,6 @@ interface Props {
 
 function TrackItem({ item, idx, collectionUri, matchContext }: Props) {
   const [isHover, setIsHover] = useState(false);
-  const { openModal } = useModalContext();
   const { playerDispatcher, currentContext, isActive } = usePlayerContext();
   const track = isPlaylistTrack(item) ? item.track : item;
   const isSameContext = matchContext
@@ -35,24 +32,6 @@ function TrackItem({ item, idx, collectionUri, matchContext }: Props) {
     isActive &&
     currentContext?.current_track?.uri === track?.uri &&
     isSameContext;
-  function play(trackUri?: string) {
-    if (!trackUri) return;
-
-    if (!currentContext) {
-      openModal(
-        <PlayWarningModal
-          transferPlayback={playerDispatcher.transferPlayback}
-        />
-      );
-      return;
-    }
-
-    if (collectionUri) {
-      playerDispatcher.playCollectionTrack(collectionUri, trackUri);
-    } else {
-      playerDispatcher.playTrackOnly(trackUri);
-    }
-  }
 
   function pause() {
     playerDispatcher.pause();
@@ -107,13 +86,17 @@ function TrackItem({ item, idx, collectionUri, matchContext }: Props) {
           ) : (
             <FiPlay
               className='m-auto'
-              onClick={() => play(trackItem?.uri)}
+              onClick={() =>
+                playerDispatcher.playTrack(trackItem?.uri, collectionUri)
+              }
             />
           )
         ) : isHover ? (
           <FiPlay
             className='m-auto'
-            onClick={() => play(trackItem?.uri)}
+            onClick={() =>
+              playerDispatcher.playTrack(trackItem?.uri, collectionUri)
+            }
           />
         ) : (
           <div className='pr-3'>{idx + 1}</div>

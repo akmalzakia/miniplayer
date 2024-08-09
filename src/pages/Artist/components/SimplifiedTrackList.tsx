@@ -3,8 +3,6 @@ import utils from "../../../utils/util";
 import SpotifyImage from "../../../component/SpotifyImage";
 import usePlayerContext from "../../../hooks/Context/usePlayerContext";
 import { FiPause, FiPlay } from "react-icons/fi";
-import PlayWarningModal from "../../../component/Modals/PlayWarningModal";
-import useModalContext from "../../../hooks/Context/useModalContext";
 import { CollectionImageResolution } from "../../../utils/enums";
 import { FaPlay } from "react-icons/fa6";
 import { Link } from "react-router-dom";
@@ -28,20 +26,6 @@ function SimplifiedTrackList({
   const { playerDispatcher, currentContext, isActive } = usePlayerContext();
   const isTrackPlayed = (trackId?: string) =>
     isActive && currentContext?.current_track?.uri === trackId;
-  const { openModal } = useModalContext();
-
-  function play(track: SpotifyApi.TrackObjectFull) {
-    if (!currentContext) {
-      openModal(
-        <PlayWarningModal
-          transferPlayback={playerDispatcher.transferPlayback}
-        />
-      );
-      return;
-    }
-
-    playerDispatcher.playTrackOnly(track.uri);
-  }
 
   return (
     <>
@@ -82,13 +66,13 @@ function SimplifiedTrackList({
                       ) : (
                         <FiPlay
                           className='my-1'
-                          onClick={() => play(track)}
+                          onClick={() => playerDispatcher.playTrack(track.uri)}
                         />
                       )
                     ) : currentHover === track.id ? (
                       <FiPlay
                         className='my-1'
-                        onClick={() => play(track)}
+                        onClick={() => playerDispatcher.playTrack(track.uri)}
                       />
                     ) : (
                       idx + 1
@@ -113,13 +97,15 @@ function SimplifiedTrackList({
                         ) : (
                           <FaPlay
                             className='text-white absolute inset-0 m-auto'
-                            onClick={() => play(track)}
+                            onClick={() =>
+                              playerDispatcher.playTrack(track.uri)
+                            }
                           />
                         )
                       ) : (
                         <FaPlay
                           className='text-white absolute inset-0 m-auto'
-                          onClick={() => play(track)}
+                          onClick={() => playerDispatcher.playTrack(track.uri)}
                         />
                       )}
                     </div>

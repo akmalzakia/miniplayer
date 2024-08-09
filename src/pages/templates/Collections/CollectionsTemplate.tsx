@@ -185,6 +185,7 @@ function CollectionsTemplate({ type, collection, isDataLoading }: Props) {
           type={type}
           tracks={collection.tracks.items}
           collectionUri={collection.uri}
+          matchContext={true}
         ></TrackList>
       </>
     )

@@ -33,6 +33,7 @@ interface PlayerContextType {
     playCollectionTrack(collectionUri: string, trackUri: string): Promise<void>;
     playArtist(artistUri: string, isTrackOnTopTracks: boolean): Promise<void>;
     playTrackOnly(trackUri: string): Promise<void>;
+    playTrack(trackUri?: string, collectionUri?: string): void;
   };
   currentContext: DataContext | null;
   setSpotifyContext(context: DataContext | null): void;
@@ -313,6 +314,30 @@ export function PlayerProvider({ children }: PropsWithChildren) {
     [currentContext, isActive, player, token, openModal, transferPlayback]
   );
 
+  const playTrack = useCallback(
+    (trackUri?: string, collectionUri?: string) => {
+      if (!trackUri) return;
+
+      if (!currentContext) {
+        openModal(<PlayWarningModal transferPlayback={transferPlayback} />);
+        return;
+      }
+
+      if (collectionUri) {
+        playCollectionTrack(collectionUri, trackUri);
+      } else {
+        playTrackOnly(trackUri);
+      }
+    },
+    [
+      currentContext,
+      openModal,
+      playCollectionTrack,
+      playTrackOnly,
+      transferPlayback,
+    ]
+  );
+
   const setSpotifyContext = useCallback((context: DataContext) => {
     setCurrentContext(context);
   }, []);
@@ -325,6 +350,7 @@ export function PlayerProvider({ children }: PropsWithChildren) {
       playCollectionTrack,
       playArtist,
       playTrackOnly,
+      playTrack,
     };
   }, [
     pause,
@@ -333,6 +359,7 @@ export function PlayerProvider({ children }: PropsWithChildren) {
     playCollectionTrack,
     playArtist,
     playTrackOnly,
+    playTrack,
   ]);
 
   return (
