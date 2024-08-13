@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { CollectionImageResolution, SpotifyObjectType } from "../utils/enums";
 import utils from "../utils/util";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
 import { isAlbum, isPlaylist } from "../utils/matchers";
 import SpotifyImage from "./SpotifyImage";
+import MajorPlayButton from "./Buttons/MajorPlayButton";
+import style from './Buttons/QuickPlayButton.module.css'
 
 interface Props extends React.ComponentPropsWithRef<"div"> {
   type: SpotifyObjectType;
@@ -16,7 +18,8 @@ interface Props extends React.ComponentPropsWithRef<"div"> {
   rounded?: boolean;
   imageResolution: CollectionImageResolution;
   imagePriority?: "high" | "low" | "auto";
-  lazy?: boolean
+  lazy?: boolean;
+  playButton?: boolean;
 }
 
 const SpotifyObjectCard = forwardRef<
@@ -32,11 +35,13 @@ const SpotifyObjectCard = forwardRef<
     imagePriority,
     imageResolution,
     lazy,
+    playButton,
     ...rest
   },
   ref
 ) {
   const navigate = useNavigate();
+  const [isHover, setIsHover] = useState(false);
 
   return (
     <div
@@ -47,17 +52,31 @@ const SpotifyObjectCard = forwardRef<
         navigate(`/${type}/${data.id}`);
       }}
       ref={ref}
+      onMouseEnter={() => {
+        setIsHover(true);
+      }}
+      onMouseLeave={() => {
+        setIsHover(false);
+      }}
       {...rest}
     >
-      <SpotifyImage
-        className={`max-w-full max-h-full aspect-square object-cover ${
-          rounded ? "rounded-full" : "rounded-md"
-        }`}
-        images={data.images}
-        priority={imagePriority}
-        resolution={imageResolution}
-        lazy={lazy}
-      ></SpotifyImage>
+      <div className='relative'>
+        <SpotifyImage
+          className={`max-w-full max-h-full aspect-square object-cover ${
+            rounded ? "rounded-full" : "rounded-md"
+          }`}
+          images={data.images}
+          priority={imagePriority}
+          resolution={imageResolution}
+          lazy={lazy}
+        ></SpotifyImage>
+        {playButton && (
+          <MajorPlayButton
+            className={`absolute z-10 bottom-2 right-2 ${isHover ? style.appear : style.disappear}`}
+            playableObjects={data}
+          />
+        )}
+      </div>
       {!imageOnly && (
         <>
           <div className='text-base text-nowrap overflow-hidden text-ellipsis'>

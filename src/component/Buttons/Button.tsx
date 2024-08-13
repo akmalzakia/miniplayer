@@ -34,7 +34,7 @@ function Button({
           return (
             <button
               ref={ref}
-              className={`text-white p-2 rounded-full shadow-lg no-underline bg-spotify-green ${className}`}
+              className={`text-white p-2 rounded-full shadow-lg no-underline bg-spotify-green hover:bg-spotify-light-green ${className}`}
               onClick={(ev) => {
                 onClick?.(ev);
               }}

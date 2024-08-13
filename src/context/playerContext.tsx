@@ -27,6 +27,7 @@ interface PlayerContextType {
       collection:
         | SpotifyApi.AlbumObjectFull
         | SpotifyApi.PlaylistObjectFull
+        | SpotifyApi.PlaylistObjectSimplified
         | SpotifyApi.AlbumObjectSimplified,
       isTrackOnCollection: boolean
     ): Promise<void>;
@@ -235,7 +236,7 @@ export function PlayerProvider({ children }: PropsWithChildren) {
 
   const playCollectionTrack = useCallback(
     async (collectionUri: string, trackUri: string) => {
-      const isSameContext = collectionUri === currentContext?.context?.uri
+      const isSameContext = collectionUri === currentContext?.context?.uri;
       const isCurrentTrack = trackUri === currentContext?.current_track?.uri;
       if (player.instance && isActive && isCurrentTrack && isSameContext) {
         player.instance.resume();

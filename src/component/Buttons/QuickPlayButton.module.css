@@ -1,0 +1,44 @@
+:root {
+  --start-bottom: 0.1rem;
+  --end-bottom: 0.5rem;
+  --end-right: 0.5rem;
+  --animation-time: 0.2s;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    bottom: var(--start-bottom);
+    visibility: hidden;
+  }
+  100% {
+    opacity: 1;
+    bottom: var(--end-bottom);
+    right: var(--end-right);
+    visibility: visible;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    bottom: var(--end-bottom);
+    right: var(--end-right);
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    bottom: var(--start-bottom);
+    visibility: hidden;
+  }
+}
+
+.appear {
+  animation: fadeIn var(--animation-time) ease-in 1;
+  visibility: visible;
+}
+
+.disappear {
+  animation: fadeOut var(--animation-time) ease-in 1;
+  visibility: hidden;
+}

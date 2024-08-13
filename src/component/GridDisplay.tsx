@@ -27,7 +27,7 @@ function GridDisplay({
   detailLink,
   imagePriority,
   lazy,
-  isMulti,
+  isMulti
 }: Props) {
   const [columnSize, columnRef] = useSingleColumnDisplay(180);
   const isShowAllNeeded =
@@ -75,6 +75,7 @@ function GridDisplay({
                   imageResolution={CollectionImageResolution.Medium}
                   imagePriority={imagePriority}
                   lazy={lazy}
+                  playButton
                 />
               );
             })}
