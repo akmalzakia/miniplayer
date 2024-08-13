@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { memo, useLayoutEffect, useRef, useState } from "react";
 import Image from "./Image";
 import { CollectionImageResolution } from "../utils/enums";
 import imgUnavailable from "../assets/bar-img-unavailable.png";
@@ -11,7 +11,7 @@ interface Props {
   lazy?: boolean;
 }
 
-function SpotifyImage({
+const SpotifyImage = memo(function SpotifysImage({
   className,
   images,
   priority,
@@ -80,6 +80,6 @@ function SpotifyImage({
       loading={lazy ? "lazy" : "eager"}
     ></Image>
   );
-}
+})
 
 export default SpotifyImage;

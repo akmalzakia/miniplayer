@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { CollectionType } from "../../../../utils/enums";
 import { isPlaylistTrack } from "../../../../utils/matchers";
 import TrackItem from "./TrackItem";
@@ -10,7 +11,12 @@ interface Props {
   matchContext?: boolean;
 }
 
-function TrackList({ type, tracks, collectionUri, matchContext }: Props) {
+const TrackList = memo(function TrackList({
+  type,
+  tracks,
+  collectionUri,
+  matchContext,
+}: Props) {
   return (
     <div className='px-4'>
       <table className='table-fixed w-full text-sm text-spotify-gray'>
@@ -45,6 +51,6 @@ function TrackList({ type, tracks, collectionUri, matchContext }: Props) {
       </table>
     </div>
   );
-}
+});
 
 export default TrackList;
