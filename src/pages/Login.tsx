@@ -4,7 +4,7 @@ import spotifyImg from "../assets/Spotify_Logo_CMYK_White.png";
 function Login() {
   async function handleLogin() {
     const scope =
-      "streaming user-read-email user-read-private playlist-read-collaborative playlist-read-private user-read-playback-state";
+      "streaming user-read-email user-read-private playlist-read-collaborative playlist-read-private user-read-playback-state user-modify-playback-state";
     const authUrl = new URL("https://accounts.spotify.com/authorize");
 
     const codeVerifier = utils.generateRandomString(64);
