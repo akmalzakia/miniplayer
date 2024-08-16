@@ -25,18 +25,45 @@ function Login() {
   }
 
   return (
-    <div className='w-full h-full'>
+    <div className='w-full h-full bg-spotify-black'>
       <header className='w-full h-full flex'>
-        <button
-          className='bg-spotify-green py-3 px-5 rounded-full m-auto'
-          onClick={handleLogin}
-        >
-          Login with{" "}
-          <img
-            src={spotifyImg}
-            className='inline w-20 ml-2'
-          ></img>
-        </button>
+        <div className='flex flex-col p-4 m-auto w-1/3 justify-between gap-10'>
+          <div>
+            <div className='font-bold text-2xl text-spotify-green mb-3'>
+              Important
+            </div>
+            <p>
+              For anyone that want to access the website, you can use this
+              account
+            </p>
+            <div className='py-2'>
+              <p>Email : de2602990@gmail.com</p>
+              <p>Password : KW(uWT\519q;G.m|</p>
+            </div>
+            <p>
+              You can&apos;t access the webplayer though, since it is not a
+              premium user. If you would like to use your own (premium) account,
+              feel free to contact me at{" "}
+              <a
+                href='mailto:zakiasmara11@gmail.com'
+                className='text-spotify-green'
+              >
+                zakiasmara11@gmail.com
+              </a>{" "}
+              or <span>(+62) 81336427692</span>
+            </p>
+          </div>
+          <button
+            className='bg-spotify-green py-3 px-5 rounded-full'
+            onClick={handleLogin}
+          >
+            Login with{" "}
+            <img
+              src={spotifyImg}
+              className='inline w-20 ml-2'
+            ></img>
+          </button>
+        </div>
       </header>
     </div>
   );
