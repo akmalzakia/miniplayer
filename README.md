@@ -1,10 +1,8 @@
 # Important
 
-For anyone that want to access the website, you can use this account  
-Email : de2602990@gmail.com  
-Password : KW(uWT\519q;G.m|  
-You can't access the webplayer though, since it is not a premium user.  
-If you would like to use your own (premium) account, feel free to contact me at zakiasmara11@gmail.com or (+62) 81336427692
+To access the website, you need to be registered to Spotify and the website dashboard.
+For anyone that want to access the website, please contact me at zakiasmara11@gmail.com.
+
 
 # Known Bugs / Unimplemented Features
 
